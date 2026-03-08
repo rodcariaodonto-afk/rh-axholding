@@ -1,6 +1,5 @@
 import { UseFormReturn } from "react-hook-form";
 import { Sparkles, Loader2, Rocket, Building2, Scale, Palette } from "lucide-react";
-import { useNavigate } from "react-router-dom";
 import {
   FormControl,
   FormField,
@@ -13,8 +12,6 @@ import { Button } from "@/components/ui/button";
 import { RichTextEditor } from "@/components/ui/rich-text-editor";
 import { WORK_MODEL_LABELS, CONTRACT_TYPE_LABELS, JOB_SENIORITY_LABELS } from "@/constants/jobOptions";
 import { useGeneratePositionDescription } from "@/hooks/useGeneratePositionDescription";
-import { useOrganizationIntegrations } from "@/hooks/useOrganizationIntegrations";
-import { useCurrentOrganization } from "@/hooks/useCurrentOrganization";
 import { toast } from "sonner";
 import type { JobFormData, DescriptionTone, JobSeniority } from "@/types/job";
 import { cn } from "@/lib/utils";
@@ -56,30 +53,12 @@ const TONE_OPTIONS: {
 ];
 
 export function JobStepDescription({ form }: JobStepDescriptionProps) {
-  const navigate = useNavigate();
   const { mutateAsync: generateDescription, isPending: isGenerating } = useGeneratePositionDescription();
-  const { organizationId } = useCurrentOrganization();
-  const { data: integrations } = useOrganizationIntegrations(organizationId);
-
-  const hasAnthropicIntegration = integrations?.some(
-    (i) => i.provider === "anthropic" && i.is_active
-  );
 
   const handleGenerateWithAI = async () => {
     const values = form.getValues();
 
     if (!values.title) {
-      return;
-    }
-
-    if (!hasAnthropicIntegration) {
-      toast.error("Integração com IA não configurada", {
-        description: "Configure a chave da Anthropic para gerar descrições com IA.",
-        action: {
-          label: "Configurar",
-          onClick: () => navigate("/company-settings/integrations"),
-        },
-      });
       return;
     }
 

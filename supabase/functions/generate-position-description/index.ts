@@ -1,6 +1,5 @@
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
 import { createClient, SupabaseClient } from "https://esm.sh/@supabase/supabase-js@2";
-import { getIntegrationSecret } from "../_shared/get-integration-secret.ts";
 import { checkRateLimit, getRateLimitKey } from "../_shared/rate-limit.ts";
 import { checkOrgRole } from "../_shared/check-org-role.ts";
 
@@ -33,9 +32,6 @@ Gere uma descrição profissional e detalhada para o cargo informado, incluindo:
 ## Formato de Saída
 Retorne o conteúdo em Markdown bem formatado, pronto para exibição.`;
 
-/**
- * Validates user authentication and returns user ID and organization
- */
 async function validateAuth(
   req: Request,
   supabaseAdmin: SupabaseClient
@@ -58,7 +54,6 @@ async function validateAuth(
     };
   }
 
-  // Create client with user's token to validate
   const supabaseClient = createClient(
     Deno.env.get("SUPABASE_URL")!,
     Deno.env.get("SUPABASE_ANON_KEY")!,
@@ -84,8 +79,6 @@ async function validateAuth(
   }
 
   const userId = user.id;
-
-  // Check if user has admin or people role (org-scoped)
   const orgAuth = await checkOrgRole(supabaseAdmin, userId, ["admin", "people"]);
   
   if (!orgAuth.authorized) {
@@ -122,26 +115,20 @@ const discProfiles: Record<string, { name: string; traits: string }> = {
 serve(async (req) => {
   const requestId = crypto.randomUUID().slice(0, 8);
 
-  // Handle CORS preflight
   if (req.method === "OPTIONS") {
     return new Response(null, { status: 204, headers: corsHeaders });
   }
 
   console.log(`[${FUNCTION_NAME}][${requestId}] Start`);
 
-  // Initialize admin client
   const supabaseAdmin = createClient(
     Deno.env.get("SUPABASE_URL")!,
     Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!
   );
 
-  // Validate authentication
   const { userId, organizationId, error: authError } = await validateAuth(req, supabaseAdmin);
-  if (authError) {
-    return authError;
-  }
+  if (authError) return authError;
 
-  // === SECURITY: Rate limiting (SEC-007) ===
   const rlKey = getRateLimitKey(req, userId);
   const rl = await checkRateLimit(supabaseAdmin, rlKey, FUNCTION_NAME);
   if (!rl.allowed) return rl.response!;
@@ -149,8 +136,6 @@ serve(async (req) => {
   try {
     const body = await req.json();
     const { title, expected_profile_code, activities, parent_position_title } = body;
-
-    
 
     if (!title || typeof title !== "string" || title.trim().length === 0) {
       return new Response(
@@ -164,36 +149,16 @@ serve(async (req) => {
       );
     }
 
-    // Get Anthropic API key from vault
-    let ANTHROPIC_API_KEY: string | null = null;
-    let apiKeySource = "none";
-
-    if (organizationId) {
-      ANTHROPIC_API_KEY = await getIntegrationSecret(supabaseAdmin, organizationId, "anthropic", {
-        updateLastUsed: true,
-      });
-      if (ANTHROPIC_API_KEY) {
-        apiKeySource = "vault";
-      }
-    }
-
-    // Fallback to global env
-    if (!ANTHROPIC_API_KEY) {
-      ANTHROPIC_API_KEY = Deno.env.get("ANTHROPIC_API_KEY") || null;
-      if (ANTHROPIC_API_KEY) {
-        apiKeySource = "global";
-      }
-    }
-
-    // No key available
-    if (!ANTHROPIC_API_KEY) {
-      console.error(`[${FUNCTION_NAME}][${requestId}] No Anthropic API key available`);
+    // Check for LOVABLE_API_KEY
+    const LOVABLE_API_KEY = Deno.env.get("LOVABLE_API_KEY");
+    if (!LOVABLE_API_KEY) {
+      console.error(`[${FUNCTION_NAME}][${requestId}] LOVABLE_API_KEY not configured`);
       return new Response(
         JSON.stringify({
           type: "about:blank",
           title: "Integration Not Configured",
           status: 424,
-          detail: "Integração com IA não configurada. Configure a integração com Anthropic nas configurações.",
+          detail: "Integração com IA não configurada. LOVABLE_API_KEY ausente.",
         }),
         { status: 424, headers: { ...corsHeaders, "Content-Type": "application/problem+json" } }
       );
@@ -216,31 +181,50 @@ serve(async (req) => {
 
 Por favor, siga a estrutura definida e retorne o conteúdo em Markdown.`;
 
-    console.log(`[${FUNCTION_NAME}][${requestId}] Calling AI`);
+    console.log(`[${FUNCTION_NAME}][${requestId}] Calling Lovable AI`);
 
-    const response = await fetch("https://api.anthropic.com/v1/messages", {
+    const response = await fetch("https://ai.gateway.lovable.dev/v1/chat/completions", {
       method: "POST",
       headers: {
-        "x-api-key": ANTHROPIC_API_KEY,
-        "anthropic-version": "2023-06-01",
+        Authorization: `Bearer ${LOVABLE_API_KEY}`,
         "Content-Type": "application/json",
       },
       body: JSON.stringify({
-        model: "claude-sonnet-4-20250514",
-        max_tokens: 2048,
-        system: SYSTEM_PROMPT,
+        model: "google/gemini-3-flash-preview",
         messages: [
-          {
-            role: "user",
-            content: userPrompt,
-          },
+          { role: "system", content: SYSTEM_PROMPT },
+          { role: "user", content: userPrompt },
         ],
       }),
     });
 
     if (!response.ok) {
       const errorText = await response.text();
-      console.error(`[${FUNCTION_NAME}][${requestId}] Anthropic API error: ${response.status} ${errorText}`);
+      console.error(`[${FUNCTION_NAME}][${requestId}] AI gateway error: ${response.status} ${errorText}`);
+      
+      if (response.status === 429) {
+        return new Response(
+          JSON.stringify({
+            type: "about:blank",
+            title: "Rate Limited",
+            status: 429,
+            detail: "Limite de requisições excedido. Tente novamente em alguns segundos.",
+          }),
+          { status: 429, headers: { ...corsHeaders, "Content-Type": "application/problem+json" } }
+        );
+      }
+      if (response.status === 402) {
+        return new Response(
+          JSON.stringify({
+            type: "about:blank",
+            title: "Payment Required",
+            status: 402,
+            detail: "Créditos de IA esgotados. Entre em contato com o administrador.",
+          }),
+          { status: 402, headers: { ...corsHeaders, "Content-Type": "application/problem+json" } }
+        );
+      }
+
       return new Response(
         JSON.stringify({
           type: "about:blank",
@@ -253,10 +237,9 @@ Por favor, siga a estrutura definida e retorne o conteúdo em Markdown.`;
     }
 
     const aiResponse = await response.json();
-    const contentBlock = aiResponse.content?.[0];
-    const description = contentBlock?.type === "text" ? contentBlock.text : "";
+    const description = aiResponse.choices?.[0]?.message?.content || "";
 
-    console.log(`[${FUNCTION_NAME}][${requestId}] Completed (length: ${description.length}, source: ${apiKeySource})`);
+    console.log(`[${FUNCTION_NAME}][${requestId}] Completed (length: ${description.length})`);
 
     return new Response(
       JSON.stringify({ description }),
