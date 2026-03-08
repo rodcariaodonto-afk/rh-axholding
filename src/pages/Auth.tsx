@@ -362,6 +362,18 @@ const Auth = () => {
                       "Entrar"
                     )}
                   </Button>
+
+                  <Button
+                    type="button"
+                    variant="link"
+                    className="w-full text-sm text-muted-foreground"
+                    onClick={() => {
+                      setShowForgotPassword(true);
+                      setForgotEmail(email);
+                    }}
+                  >
+                    Esqueci minha senha
+                  </Button>
                 </form>
               </TabsContent>
 
