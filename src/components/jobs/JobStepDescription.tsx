@@ -1,6 +1,5 @@
 import { UseFormReturn } from "react-hook-form";
 import { Sparkles, Loader2, Rocket, Building2, Scale, Palette } from "lucide-react";
-import { useNavigate } from "react-router-dom";
 import {
   FormControl,
   FormField,
