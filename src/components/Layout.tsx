@@ -1,4 +1,4 @@
-import { createContext, useContext } from "react";
+import { createContext, useContext, lazy, Suspense } from "react";
 import { SidebarProvider, SidebarInset, SidebarTrigger } from "@/components/ui/sidebar";
 import { AppSidebar } from "@/components/AppSidebar";
 import { useAuth } from "@/hooks/useAuth";
