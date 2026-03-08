@@ -1,5 +1,7 @@
 import { createContext, useContext, lazy, Suspense } from "react";
 import { SidebarProvider, SidebarInset, SidebarTrigger } from "@/components/ui/sidebar";
+
+const FloatingChat = lazy(() => import("@/components/FloatingChat"));
 import { AppSidebar } from "@/components/AppSidebar";
 import { useAuth } from "@/hooks/useAuth";
 import { ThemeToggle } from "@/components/ThemeToggle";
