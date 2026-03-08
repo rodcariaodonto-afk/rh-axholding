@@ -1,7 +1,6 @@
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
 import { createClient, SupabaseClient } from "https://esm.sh/@supabase/supabase-js@2";
 import { encode as base64Encode } from "https://deno.land/std@0.168.0/encoding/base64.ts";
-import { getIntegrationSecret } from "../_shared/get-integration-secret.ts";
 import { checkRateLimit, getRateLimitKey } from "../_shared/rate-limit.ts";
 import { checkOrgRole } from "../_shared/check-org-role.ts";
 
@@ -9,7 +8,7 @@ const FUNCTION_NAME = "analyze-candidate";
 
 const corsHeaders = {
   "Access-Control-Allow-Origin": "*",
-  "Access-Control-Allow-Headers": "authorization, x-client-info, apikey, content-type",
+  "Access-Control-Allow-Headers": "authorization, x-client-info, apikey, content-type, x-supabase-client-platform, x-supabase-client-platform-version, x-supabase-client-runtime, x-supabase-client-runtime-version",
 };
 
 // Fixed UUID for Talent Bank job
@@ -35,7 +34,7 @@ Para candidatos do Banco de Talentos, o descritivo correto é a concatenação d
 - **86-100**: Excepcional, atende >90% + diferenciais
 
 IMPORTANTE: 
-- ANALISE O CURRÍCULO PDF ANEXADO em detalhe
+- Se houver informações do currículo, analise em detalhe
 - Compare CADA requisito da vaga com as evidências do currículo
 - Seja RIGOROSO - notas altas apenas com evidências concretas
 
@@ -46,11 +45,6 @@ Retorne APENAS JSON válido:
   "relatorio_detalhado": "<relatório com: Resumo Geral, Avaliação Técnica, Avaliação Comportamental, Fit Cultural, Match com Vaga, Riscos, Recomendação Final>"
 }`;
 
-/**
- * Validates user authentication and authorization
- * Returns user ID if valid, null otherwise
- * Also allows service role key for internal calls
- */
 async function validateAuth(
   req: Request,
   supabaseAdmin: SupabaseClient
@@ -70,14 +64,12 @@ async function validateAuth(
 
   const token = authHeader.replace("Bearer ", "");
   
-  // Check if this is a service role key (internal call from submit-application)
   const serviceRoleKey = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY");
   if (serviceRoleKey && token === serviceRoleKey) {
     console.log(`[${FUNCTION_NAME}] Authenticated via service role key (internal call)`);
     return { userId: "service-role", isServiceRole: true, error: null };
   }
 
-  // Create client with user's token to validate
   const supabaseClient = createClient(
     Deno.env.get("SUPABASE_URL")!,
     Deno.env.get("SUPABASE_ANON_KEY")!,
@@ -98,8 +90,6 @@ async function validateAuth(
   }
 
   const userId = user.id;
-
-  // Check if user has admin or people role (org-scoped)
   const orgAuth = await checkOrgRole(supabaseAdmin, userId, ["admin", "people"]);
   
   if (!orgAuth.authorized) {
@@ -116,37 +106,6 @@ async function validateAuth(
   return { userId, isServiceRole: false, error: null };
 }
 
-/**
- * Resolve organization ID from job's created_by user
- */
-async function resolveOrganizationId(
-  supabaseAdmin: SupabaseClient,
-  jobId: string
-): Promise<string | null> {
-  // Get job's created_by
-  const { data: job, error: jobError } = await supabaseAdmin
-    .from("jobs")
-    .select("created_by")
-    .eq("id", jobId)
-    .single();
-
-  if (jobError || !job?.created_by) {
-    return null;
-  }
-
-  // Use existing RPC to get user's organization
-  const { data: orgId, error: orgError } = await supabaseAdmin.rpc(
-    "get_user_organization",
-    { _user_id: job.created_by }
-  );
-
-  if (orgError) {
-    return null;
-  }
-
-  return orgId;
-}
-
 serve(async (req) => {
   const requestId = crypto.randomUUID().slice(0, 8);
   
@@ -156,19 +115,14 @@ serve(async (req) => {
 
   console.log(`[${FUNCTION_NAME}][${requestId}] Start`);
 
-  // Initialize admin client first (needed for auth validation)
   const supabaseAdmin = createClient(
     Deno.env.get("SUPABASE_URL")!,
     Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!
   );
 
-  // === SECURITY: Validate authentication and authorization ===
   const { userId, error: authError, isServiceRole } = await validateAuth(req, supabaseAdmin);
-  if (authError) {
-    return authError;
-  }
+  if (authError) return authError;
 
-  // === SECURITY: Rate limiting (SEC-007) - Skip for service role ===
   if (!isServiceRole) {
     const rlKey = getRateLimitKey(req, userId);
     const rl = await checkRateLimit(supabaseAdmin, rlKey, FUNCTION_NAME);
@@ -178,46 +132,21 @@ serve(async (req) => {
   try {
     const { candidateEmail, jobId, jobData, candidateData, profilerResult, resumeUrl, desiredPosition, desiredSeniority } = await req.json();
 
-    // Mark as "processing" BEFORE calling Anthropic
+    // Mark as "processing"
     await supabaseAdmin
       .from("job_applications")
       .update({ ai_analysis_status: 'processing' })
       .eq("candidate_email", candidateEmail)
       .eq("job_id", jobId);
 
-    // === MULTI-TENANT: Fetch API key from Vault ===
-    let ANTHROPIC_API_KEY: string | null = null;
-    let apiKeySource = "none";
-
-    // 1. Try to get from Vault by organization
-    const organizationId = await resolveOrganizationId(supabaseAdmin, jobId);
-    if (organizationId) {
-      ANTHROPIC_API_KEY = await getIntegrationSecret(
-        supabaseAdmin,
-        organizationId,
-        "anthropic",
-        { updateLastUsed: true }
-      );
-      if (ANTHROPIC_API_KEY) {
-        apiKeySource = "vault";
-      }
-    }
-
-    // 2. Fallback to global env (transition period)
-    if (!ANTHROPIC_API_KEY) {
-      ANTHROPIC_API_KEY = Deno.env.get("ANTHROPIC_API_KEY") || null;
-      if (ANTHROPIC_API_KEY) {
-        apiKeySource = "global";
-      }
-    }
-
-    // 3. No key available - return friendly error
-    if (!ANTHROPIC_API_KEY) {
-      console.error(`[${FUNCTION_NAME}][${requestId}] No Anthropic API key available`);
+    // Check for LOVABLE_API_KEY
+    const LOVABLE_API_KEY = Deno.env.get("LOVABLE_API_KEY");
+    if (!LOVABLE_API_KEY) {
+      console.error(`[${FUNCTION_NAME}][${requestId}] LOVABLE_API_KEY not configured`);
       return new Response(
         JSON.stringify({
           nota_aderencia: null,
-          relatorio_detalhado: "Integração com IA não configurada. Contate o administrador.",
+          relatorio_detalhado: "Integração com IA não configurada. LOVABLE_API_KEY ausente.",
         }),
         { headers: { ...corsHeaders, "Content-Type": "application/json" } }
       );
@@ -226,7 +155,6 @@ serve(async (req) => {
     // For Talent Bank, fetch job description from job_descriptions table
     let effectiveJobData = jobData;
     if (jobId === TALENT_BANK_JOB_ID && desiredPosition && desiredSeniority) {
-      
       const { data: jobDesc, error: jobDescError } = await supabaseAdmin
         .from("job_descriptions")
         .select("description, requirements")
@@ -246,10 +174,8 @@ serve(async (req) => {
       }
     }
 
-    // Download and encode PDF for Claude
-    let pdfBase64 = "";
-    let pdfAvailable = false;
-    
+    // Try to get resume text content (PDF analysis not supported via OpenAI-compatible API, use text)
+    let resumeInfo = "Currículo não disponível.";
     if (resumeUrl) {
       try {
         const { data: fileData, error: fileError } = await supabaseAdmin.storage
@@ -257,19 +183,21 @@ serve(async (req) => {
           .download(resumeUrl);
           
         if (fileData && !fileError) {
-          const arrayBuffer = await fileData.arrayBuffer();
-          pdfBase64 = base64Encode(arrayBuffer);
-          pdfAvailable = true;
-          console.log(`[${FUNCTION_NAME}][${requestId}] PDF loaded, size: ${arrayBuffer.byteLength} bytes`);
-        } else {
-          console.error(`[${FUNCTION_NAME}][${requestId}] PDF download error: ${fileError?.message}`);
+          // Try to extract text from the PDF (basic approach)
+          const text = await fileData.text();
+          if (text && text.length > 50) {
+            resumeInfo = `CONTEÚDO DO CURRÍCULO:\n${text.slice(0, 8000)}`;
+          } else {
+            resumeInfo = "Currículo em PDF disponível mas não foi possível extrair texto.";
+          }
+          console.log(`[${FUNCTION_NAME}][${requestId}] Resume processed`);
         }
       } catch (err) {
-        console.error(`[${FUNCTION_NAME}][${requestId}] Error loading PDF:`, err);
+        console.error(`[${FUNCTION_NAME}][${requestId}] Error loading resume:`, err);
       }
     }
 
-    // Build user prompt with job and candidate data
+    // Build user prompt
     const textPrompt = `
 === DADOS DA VAGA ===
 Título: ${effectiveJobData?.title || "N/A"}
@@ -293,59 +221,52 @@ Resumo: ${profilerResult?.profile?.summary || "N/A"}
 Habilidades: ${profilerResult?.profile?.mainSkills || "N/A"}
 Vantagens: ${profilerResult?.profile?.mainAdvantages || "N/A"}
 
-=== INSTRUÇÕES ===
-${pdfAvailable 
-  ? "ANALISE O CURRÍCULO PDF ANEXADO e compare com os requisitos da vaga."
-  : "ATENÇÃO: Currículo não disponível. Avalie apenas com base no perfil comportamental."}
+=== CURRÍCULO ===
+${resumeInfo}
 
+=== INSTRUÇÕES ===
 Seja RIGOROSO na pontuação baseada em evidências concretas.
 Retorne o JSON com nota_aderencia e relatorio_detalhado.`;
 
-    console.log(`[${FUNCTION_NAME}][${requestId}] Calling AI (pdf: ${pdfAvailable})`);
+    console.log(`[${FUNCTION_NAME}][${requestId}] Calling Lovable AI`);
 
-    // Build content array for Claude
-    const content: unknown[] = [];
-    
-    if (pdfAvailable) {
-      content.push({
-        type: "document",
-        source: {
-          type: "base64",
-          media_type: "application/pdf",
-          data: pdfBase64
-        }
-      });
-    }
-    
-    content.push({
-      type: "text",
-      text: textPrompt
-    });
-
-    const response = await fetch("https://api.anthropic.com/v1/messages", {
+    const response = await fetch("https://ai.gateway.lovable.dev/v1/chat/completions", {
       method: "POST",
-      headers: { 
-        "x-api-key": ANTHROPIC_API_KEY,
-        "anthropic-version": "2023-06-01",
-        "Content-Type": "application/json" 
+      headers: {
+        Authorization: `Bearer ${LOVABLE_API_KEY}`,
+        "Content-Type": "application/json",
       },
       body: JSON.stringify({
-        model: "claude-sonnet-4-20250514",
-        max_tokens: 4096,
-        system: ANALYSIS_PROMPT,
+        model: "google/gemini-2.5-flash",
         messages: [
-          {
-            role: "user",
-            content
-          }
+          { role: "system", content: ANALYSIS_PROMPT },
+          { role: "user", content: textPrompt },
         ],
+        tools: [
+          {
+            type: "function",
+            function: {
+              name: "candidate_analysis",
+              description: "Return the candidate analysis result with score and detailed report",
+              parameters: {
+                type: "object",
+                properties: {
+                  nota_aderencia: { type: "number", description: "Score from 0-100" },
+                  relatorio_detalhado: { type: "string", description: "Detailed analysis report in markdown" },
+                },
+                required: ["nota_aderencia", "relatorio_detalhado"],
+                additionalProperties: false,
+              },
+            },
+          },
+        ],
+        tool_choice: { type: "function", function: { name: "candidate_analysis" } },
       }),
     });
 
     if (!response.ok) {
       const errorText = await response.text();
-      console.error(`[${FUNCTION_NAME}][${requestId}] Anthropic API error: ${response.status} ${errorText}`);
-      // Mark as error before returning
+      console.error(`[${FUNCTION_NAME}][${requestId}] AI gateway error: ${response.status} ${errorText}`);
       await supabaseAdmin
         .from("job_applications")
         .update({ ai_analysis_status: 'error' })
@@ -357,33 +278,34 @@ Retorne o JSON com nota_aderencia e relatorio_detalhado.`;
     }
 
     const aiResponse = await response.json();
-    const contentBlock = aiResponse.content?.[0];
-    const responseText = contentBlock?.type === "text" ? contentBlock.text : "";
     
-    console.log(`[${FUNCTION_NAME}][${requestId}] AI response length: ${responseText.length}`);
-
-    let result = { nota_aderencia: null as number | null, relatorio_detalhado: responseText };
-    try {
-      // Remove markdown code blocks and find JSON object
-      const cleaned = responseText.replace(/```json\n?/g, "").replace(/```\n?/g, "").trim();
-      // Try to find JSON object in the response
-      const jsonMatch = cleaned.match(/\{[\s\S]*"nota_aderencia"[\s\S]*\}/);
-      if (jsonMatch) {
-        const parsed = JSON.parse(jsonMatch[0]);
-        const score = typeof parsed.nota_aderencia === 'number' ? parsed.nota_aderencia : 
-                     typeof parsed.nota_aderencia === 'string' ? parseInt(parsed.nota_aderencia, 10) : null;
-        result = { 
-          nota_aderencia: score, 
-          relatorio_detalhado: parsed.relatorio_detalhado || responseText 
-        };
-      } else {
-        throw new Error("No JSON found");
+    let result = { nota_aderencia: null as number | null, relatorio_detalhado: "" };
+    
+    // Try to parse from tool call response
+    const toolCall = aiResponse.choices?.[0]?.message?.tool_calls?.[0];
+    if (toolCall?.function?.arguments) {
+      try {
+        const parsed = JSON.parse(toolCall.function.arguments);
+        result.nota_aderencia = typeof parsed.nota_aderencia === 'number' ? parsed.nota_aderencia : parseInt(parsed.nota_aderencia, 10);
+        result.relatorio_detalhado = parsed.relatorio_detalhado || "";
+      } catch (e) {
+        console.error(`[${FUNCTION_NAME}][${requestId}] Tool call parse error:`, e);
       }
-    } catch (parseError) {
-      const match = responseText.match(/"?nota[_\s]*ader[êe]ncia"?\s*[:\s]\s*(\d+)/i);
-      if (match) {
-        result.nota_aderencia = parseInt(match[1], 10);
-      }
+    }
+    
+    // Fallback: try message content
+    if (!result.relatorio_detalhado) {
+      const responseText = aiResponse.choices?.[0]?.message?.content || "";
+      result.relatorio_detalhado = responseText;
+      try {
+        const cleaned = responseText.replace(/```json\n?/g, "").replace(/```\n?/g, "").trim();
+        const jsonMatch = cleaned.match(/\{[\s\S]*"nota_aderencia"[\s\S]*\}/);
+        if (jsonMatch) {
+          const parsed = JSON.parse(jsonMatch[0]);
+          result.nota_aderencia = typeof parsed.nota_aderencia === 'number' ? parsed.nota_aderencia : parseInt(parsed.nota_aderencia, 10);
+          result.relatorio_detalhado = parsed.relatorio_detalhado || responseText;
+        }
+      } catch { /* keep raw text */ }
     }
 
     // Update database
@@ -401,14 +323,13 @@ Retorne o JSON com nota_aderencia e relatorio_detalhado.`;
       console.error(`[${FUNCTION_NAME}][${requestId}] DB update error: ${updateError.message}`);
     }
 
-    console.log(`[${FUNCTION_NAME}][${requestId}] Completed (score: ${result.nota_aderencia}, source: ${apiKeySource})`);
+    console.log(`[${FUNCTION_NAME}][${requestId}] Completed (score: ${result.nota_aderencia})`);
 
     return new Response(JSON.stringify(result), { 
       headers: { ...corsHeaders, "Content-Type": "application/json" } 
     });
   } catch (error) {
     console.error(`[${FUNCTION_NAME}][${requestId}] Error:`, error);
-    // Try to mark as error (best effort)
     try {
       const body = await req.clone().json().catch(() => ({}));
       if (body.candidateEmail && body.jobId) {
