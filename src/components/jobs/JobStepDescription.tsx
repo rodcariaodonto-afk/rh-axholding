@@ -53,30 +53,12 @@ const TONE_OPTIONS: {
 ];
 
 export function JobStepDescription({ form }: JobStepDescriptionProps) {
-  const navigate = useNavigate();
   const { mutateAsync: generateDescription, isPending: isGenerating } = useGeneratePositionDescription();
-  const { organizationId } = useCurrentOrganization();
-  const { data: integrations } = useOrganizationIntegrations(organizationId);
-
-  const hasAnthropicIntegration = integrations?.some(
-    (i) => i.provider === "anthropic" && i.is_active
-  );
 
   const handleGenerateWithAI = async () => {
     const values = form.getValues();
 
     if (!values.title) {
-      return;
-    }
-
-    if (!hasAnthropicIntegration) {
-      toast.error("Integração com IA não configurada", {
-        description: "Configure a chave da Anthropic para gerar descrições com IA.",
-        action: {
-          label: "Configurar",
-          onClick: () => navigate("/company-settings/integrations"),
-        },
-      });
       return;
     }
 
