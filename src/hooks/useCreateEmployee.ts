@@ -7,6 +7,9 @@ export interface InviteEmployeeData {
   email: string;
   full_name: string;
   
+  // Modo de cadastro
+  skip_invite?: boolean;
+  
   // Organizacionais (opcionais)
   department_id?: string | null;
   manager_id?: string | null;
