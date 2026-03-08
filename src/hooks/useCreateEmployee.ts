@@ -40,6 +40,8 @@ export const useCreateEmployee = (onSuccessCallback?: () => void) => {
           position_level_detail: data.position_level_detail || null,
           unit_id: data.unit_id || null,
           employment_type: data.employment_type || 'full_time',
+          skip_invite: data.skip_invite || false,
+          employment_type: data.employment_type || 'full_time',
           contract_type: data.contract_type || null,
           hire_date: data.hire_date || null,
           base_salary: data.base_salary || null,
