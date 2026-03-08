@@ -180,6 +180,9 @@ const Layout = ({ children }: LayoutProps) => {
           </main>
         </SidebarInset>
       </div>
+      <Suspense fallback={null}>
+        <FloatingChat />
+      </Suspense>
     </SidebarProvider>
     </LayoutContext.Provider>
   );
