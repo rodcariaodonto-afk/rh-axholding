@@ -1,0 +1,8 @@
+-- Adicionar novos campos à tabela departments
+ALTER TABLE departments
+ADD COLUMN IF NOT EXISTS monthly_budget NUMERIC DEFAULT 0,
+ADD COLUMN IF NOT EXISTS location TEXT,
+ADD COLUMN IF NOT EXISTS phone TEXT,
+ADD COLUMN IF NOT EXISTS fax TEXT,
+ADD COLUMN IF NOT EXISTS extension TEXT,
+ADD COLUMN IF NOT EXISTS email TEXT;

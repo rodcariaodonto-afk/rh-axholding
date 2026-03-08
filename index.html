@@ -1,0 +1,66 @@
+<!doctype html>
+<html lang="pt-BR">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Orb RH</title>
+    <meta name="description" content="Orb RH - Sistema de Gestão de RH">
+    <meta name="author" content="Orb RH" />
+
+    <!-- Inter Font -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+
+    
+    
+    <meta property="og:type" content="website" />
+    <meta property="og:image" content="https://orbrh.lovable.app/og-image.png">
+
+    <meta name="twitter:card" content="summary_large_image" />
+
+    <meta name="twitter:image" content="https://orbrh.lovable.app/og-image.png">
+    
+  
+  
+  
+  <meta property="og:title" content="Orb RH">
+  <meta name="twitter:title" content="Orb RH">
+  <meta property="og:description" content="Orb RH - Sistema de Gestão de RH">
+  <meta name="twitter:description" content="Orb RH - Sistema de Gestão de RH">
+</head>
+
+  <body>
+    <script>
+      // Prevent theme flash by reading cached theme before React hydrates
+      (function() {
+        try {
+          var resolved;
+          // Try org-specific theme cache first
+          var keys = Object.keys(localStorage).filter(function(k) { return k.startsWith('orb-theme-cache-'); });
+          if (keys.length > 0) {
+            var cached = JSON.parse(localStorage.getItem(keys[0]));
+            if (cached && cached.colorMode) {
+              resolved = cached.colorMode === 'system'
+                ? (window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light')
+                : cached.colorMode;
+            }
+          }
+          // Fallback to next-themes localStorage key
+          if (!resolved) {
+            var theme = localStorage.getItem('theme');
+            if (theme === 'dark') resolved = 'dark';
+            else if (theme === 'light') resolved = 'light';
+            else if (window.matchMedia('(prefers-color-scheme: dark)').matches) resolved = 'dark';
+          }
+          if (resolved) {
+            document.documentElement.classList.add(resolved);
+            document.documentElement.style.colorScheme = resolved;
+          }
+        } catch (e) {}
+      })();
+    </script>
+    <div id="root"></div>
+    <script type="module" src="/src/main.tsx"></script>
+  </body>
+</html>

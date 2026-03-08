@@ -1,0 +1,11 @@
+User-agent: *
+Allow: /carreiras/
+Allow: /vagas/*/aplicar
+Allow: /profiler-intro
+Allow: /profiler-etapa-1
+Allow: /profiler-etapa-2
+Allow: /profiler-resultado
+Allow: /auth
+Disallow: /
+
+Sitemap: https://orbrh.lovable.app/sitemap.xml

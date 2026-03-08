@@ -1,0 +1,23 @@
+-- Adicionar novas colunas na tabela jobs para o wizard de criação
+ALTER TABLE jobs
+ADD COLUMN IF NOT EXISTS unit_id UUID REFERENCES units(id),
+ADD COLUMN IF NOT EXISTS work_model TEXT DEFAULT 'onsite',
+ADD COLUMN IF NOT EXISTS contract_type TEXT DEFAULT 'clt',
+ADD COLUMN IF NOT EXISTS seniority TEXT,
+ADD COLUMN IF NOT EXISTS openings_count INTEGER DEFAULT 1,
+ADD COLUMN IF NOT EXISTS required_skills TEXT[] DEFAULT '{}',
+ADD COLUMN IF NOT EXISTS desired_skills TEXT[] DEFAULT '{}',
+ADD COLUMN IF NOT EXISTS experience_years INTEGER,
+ADD COLUMN IF NOT EXISTS education_level TEXT,
+ADD COLUMN IF NOT EXISTS languages JSONB DEFAULT '[]',
+ADD COLUMN IF NOT EXISTS salary_type TEXT DEFAULT 'not_disclosed',
+ADD COLUMN IF NOT EXISTS salary_min NUMERIC,
+ADD COLUMN IF NOT EXISTS salary_max NUMERIC,
+ADD COLUMN IF NOT EXISTS benefits TEXT[] DEFAULT '{}',
+ADD COLUMN IF NOT EXISTS description_tone TEXT,
+ADD COLUMN IF NOT EXISTS description_context TEXT,
+ADD COLUMN IF NOT EXISTS application_deadline DATE,
+ADD COLUMN IF NOT EXISTS expected_start_date DATE,
+ADD COLUMN IF NOT EXISTS urgency TEXT DEFAULT 'medium',
+ADD COLUMN IF NOT EXISTS require_cover_letter BOOLEAN DEFAULT false,
+ADD COLUMN IF NOT EXISTS tags TEXT[] DEFAULT '{}';
