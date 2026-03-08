@@ -16,6 +16,9 @@ const InvitePayloadSchema = z.object({
   email: z.string().email("Email inválido"),
   full_name: z.string().min(2, "Nome deve ter pelo menos 2 caracteres"),
   
+  // Modo: se true, cria usuário sem enviar email (cadastro manual)
+  skip_invite: z.boolean().optional().default(false),
+  
   // Opcionais - dados organizacionais
   department_id: z.string().uuid().optional().nullable(),
   manager_id: z.string().uuid().optional().nullable(),
