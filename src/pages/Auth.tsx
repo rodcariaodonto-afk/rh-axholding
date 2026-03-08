@@ -44,6 +44,8 @@ const Auth = () => {
   const [errors, setErrors] = useState<Record<string, string>>({});
   const [activeTab, setActiveTab] = useState<"login" | "signup">("login");
   const [adminCreated, setAdminCreated] = useState(false);
+  const [showForgotPassword, setShowForgotPassword] = useState(false);
+  const [forgotEmail, setForgotEmail] = useState("");
 
   const isFirstTimeSetup = !hasUsers;
 
