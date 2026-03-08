@@ -10,8 +10,9 @@ import {
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import { Switch } from "@/components/ui/switch";
 import { useCreateEmployee } from "@/hooks/useCreateEmployee";
-import { Mail } from "lucide-react";
+import { Mail, UserPlus } from "lucide-react";
 
 interface NewEmployeeDialogProps {
   open: boolean;
@@ -25,12 +26,16 @@ export function NewEmployeeDialog({ open, onOpenChange }: NewEmployeeDialogProps
   });
 
   const [formData, setFormData] = useState({ email: "", full_name: "" });
+  const [skipInvite, setSkipInvite] = useState(false);
 
-  const resetForm = () => setFormData({ email: "", full_name: "" });
+  const resetForm = () => {
+    setFormData({ email: "", full_name: "" });
+    setSkipInvite(false);
+  };
 
   const handleSubmit = () => {
     if (!formData.full_name.trim() || !formData.email.trim()) return;
-    inviteEmployee(formData);
+    inviteEmployee({ ...formData, skip_invite: skipInvite });
   };
 
   const handleClose = () => {
@@ -49,9 +54,13 @@ export function NewEmployeeDialog({ open, onOpenChange }: NewEmployeeDialogProps
       }}>
       <DialogContent className="sm:max-w-[450px]">
         <DialogHeader>
-          <DialogTitle>Convidar Novo Colaborador</DialogTitle>
+          <DialogTitle>
+            {skipInvite ? "Cadastrar Colaborador" : "Convidar Novo Colaborador"}
+          </DialogTitle>
           <DialogDescription>
-            Preencha os dados do colaborador. Após o envio, ele receberá um email para criar sua conta.
+            {skipInvite
+              ? "O colaborador será cadastrado sem receber email. Ele poderá acessar usando \"Esqueci minha senha\" na tela de login."
+              : "Preencha os dados do colaborador. Após o envio, ele receberá um email para criar sua conta."}
           </DialogDescription>
         </DialogHeader>
 
@@ -77,8 +86,24 @@ export function NewEmployeeDialog({ open, onOpenChange }: NewEmployeeDialogProps
             />
           </div>
 
+          <div className="flex items-center justify-between rounded-lg border border-border p-3">
+            <div className="space-y-0.5">
+              <Label htmlFor="skip-invite" className="text-sm font-medium cursor-pointer">
+                Cadastro manual (sem email)
+              </Label>
+              <p className="text-xs text-muted-foreground">
+                Cadastra o colaborador sem enviar convite por email
+              </p>
+            </div>
+            <Switch
+              id="skip-invite"
+              checked={skipInvite}
+              onCheckedChange={setSkipInvite}
+            />
+          </div>
+
           <p className="text-sm text-muted-foreground">
-            Os demais dados (departamento, cargo, contrato) podem ser preenchidos após o convite.
+            Os demais dados (departamento, cargo, contrato) podem ser preenchidos após o cadastro.
           </p>
         </div>
 
@@ -87,8 +112,14 @@ export function NewEmployeeDialog({ open, onOpenChange }: NewEmployeeDialogProps
             Cancelar
           </Button>
           <Button onClick={handleSubmit} disabled={!isValid || isPending}>
-            <Mail className="h-4 w-4 mr-2" />
-            {isPending ? "Enviando..." : "Enviar Convite"}
+            {skipInvite ? (
+              <UserPlus className="h-4 w-4 mr-2" />
+            ) : (
+              <Mail className="h-4 w-4 mr-2" />
+            )}
+            {isPending
+              ? (skipInvite ? "Cadastrando..." : "Enviando...")
+              : (skipInvite ? "Cadastrar" : "Enviar Convite")}
           </Button>
         </DialogFooter>
       </DialogContent>

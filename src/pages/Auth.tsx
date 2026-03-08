@@ -10,6 +10,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { useAuth } from "@/hooks/useAuth";
 import { useSystemStatus } from "@/hooks/useSystemStatus";
 import { useToast } from "@/hooks/use-toast";
+import { supabase } from "@/integrations/supabase/client";
 import { Loader2 } from "lucide-react";
 import { z } from "zod";
 
@@ -43,6 +44,8 @@ const Auth = () => {
   const [errors, setErrors] = useState<Record<string, string>>({});
   const [activeTab, setActiveTab] = useState<"login" | "signup">("login");
   const [adminCreated, setAdminCreated] = useState(false);
+  const [showForgotPassword, setShowForgotPassword] = useState(false);
+  const [forgotEmail, setForgotEmail] = useState("");
 
   const isFirstTimeSetup = !hasUsers;
 
@@ -359,6 +362,18 @@ const Auth = () => {
                       "Entrar"
                     )}
                   </Button>
+
+                  <Button
+                    type="button"
+                    variant="link"
+                    className="w-full text-sm text-muted-foreground"
+                    onClick={() => {
+                      setShowForgotPassword(true);
+                      setForgotEmail(email);
+                    }}
+                  >
+                    Esqueci minha senha
+                  </Button>
                 </form>
               </TabsContent>
 
@@ -478,6 +493,75 @@ const Auth = () => {
       </Card>
 
     </div>
+
+    {/* Forgot Password Dialog */}
+    {showForgotPassword && (
+      <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-4">
+        <Card className="w-full max-w-md border-border/50 shadow-lg">
+          <CardHeader className="text-center">
+            <CardTitle className="text-xl">Recuperar Senha</CardTitle>
+            <CardDescription>
+              Informe seu email e enviaremos um link para redefinir sua senha.
+            </CardDescription>
+          </CardHeader>
+          <CardContent className="space-y-4">
+            <div className="space-y-2">
+              <Label htmlFor="forgot-email">Email</Label>
+              <Input
+                id="forgot-email"
+                type="email"
+                placeholder="seu@email.com"
+                value={forgotEmail}
+                onChange={(e) => setForgotEmail(e.target.value)}
+                disabled={isLoading}
+              />
+            </div>
+            <Button
+              className="w-full"
+              disabled={isLoading || !forgotEmail.includes("@")}
+              onClick={async () => {
+                setIsLoading(true);
+                try {
+                  const { error } = await supabase.auth.resetPasswordForEmail(forgotEmail, {
+                    redirectTo: `${window.location.origin}/reset-password`,
+                  });
+                  if (error) throw error;
+                  toast({
+                    title: "Email enviado!",
+                    description: "Verifique sua caixa de entrada para redefinir sua senha.",
+                  });
+                  setShowForgotPassword(false);
+                } catch (error: any) {
+                  toast({
+                    title: "Erro",
+                    description: error.message || "Não foi possível enviar o email de recuperação.",
+                    variant: "destructive",
+                  });
+                } finally {
+                  setIsLoading(false);
+                }
+              }}
+            >
+              {isLoading ? (
+                <>
+                  <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                  Enviando...
+                </>
+              ) : (
+                "Enviar Link de Recuperação"
+              )}
+            </Button>
+            <Button
+              variant="outline"
+              className="w-full"
+              onClick={() => setShowForgotPassword(false)}
+            >
+              Voltar
+            </Button>
+          </CardContent>
+        </Card>
+      </div>
+    )}
     </>
   );
 };

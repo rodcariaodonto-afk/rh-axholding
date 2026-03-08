@@ -6,6 +6,7 @@ import { Toaster } from "@/components/ui/toaster";
 import { Toaster as Sonner } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { Skeleton } from "@/components/ui/skeleton";
+import { Loader2 } from "lucide-react";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 import { ThemeProvider } from "@/components/ThemeProvider";
@@ -68,6 +69,7 @@ const MyPdis = lazy(() => import("./pages/MyPdis"));
 const TimeTracking = lazy(() => import("./pages/TimeTracking"));
 const EvaluationAnswerPage = lazy(() => import("./pages/EvaluationAnswerPage"));
 const EvaluationResultPage = lazy(() => import("./pages/EvaluationResultPage"));
+const ResetPassword = lazy(() => import("./pages/ResetPassword"));
 
 const queryClient = new QueryClient({
   defaultOptions: {
@@ -94,6 +96,11 @@ const App = () => (
           {/* Public routes (no layout) */}
           <Route path="/auth" element={<Auth />} />
           <Route path="/accept-invite" element={<AcceptInvite />} />
+          <Route path="/reset-password" element={
+            <Suspense fallback={<div className="min-h-screen flex items-center justify-center"><Loader2 className="h-8 w-8 animate-spin text-muted-foreground" /></div>}>
+              <ResetPassword />
+            </Suspense>
+          } />
           <Route path="/vagas/00000000-0000-0000-0000-000000000001/aplicar" element={
             <Suspense fallback={<div className="container mx-auto px-4 py-8 space-y-4"><Skeleton className="h-12 w-64" /><Skeleton className="h-64 w-full" /></div>}>
               <TalentBankApplication />
