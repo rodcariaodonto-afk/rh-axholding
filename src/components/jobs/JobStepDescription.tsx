@@ -12,8 +12,6 @@ import { Button } from "@/components/ui/button";
 import { RichTextEditor } from "@/components/ui/rich-text-editor";
 import { WORK_MODEL_LABELS, CONTRACT_TYPE_LABELS, JOB_SENIORITY_LABELS } from "@/constants/jobOptions";
 import { useGeneratePositionDescription } from "@/hooks/useGeneratePositionDescription";
-import { useOrganizationIntegrations } from "@/hooks/useOrganizationIntegrations";
-import { useCurrentOrganization } from "@/hooks/useCurrentOrganization";
 import { toast } from "sonner";
 import type { JobFormData, DescriptionTone, JobSeniority } from "@/types/job";
 import { cn } from "@/lib/utils";
