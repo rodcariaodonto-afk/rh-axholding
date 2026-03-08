@@ -340,7 +340,61 @@ Deno.serve(async (req) => {
       }
     }
 
-    // 10. Enviar convite via Supabase Auth (gerar link) + Resend se configurado
+    // 10. Enviar convite ou cadastrar manualmente
+    if (input.skip_invite) {
+      // --- MANUAL REGISTRATION: create auth user with random password, no email ---
+      console.log(`[${FUNCTION_NAME}][${requestId}] Manual registration (skip_invite=true)`);
+      
+      const randomPassword = crypto.randomUUID() + crypto.randomUUID();
+      
+      const { data: newUser, error: createError } = await supabaseAdmin.auth.admin.createUser({
+        email: input.email,
+        password: randomPassword,
+        email_confirm: true,
+        user_metadata: { full_name: input.full_name },
+      });
+
+      if (createError) {
+        console.error(`[${FUNCTION_NAME}][${requestId}] Create user error:`, createError.message);
+        return new Response(
+          JSON.stringify({ 
+            type: "about:blank",
+            title: "Internal Server Error",
+            status: 500,
+            detail: `Erro ao criar usuário: ${createError.message}`
+          }),
+          { status: 500, headers: { ...corsHeaders, "Content-Type": "application/problem+json" } }
+        );
+      }
+
+      console.log(`[${FUNCTION_NAME}][${requestId}] Auth user created: ${newUser.user.id}`);
+
+      // Update pending_employees status
+      await supabaseAdmin
+        .from('pending_employees')
+        .update({ status: 'accepted', updated_at: new Date().toISOString() })
+        .eq('organization_id', orgId)
+        .eq('email', input.email)
+        .in('status', ['draft', 'invited']);
+
+      console.log(`[${FUNCTION_NAME}][${requestId}] Manual registration completed`);
+      
+      return new Response(
+        JSON.stringify({ 
+          success: true, 
+          message: `Colaborador ${input.full_name} cadastrado com sucesso. Ele poderá acessar usando "Esqueci minha senha" na tela de login.`,
+          data: {
+            email: input.email,
+            full_name: input.full_name,
+            organization_name: org?.name,
+            manual: true,
+          }
+        }),
+        { status: 200, headers: { ...corsHeaders, "Content-Type": "application/json" } }
+      );
+    }
+
+    // --- INVITE FLOW (original) ---
     const origin = req.headers.get("origin") || req.headers.get("referer")?.replace(/\/+$/, "") || Deno.env.get("SITE_URL") || Deno.env.get("SUPABASE_URL")!.replace(".supabase.co", ".lovable.app");
     const acceptInviteUrl = `${origin}/accept-invite`;
     console.log(`[${FUNCTION_NAME}][${requestId}] Redirect URL: ${acceptInviteUrl}`);
@@ -379,7 +433,6 @@ Deno.serve(async (req) => {
         );
       }
 
-      // The generated link contains the token - we use it directly
       const inviteLink = linkData?.properties?.action_link;
       if (!inviteLink) {
         console.error(`[${FUNCTION_NAME}][${requestId}] No action_link in generateLink response`);
@@ -394,7 +447,6 @@ Deno.serve(async (req) => {
         );
       }
 
-      // Send email via Resend
       const fromName = org.invite_from_name || org.name || "RH";
       const fromEmail = org.invite_from_email;
 
@@ -476,8 +528,6 @@ Deno.serve(async (req) => {
         );
       }
     }
-
-    // 11. Status já definido como 'invited' antes do inviteUserByEmail (race condition fix)
 
     console.log(`[${FUNCTION_NAME}][${requestId}] Invite sent successfully`);
     
