@@ -38,7 +38,7 @@ export function DailyTimeline({ entries }: DailyTimelineProps) {
           <div className="flex items-center gap-2 min-w-[100px]">
             <LogIn className="size-4 text-green-500" />
             <span className="font-mono text-sm font-medium">
-              {format(new Date(entry.clock_in), "HH:mm")}
+              {formatTimeBrasilia(entry.clock_in)}
             </span>
           </div>
 
