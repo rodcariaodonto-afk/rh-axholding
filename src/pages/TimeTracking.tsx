@@ -189,6 +189,8 @@ export default function TimeTracking() {
           <TabsTrigger value="entries">Registros</TabsTrigger>
           <TabsTrigger value="balance">Banco de Horas</TabsTrigger>
           <TabsTrigger value="locations">Locais</TabsTrigger>
+          <TabsTrigger value="historico-qr">Histórico QR</TabsTrigger>
+          <TabsTrigger value="auditoria">Auditoria</TabsTrigger>
         </TabsList>
 
         <TabsContent value="overview" className="space-y-6">
