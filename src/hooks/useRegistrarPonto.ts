@@ -120,7 +120,11 @@ export function useRegistrarPonto() {
       if (insertError) throw insertError;
 
       // 8. Also create a time_entries record so it appears in the main system
-      const today = new Date().toISOString().split("T")[0];
+      // Use Brasília timezone for the date
+      const brasiliaDate = toBrasiliaDate(new Date().toISOString());
+      const today = brasiliaDate.getFullYear() + '-' + 
+        String(brasiliaDate.getMonth() + 1).padStart(2, '0') + '-' + 
+        String(brasiliaDate.getDate()).padStart(2, '0');
       const clockInTime = new Date().toISOString();
 
       // Check if there's an open time entry (no clock_out) for today
