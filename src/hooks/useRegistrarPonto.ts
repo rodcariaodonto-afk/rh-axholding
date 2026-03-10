@@ -4,6 +4,7 @@ import { useAuth } from "@/hooks/useAuth";
 import { useToast } from "@/hooks/use-toast";
 import { getCurrentPosition, haversineDistance } from "@/lib/geolocation";
 import { hashSHA256 } from "@/lib/hashSHA256";
+import { toBrasiliaDate } from "@/lib/timezone";
 
 interface RegistrarPontoInput {
   locationId: string;
