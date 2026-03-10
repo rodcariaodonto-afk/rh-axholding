@@ -1,5 +1,4 @@
-import { format } from "date-fns";
-import { ptBR } from "date-fns/locale";
+import { formatTimeBrasilia } from "@/lib/timezone";
 import { Clock, LogIn, LogOut } from "lucide-react";
 
 interface TimeEntry {
@@ -39,7 +38,7 @@ export function DailyTimeline({ entries }: DailyTimelineProps) {
           <div className="flex items-center gap-2 min-w-[100px]">
             <LogIn className="size-4 text-green-500" />
             <span className="font-mono text-sm font-medium">
-              {format(new Date(entry.clock_in), "HH:mm")}
+              {formatTimeBrasilia(entry.clock_in)}
             </span>
           </div>
 
@@ -50,7 +49,7 @@ export function DailyTimeline({ entries }: DailyTimelineProps) {
               <>
                 <LogOut className="size-4 text-destructive" />
                 <span className="font-mono text-sm font-medium">
-                  {format(new Date(entry.clock_out), "HH:mm")}
+                  {formatTimeBrasilia(entry.clock_out)}
                 </span>
               </>
             ) : (
