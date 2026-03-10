@@ -18,9 +18,11 @@ const ProtectedRoute = ({ children }: ProtectedRouteProps) => {
   useEffect(() => {
     if (isLoading || isCheckingSystem) return;
 
-    // Not logged in -> redirect to auth
+    // Not logged in -> redirect to auth, preserving return URL
     if (!user) {
-      navigate("/auth");
+      const returnUrl = location.pathname + location.search;
+      const redirectParam = returnUrl !== "/" ? `?redirect=${encodeURIComponent(returnUrl)}` : "";
+      navigate(`/auth${redirectParam}`);
       return;
     }
 

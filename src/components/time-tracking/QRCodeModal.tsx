@@ -29,7 +29,8 @@ export function QRCodeModal({ open, onOpenChange, location }: QRCodeModalProps) 
   useEffect(() => {
     if (!open || !location || !canvasRef.current) return;
 
-    const url = `${window.location.origin}/registrar-ponto?local=${location.id}&lat=${location.latitude}&lng=${location.longitude}&raio=${location.radius_meters}`;
+    const publishedUrl = "https://ax-rh.lovable.app";
+    const url = `${publishedUrl}/registrar-ponto?local=${location.id}&lat=${location.latitude}&lng=${location.longitude}&raio=${location.radius_meters}`;
     setQrUrl(url);
 
     QRCode.toCanvas(canvasRef.current, url, {

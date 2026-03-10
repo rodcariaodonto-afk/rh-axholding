@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useSearchParams } from "react-router-dom";
 import { hasInviteTokenInHash } from "@/lib/inviteDetection";
 
 import { Button } from "@/components/ui/button";
@@ -34,6 +34,7 @@ const Auth = () => {
   const { user, loading, signInWithEmail, signUpWithEmail, signInWithGoogle } = useAuth();
   const { hasUsers, isLoading: isCheckingUsers } = useSystemStatus();
   const navigate = useNavigate();
+  const [searchParams] = useSearchParams();
   const { toast } = useToast();
 
   const [fullName, setFullName] = useState("");
@@ -58,11 +59,12 @@ const Auth = () => {
       return;
     }
     // First time setup: go to onboarding to create organization
-    // Normal login: go to dashboard
+    // Normal login: go to redirect URL or dashboard
     if (isFirstTimeSetup) {
       navigate("/onboarding");
     } else {
-      navigate("/people-analytics");
+      const redirectTo = searchParams.get("redirect");
+      navigate(redirectTo || "/people-analytics");
     }
   }, [user, isFirstTimeSetup, isCheckingUsers, navigate]);
 
