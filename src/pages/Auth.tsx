@@ -59,11 +59,12 @@ const Auth = () => {
       return;
     }
     // First time setup: go to onboarding to create organization
-    // Normal login: go to dashboard
+    // Normal login: go to redirect URL or dashboard
     if (isFirstTimeSetup) {
       navigate("/onboarding");
     } else {
-      navigate("/people-analytics");
+      const redirectTo = searchParams.get("redirect");
+      navigate(redirectTo || "/people-analytics");
     }
   }, [user, isFirstTimeSetup, isCheckingUsers, navigate]);
 
