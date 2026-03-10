@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useSearchParams } from "react-router-dom";
 import { hasInviteTokenInHash } from "@/lib/inviteDetection";
 
 import { Button } from "@/components/ui/button";
