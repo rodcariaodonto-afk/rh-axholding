@@ -115,6 +115,14 @@ export function LocationSettings() {
                     <Badge variant={loc.is_active ? "default" : "secondary"}>
                       {loc.is_active ? "Ativo" : "Inativo"}
                     </Badge>
+                    <Button
+                      size="icon"
+                      variant="ghost"
+                      onClick={() => setQrLocation(loc)}
+                      title="Ver QR Code"
+                    >
+                      <QrCode className="size-4" />
+                    </Button>
                     <Switch
                       checked={loc.is_active}
                       onCheckedChange={(checked) =>
