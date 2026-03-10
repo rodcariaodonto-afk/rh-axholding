@@ -303,6 +303,14 @@ export default function TimeTracking() {
         <TabsContent value="locations">
           <LocationSettings />
         </TabsContent>
+
+        <TabsContent value="historico-qr">
+          <HistoricoQRPonto />
+        </TabsContent>
+
+        <TabsContent value="auditoria">
+          <AuditoriaPonto />
+        </TabsContent>
       </Tabs>
     </div>
   );

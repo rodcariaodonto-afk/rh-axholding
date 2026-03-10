@@ -118,6 +118,15 @@ const App = () => (
             </Suspense>
           } />
 
+          {/* Registrar Ponto via QR Code (protected, no layout) */}
+          <Route path="/registrar-ponto" element={
+            <ProtectedRoute>
+              <Suspense fallback={<div className="min-h-screen flex items-center justify-center"><Loader2 className="h-8 w-8 animate-spin text-muted-foreground" /></div>}>
+                <RegistrarPonto />
+              </Suspense>
+            </ProtectedRoute>
+          } />
+
           {/* Onboarding (protected, no layout) */}
           <Route path="/onboarding" element={
             <ProtectedRoute>
