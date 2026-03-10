@@ -1,68 +1,55 @@
 
 
-# Visualizacoes Avancadas para Gestao de Ponto
+# Correção: QR Code Não Abre Página de Registro
 
-## Visao Geral
+## Problemas Identificados
 
-Adicionar uma nova aba **"Visao Geral"** na tela admin de Gestao de Ponto com 3 componentes visuais usando Recharts (ja instalado no projeto):
+1. **ProtectedRoute redireciona para `/auth` sem preservar a URL de retorno** — quando o funcionário escaneia o QR Code sem estar logado, ele é redirecionado para `/auth` e perde os parâmetros (`?local=...&lat=...&lng=...&raio=...`).
 
-### 1. Grafico de Barras Semanal - Horas por Dia
+2. **QR Code usa `window.location.origin`** — no ambiente de preview, isso gera uma URL do tipo `lovableproject.com`, que não funciona no celular. A URL deveria usar o domínio publicado `https://ax-rh.lovable.app`.
 
-Um grafico de barras empilhadas mostrando, para cada dia da semana, as horas trabalhadas vs. horas esperadas. Barras com cores indicando:
-- Verde: dentro da meta
-- Vermelho: abaixo da meta
-- Azul: horas extras
+## Correções
 
-Filtro por colaborador ou "todos" (agregado). Facilita identificar dias com mais ou menos carga.
+### 1. ProtectedRoute: preservar URL de retorno
 
-### 2. Heatmap Mensal (Grid de Quadrados)
+Alterar `src/components/ProtectedRoute.tsx` para passar a URL atual como query param ao redirecionar para `/auth`:
 
-Uma grade estilo calendario (similar ao contribution graph do GitHub) onde cada celula e um dia do mes. A intensidade da cor indica a quantidade de horas trabalhadas naquele dia:
-- Cinza claro: sem registro
-- Verde claro a verde escuro: de poucas a muitas horas
-- Vermelho: deficit significativo
+```ts
+// Antes:
+navigate("/auth");
 
-Permite visualizar rapidamente padroes ao longo do mes.
+// Depois:
+navigate(`/auth?redirect=${encodeURIComponent(location.pathname + location.search)}`);
+```
 
-### 3. Ranking de Colaboradores - Horas Trabalhadas no Mes
+### 2. Auth: redirecionar de volta após login
 
-Um grafico de barras horizontais mostrando o total de horas trabalhadas por cada colaborador no mes, com uma linha de referencia indicando a meta esperada. Facilita comparar a equipe.
+Alterar `src/pages/Auth.tsx` para, após login bem-sucedido, verificar se há um `?redirect=` param e navegar para lá em vez de `/`.
 
----
+### 3. QRCodeModal: usar domínio publicado
 
-## Detalhes Tecnicos
+Alterar `src/components/time-tracking/QRCodeModal.tsx` para usar a URL publicada:
 
-### Novos arquivos
+```ts
+// Antes:
+const url = `${window.location.origin}/registrar-ponto?...`;
 
-1. **`src/components/time-tracking/WeeklyHoursChart.tsx`**
-   - Usa `BarChart` do Recharts com `ResponsiveContainer`
-   - Recebe `time_entries` da semana e agrupa por dia
-   - Calcula horas esperadas com base em `weekly_hours / 5` (media diaria)
-   - Barras: `worked` (horas trabalhadas) e `expected` (referencia como linha ou barra secundaria)
+// Depois:
+const publishedUrl = "https://ax-rh.lovable.app";
+const url = `${publishedUrl}/registrar-ponto?local=${location.id}&lat=${location.latitude}&lng=${location.longitude}&raio=${location.radius_meters}`;
+```
 
-2. **`src/components/time-tracking/MonthlyHeatmap.tsx`**
-   - Componente custom com grid CSS (7 colunas x ~5 linhas)
-   - Cada celula recebe `total_minutes` do dia e aplica escala de cor via Tailwind (`bg-green-100` ate `bg-green-700`)
-   - Tooltip mostrando data e horas ao passar o mouse
+Isso garante que o QR Code sempre gere uma URL acessível de qualquer celular.
 
-3. **`src/components/time-tracking/TeamHoursRanking.tsx`**
-   - `BarChart` horizontal do Recharts
-   - Agrupa `time_entries` do mes por `employee_id`
-   - Exibe nome do colaborador no eixo Y e horas no eixo X
-   - Linha de referencia vertical (`ReferenceLine`) para a meta mensal
+### 4. Página RegistrarPonto: verificação de auth inline
 
-### Hook adicional
+A página já existe e funciona corretamente. O problema era apenas que o usuário não chegava nela por causa dos itens 1-3 acima.
 
-4. **`src/hooks/useMonthlyTimeEntries.ts`**
-   - Busca todas as `time_entries` do mes corrente para a organizacao (sem filtro de employee)
-   - Reutilizado pelos 3 componentes visuais
+## Resumo de arquivos alterados
 
-### Alteracoes em arquivos existentes
-
-5. **`src/pages/TimeTracking.tsx`**
-   - Adicionar nova aba "Visao Geral" no `TabsList` da visao admin
-   - `TabsContent` renderiza os 3 componentes visuais em grid
-
-### Dependencias
-- Nenhuma nova -- usa Recharts (ja instalado) e Tailwind para o heatmap
+| Arquivo | Alteração |
+|---|---|
+| `src/components/ProtectedRoute.tsx` | Preservar URL de retorno no redirect para `/auth` |
+| `src/pages/Auth.tsx` | Usar `?redirect=` param após login |
+| `src/components/time-tracking/QRCodeModal.tsx` | Usar domínio publicado na URL do QR Code |
 
