@@ -19,6 +19,8 @@ import { MonthlyHeatmap } from "@/components/time-tracking/MonthlyHeatmap";
 import { TeamHoursRanking } from "@/components/time-tracking/TeamHoursRanking";
 import { DailyVisualControlChart } from "@/components/time-tracking/DailyVisualControlChart";
 import { LocationSettings } from "@/components/time-tracking/LocationSettings";
+import { HistoricoQRPonto } from "@/components/time-tracking/HistoricoQRPonto";
+import { AuditoriaPonto } from "@/components/time-tracking/AuditoriaPonto";
 import { format, startOfMonth, endOfMonth, startOfWeek, endOfWeek } from "date-fns";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
