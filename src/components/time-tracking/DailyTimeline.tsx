@@ -49,7 +49,7 @@ export function DailyTimeline({ entries }: DailyTimelineProps) {
               <>
                 <LogOut className="size-4 text-destructive" />
                 <span className="font-mono text-sm font-medium">
-                  {format(new Date(entry.clock_out), "HH:mm")}
+                  {formatTimeBrasilia(entry.clock_out)}
                 </span>
               </>
             ) : (

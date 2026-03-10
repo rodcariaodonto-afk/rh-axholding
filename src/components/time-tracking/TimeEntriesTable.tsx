@@ -68,13 +68,13 @@ export function TimeEntriesTable({ entries, showEmployee = true }: TimeEntriesTa
                   </TableCell>
                 )}
                 <TableCell className="text-sm">
-                  {format(new Date(entry.date + "T12:00:00"), "dd/MM/yyyy")}
+                  {formatDateBrasilia(entry.date + "T12:00:00Z")}
                 </TableCell>
                 <TableCell className="font-mono text-sm">
-                  {format(new Date(entry.clock_in), "HH:mm")}
+                  {formatTimeBrasilia(entry.clock_in)}
                 </TableCell>
                 <TableCell className="font-mono text-sm">
-                  {entry.clock_out ? format(new Date(entry.clock_out), "HH:mm") : "—"}
+                  {entry.clock_out ? formatTimeBrasilia(entry.clock_out) : "—"}
                 </TableCell>
                 <TableCell className="text-sm">
                   {entry.total_minutes != null ? formatMinutes(entry.total_minutes) : "—"}
