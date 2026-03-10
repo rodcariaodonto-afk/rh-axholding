@@ -7,8 +7,9 @@ import { useCurrentOrganization } from "@/hooks/useCurrentOrganization";
 import { useToast } from "@/hooks/use-toast";
 import { supabase } from "@/integrations/supabase/client";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
-import { MapPin, Trash2 } from "lucide-react";
+import { MapPin, Trash2, QrCode } from "lucide-react";
 import { AddLocationDialog } from "./AddLocationDialog";
+import { QRCodeModal } from "./QRCodeModal";
 import { useState } from "react";
 
 export function LocationSettings() {
