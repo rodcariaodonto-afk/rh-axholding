@@ -148,17 +148,22 @@ export function useRegistrarPonto() {
           .eq("id", openEntry.id);
       } else {
         // Clock in - create new entry
-        await supabase
+        const { error: timeEntryError } = await supabase
           .from("time_entries")
           .insert({
             employee_id: user.id,
             organization_id: employee.organization_id,
             date: today,
             clock_in: clockInTime,
-            location_id: input.locationId,
-            latitude: position.latitude,
-            longitude: position.longitude,
+            clock_in_latitude: position.latitude,
+            clock_in_longitude: position.longitude,
+            clock_in_accuracy: position.accuracy,
+            clock_in_within_fence: true,
           });
+
+        if (timeEntryError) {
+          console.error("Erro ao criar time_entry:", timeEntryError);
+        }
       }
 
       // 8. Audit log
