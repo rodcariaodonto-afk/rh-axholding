@@ -70,6 +70,7 @@ const TimeTracking = lazy(() => import("./pages/TimeTracking"));
 const EvaluationAnswerPage = lazy(() => import("./pages/EvaluationAnswerPage"));
 const EvaluationResultPage = lazy(() => import("./pages/EvaluationResultPage"));
 const ResetPassword = lazy(() => import("./pages/ResetPassword"));
+const RegistrarPonto = lazy(() => import("./pages/RegistrarPonto"));
 
 const queryClient = new QueryClient({
   defaultOptions: {
@@ -115,6 +116,15 @@ const App = () => (
             <Suspense fallback={<div className="container mx-auto px-4 py-8 space-y-4"><Skeleton className="h-12 w-64" /><Skeleton className="h-64 w-full" /></div>}>
               <CareersPage />
             </Suspense>
+          } />
+
+          {/* Registrar Ponto via QR Code (protected, no layout) */}
+          <Route path="/registrar-ponto" element={
+            <ProtectedRoute>
+              <Suspense fallback={<div className="min-h-screen flex items-center justify-center"><Loader2 className="h-8 w-8 animate-spin text-muted-foreground" /></div>}>
+                <RegistrarPonto />
+              </Suspense>
+            </ProtectedRoute>
           } />
 
           {/* Onboarding (protected, no layout) */}

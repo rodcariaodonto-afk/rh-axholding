@@ -7,8 +7,9 @@ import { useCurrentOrganization } from "@/hooks/useCurrentOrganization";
 import { useToast } from "@/hooks/use-toast";
 import { supabase } from "@/integrations/supabase/client";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
-import { MapPin, Trash2 } from "lucide-react";
+import { MapPin, Trash2, QrCode } from "lucide-react";
 import { AddLocationDialog } from "./AddLocationDialog";
+import { QRCodeModal } from "./QRCodeModal";
 import { useState } from "react";
 
 export function LocationSettings() {
@@ -17,6 +18,7 @@ export function LocationSettings() {
   const { toast } = useToast();
   const queryClient = useQueryClient();
   const [dialogOpen, setDialogOpen] = useState(false);
+  const [qrLocation, setQrLocation] = useState<typeof locations[0] | null>(null);
 
   const { data: orgSettings } = useQuery({
     queryKey: ["org-geolocation-settings", organizationId],
@@ -113,6 +115,14 @@ export function LocationSettings() {
                     <Badge variant={loc.is_active ? "default" : "secondary"}>
                       {loc.is_active ? "Ativo" : "Inativo"}
                     </Badge>
+                    <Button
+                      size="icon"
+                      variant="ghost"
+                      onClick={() => setQrLocation(loc)}
+                      title="Ver QR Code"
+                    >
+                      <QrCode className="size-4" />
+                    </Button>
                     <Switch
                       checked={loc.is_active}
                       onCheckedChange={(checked) =>
@@ -134,6 +144,12 @@ export function LocationSettings() {
           )}
         </CardContent>
       </Card>
+
+      <QRCodeModal
+        open={!!qrLocation}
+        onOpenChange={(open) => !open && setQrLocation(null)}
+        location={qrLocation}
+      />
     </div>
   );
 }

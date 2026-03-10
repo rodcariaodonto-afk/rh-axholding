@@ -71,6 +71,58 @@ export type Database = {
           },
         ]
       }
+      auditoria_ponto: {
+        Row: {
+          acao: string
+          created_at: string | null
+          detalhes: Json | null
+          hash_atual: string | null
+          id: string
+          organization_id: string | null
+          user_id: string | null
+        }
+        Insert: {
+          acao: string
+          created_at?: string | null
+          detalhes?: Json | null
+          hash_atual?: string | null
+          id?: string
+          organization_id?: string | null
+          user_id?: string | null
+        }
+        Update: {
+          acao?: string
+          created_at?: string | null
+          detalhes?: Json | null
+          hash_atual?: string | null
+          id?: string
+          organization_id?: string | null
+          user_id?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "auditoria_ponto_organization_id_fkey"
+            columns: ["organization_id"]
+            isOneToOne: false
+            referencedRelation: "organizations"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "auditoria_ponto_organization_id_fkey"
+            columns: ["organization_id"]
+            isOneToOne: false
+            referencedRelation: "organizations_public"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "auditoria_ponto_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "employees"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       bonuses: {
         Row: {
           amount: number
@@ -2109,6 +2161,7 @@ export type Database = {
       }
       organization_locations: {
         Row: {
+          address: string | null
           created_at: string
           created_by: string
           id: string
@@ -2121,6 +2174,7 @@ export type Database = {
           updated_at: string
         }
         Insert: {
+          address?: string | null
           created_at?: string
           created_by: string
           id?: string
@@ -2133,6 +2187,7 @@ export type Database = {
           updated_at?: string
         }
         Update: {
+          address?: string | null
           created_at?: string
           created_by?: string
           id?: string
@@ -2829,6 +2884,80 @@ export type Database = {
           module?: string
         }
         Relationships: []
+      }
+      ponto_registros: {
+        Row: {
+          created_at: string | null
+          distance_meters: number
+          employee_id: string
+          gps_accuracy: number | null
+          gps_latitude: number
+          gps_longitude: number
+          hash_sha256: string
+          id: string
+          location_id: string
+          metodo_registro: string | null
+          organization_id: string
+          status: string | null
+        }
+        Insert: {
+          created_at?: string | null
+          distance_meters: number
+          employee_id: string
+          gps_accuracy?: number | null
+          gps_latitude: number
+          gps_longitude: number
+          hash_sha256: string
+          id?: string
+          location_id: string
+          metodo_registro?: string | null
+          organization_id: string
+          status?: string | null
+        }
+        Update: {
+          created_at?: string | null
+          distance_meters?: number
+          employee_id?: string
+          gps_accuracy?: number | null
+          gps_latitude?: number
+          gps_longitude?: number
+          hash_sha256?: string
+          id?: string
+          location_id?: string
+          metodo_registro?: string | null
+          organization_id?: string
+          status?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "ponto_registros_employee_id_fkey"
+            columns: ["employee_id"]
+            isOneToOne: false
+            referencedRelation: "employees"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "ponto_registros_location_id_fkey"
+            columns: ["location_id"]
+            isOneToOne: false
+            referencedRelation: "organization_locations"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "ponto_registros_organization_id_fkey"
+            columns: ["organization_id"]
+            isOneToOne: false
+            referencedRelation: "organizations"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "ponto_registros_organization_id_fkey"
+            columns: ["organization_id"]
+            isOneToOne: false
+            referencedRelation: "organizations_public"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       position_seniority_levels: {
         Row: {
