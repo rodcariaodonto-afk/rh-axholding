@@ -98,7 +98,7 @@ export function useRegistrarPonto() {
       const hashInput = `${user.id}|${input.locationId}|${now}|${position.latitude}|${position.longitude}`;
       const hash = await hashSHA256(hashInput);
 
-      // 7. Insert record
+      // 7. Insert ponto_registros record
       const { data: registro, error: insertError } = await supabase
         .from("ponto_registros")
         .insert({
@@ -117,6 +117,49 @@ export function useRegistrarPonto() {
         .single();
 
       if (insertError) throw insertError;
+
+      // 8. Also create a time_entries record so it appears in the main system
+      const today = new Date().toISOString().split("T")[0];
+      const clockInTime = new Date().toISOString();
+
+      // Check if there's an open time entry (no clock_out) for today
+      const { data: openEntry } = await supabase
+        .from("time_entries")
+        .select("id, clock_in")
+        .eq("employee_id", user.id)
+        .eq("date", today)
+        .is("clock_out", null)
+        .order("clock_in", { ascending: false })
+        .limit(1)
+        .maybeSingle();
+
+      if (openEntry) {
+        // Clock out the open entry
+        const clockIn = new Date(openEntry.clock_in);
+        const clockOut = new Date();
+        const totalMinutes = Math.round((clockOut.getTime() - clockIn.getTime()) / 60000);
+
+        await supabase
+          .from("time_entries")
+          .update({
+            clock_out: clockInTime,
+            total_minutes: totalMinutes,
+          })
+          .eq("id", openEntry.id);
+      } else {
+        // Clock in - create new entry
+        await supabase
+          .from("time_entries")
+          .insert({
+            employee_id: user.id,
+            organization_id: employee.organization_id,
+            date: today,
+            clock_in: clockInTime,
+            location_id: input.locationId,
+            latitude: position.latitude,
+            longitude: position.longitude,
+          });
+      }
 
       // 8. Audit log
       await supabase.from("auditoria_ponto").insert({
