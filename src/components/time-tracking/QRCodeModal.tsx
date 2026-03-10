@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useRef, useState, useCallback } from "react";
 import QRCode from "qrcode";
 import {
   Dialog,
@@ -23,28 +23,32 @@ interface QRCodeModalProps {
 }
 
 export function QRCodeModal({ open, onOpenChange, location }: QRCodeModalProps) {
-  const canvasRef = useRef<HTMLCanvasElement>(null);
   const [qrUrl, setQrUrl] = useState("");
+  const [qrDataUrl, setQrDataUrl] = useState("");
 
   useEffect(() => {
-    if (!open || !location || !canvasRef.current) return;
+    if (!open || !location) return;
 
     const publishedUrl = "https://ax-rh.lovable.app";
     const url = `${publishedUrl}/registrar-ponto?local=${location.id}&lat=${location.latitude}&lng=${location.longitude}&raio=${location.radius_meters}`;
     setQrUrl(url);
 
-    QRCode.toCanvas(canvasRef.current, url, {
+    QRCode.toDataURL(url, {
       width: 300,
       margin: 2,
       color: { dark: "#000000", light: "#ffffff" },
+    }).then((dataUrl) => {
+      setQrDataUrl(dataUrl);
+    }).catch((err) => {
+      console.error("QR Code generation failed:", err);
     });
   }, [open, location]);
 
   const handleDownload = () => {
-    if (!canvasRef.current || !location) return;
+    if (!qrDataUrl || !location) return;
     const link = document.createElement("a");
     link.download = `qrcode-${location.name.replace(/\s+/g, "-").toLowerCase()}.png`;
-    link.href = canvasRef.current.toDataURL("image/png");
+    link.href = qrDataUrl;
     link.click();
   };
 
@@ -62,13 +66,19 @@ export function QRCodeModal({ open, onOpenChange, location }: QRCodeModalProps) 
         </DialogHeader>
 
         <div className="flex flex-col items-center gap-4 py-4">
-          <canvas ref={canvasRef} className="rounded-lg border" />
+          {qrDataUrl ? (
+            <img src={qrDataUrl} alt="QR Code" className="rounded-lg border" width={300} height={300} />
+          ) : (
+            <div className="w-[300px] h-[300px] rounded-lg border flex items-center justify-center text-muted-foreground text-sm">
+              Gerando QR Code...
+            </div>
+          )}
 
           <p className="text-xs text-muted-foreground text-center max-w-xs break-all">
             {qrUrl}
           </p>
 
-          <Button onClick={handleDownload} className="gap-2">
+          <Button onClick={handleDownload} className="gap-2" disabled={!qrDataUrl}>
             <Download className="size-4" />
             Baixar QR Code
           </Button>
