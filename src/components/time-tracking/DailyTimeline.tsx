@@ -1,5 +1,4 @@
-import { format } from "date-fns";
-import { ptBR } from "date-fns/locale";
+import { formatTimeBrasilia } from "@/lib/timezone";
 import { Clock, LogIn, LogOut } from "lucide-react";
 
 interface TimeEntry {
