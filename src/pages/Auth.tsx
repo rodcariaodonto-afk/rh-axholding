@@ -34,6 +34,7 @@ const Auth = () => {
   const { user, loading, signInWithEmail, signUpWithEmail, signInWithGoogle } = useAuth();
   const { hasUsers, isLoading: isCheckingUsers } = useSystemStatus();
   const navigate = useNavigate();
+  const [searchParams] = useSearchParams();
   const { toast } = useToast();
 
   const [fullName, setFullName] = useState("");
