@@ -70,6 +70,7 @@ const TimeTracking = lazy(() => import("./pages/TimeTracking"));
 const EvaluationAnswerPage = lazy(() => import("./pages/EvaluationAnswerPage"));
 const EvaluationResultPage = lazy(() => import("./pages/EvaluationResultPage"));
 const ResetPassword = lazy(() => import("./pages/ResetPassword"));
+const RegistrarPonto = lazy(() => import("./pages/RegistrarPonto"));
 
 const queryClient = new QueryClient({
   defaultOptions: {
