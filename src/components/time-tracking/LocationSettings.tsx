@@ -144,6 +144,12 @@ export function LocationSettings() {
           )}
         </CardContent>
       </Card>
+
+      <QRCodeModal
+        open={!!qrLocation}
+        onOpenChange={(open) => !open && setQrLocation(null)}
+        location={qrLocation}
+      />
     </div>
   );
 }
