@@ -1,68 +1,117 @@
 
 
-# Visualizacoes Avancadas para Gestao de Ponto
+# Plano: Sistema de Registro de Ponto com QR Code + GPS
 
-## Visao Geral
+## Contexto
 
-Adicionar uma nova aba **"Visao Geral"** na tela admin de Gestao de Ponto com 3 componentes visuais usando Recharts (ja instalado no projeto):
+O projeto já possui um módulo de ponto (`TimeTracking`) com:
+- Tabela `time_entries` no banco
+- Tabela `organization_locations` para locais autorizados
+- Componentes de clock-in/out, geolocalização e Haversine já implementados
+- Aba "Locais" funcional com AddLocationDialog
 
-### 1. Grafico de Barras Semanal - Horas por Dia
-
-Um grafico de barras empilhadas mostrando, para cada dia da semana, as horas trabalhadas vs. horas esperadas. Barras com cores indicando:
-- Verde: dentro da meta
-- Vermelho: abaixo da meta
-- Azul: horas extras
-
-Filtro por colaborador ou "todos" (agregado). Facilita identificar dias com mais ou menos carga.
-
-### 2. Heatmap Mensal (Grid de Quadrados)
-
-Uma grade estilo calendario (similar ao contribution graph do GitHub) onde cada celula e um dia do mes. A intensidade da cor indica a quantidade de horas trabalhadas naquele dia:
-- Cinza claro: sem registro
-- Verde claro a verde escuro: de poucas a muitas horas
-- Vermelho: deficit significativo
-
-Permite visualizar rapidamente padroes ao longo do mes.
-
-### 3. Ranking de Colaboradores - Horas Trabalhadas no Mes
-
-Um grafico de barras horizontais mostrando o total de horas trabalhadas por cada colaborador no mes, com uma linha de referencia indicando a meta esperada. Facilita comparar a equipe.
+O documento pede um sistema de QR Code onde funcionários escaneiam um código que abre uma URL com coordenadas do local, valida GPS e registra o ponto. Vou implementar isso reutilizando a infraestrutura existente.
 
 ---
 
-## Detalhes Tecnicos
+## Fase 1 — Essencial (o que será implementado agora)
 
-### Novos arquivos
+### 1. Migração de banco de dados
 
-1. **`src/components/time-tracking/WeeklyHoursChart.tsx`**
-   - Usa `BarChart` do Recharts com `ResponsiveContainer`
-   - Recebe `time_entries` da semana e agrupa por dia
-   - Calcula horas esperadas com base em `weekly_hours / 5` (media diaria)
-   - Barras: `worked` (horas trabalhadas) e `expected` (referencia como linha ou barra secundaria)
+Criar tabela `ponto_registros` para registros via QR Code (separada da `time_entries` existente para manter auditoria com hash):
 
-2. **`src/components/time-tracking/MonthlyHeatmap.tsx`**
-   - Componente custom com grid CSS (7 colunas x ~5 linhas)
-   - Cada celula recebe `total_minutes` do dia e aplica escala de cor via Tailwind (`bg-green-100` ate `bg-green-700`)
-   - Tooltip mostrando data e horas ao passar o mouse
+```sql
+CREATE TABLE public.ponto_registros (
+  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  organization_id UUID NOT NULL REFERENCES organizations(id),
+  employee_id UUID NOT NULL REFERENCES employees(id),
+  location_id UUID NOT NULL REFERENCES organization_locations(id),
+  gps_latitude DECIMAL(10,8) NOT NULL,
+  gps_longitude DECIMAL(11,8) NOT NULL,
+  gps_accuracy NUMERIC,
+  distance_meters NUMERIC NOT NULL,
+  hash_sha256 VARCHAR(64) UNIQUE NOT NULL,
+  metodo_registro VARCHAR(50) DEFAULT 'qrcode_gps',
+  status VARCHAR(50) DEFAULT 'registrado',
+  created_at TIMESTAMPTZ DEFAULT now()
+);
+```
 
-3. **`src/components/time-tracking/TeamHoursRanking.tsx`**
-   - `BarChart` horizontal do Recharts
-   - Agrupa `time_entries` do mes por `employee_id`
-   - Exibe nome do colaborador no eixo Y e horas no eixo X
-   - Linha de referencia vertical (`ReferenceLine`) para a meta mensal
+Criar tabela `auditoria_ponto`:
+```sql
+CREATE TABLE public.auditoria_ponto (
+  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  organization_id UUID REFERENCES organizations(id),
+  user_id UUID REFERENCES employees(id),
+  acao VARCHAR(100) NOT NULL,
+  detalhes JSONB,
+  hash_atual VARCHAR(64),
+  created_at TIMESTAMPTZ DEFAULT now()
+);
+```
 
-### Hook adicional
+Adicionar coluna `address` na `organization_locations` (se não existir). Adicionar RLS policies para ambas as tabelas. Criar indices de performance.
 
-4. **`src/hooks/useMonthlyTimeEntries.ts`**
-   - Busca todas as `time_entries` do mes corrente para a organizacao (sem filtro de employee)
-   - Reutilizado pelos 3 componentes visuais
+### 2. QR Code — Geração e exibição
 
-### Alteracoes em arquivos existentes
+- Instalar pacote `qrcode` (npm) para gerar QR Codes no frontend
+- Na aba "Locais" (`LocationSettings`), adicionar botão "Ver QR Code" por local
+- Modal que mostra QR Code gerado com URL:
+  `https://ax-rh.lovable.app/registrar-ponto?local={id}&lat={lat}&lng={lng}&raio={raio}`
+- Botão para download do QR Code como PNG
 
-5. **`src/pages/TimeTracking.tsx`**
-   - Adicionar nova aba "Visao Geral" no `TabsList` da visao admin
-   - `TabsContent` renderiza os 3 componentes visuais em grid
+### 3. Página `/registrar-ponto` — Registro via QR Code
 
-### Dependencias
-- Nenhuma nova -- usa Recharts (ja instalado) e Tailwind para o heatmap
+Nova página pública (protegida por auth) que:
+1. Lê parâmetros da URL (`local`, `lat`, `lng`, `raio`)
+2. Busca dados do local no banco para validar
+3. Solicita GPS do celular via `getCurrentPosition()`
+4. Calcula distância com Haversine (já existe em `geolocation.ts`)
+5. Valida: dentro do raio? Rate limit (5 min entre registros)?
+6. Gera hash SHA-256 do registro (Web Crypto API)
+7. Insere em `ponto_registros` + `auditoria_ponto`
+8. Exibe feedback visual de sucesso/erro
+
+Rota adicionada em `App.tsx` como rota protegida sem layout pesado.
+
+### 4. Novas abas na Gestão de Ponto (admin)
+
+Adicionar na página `TimeTracking.tsx`:
+- Aba **"QR Code"**: botão de registrar ponto (para funcionários) + link para escanear
+- Aba **"Histórico QR"**: tabela de registros da `ponto_registros` com filtros (data, funcionário, local, status)
+- Aba **"Auditoria"**: log de auditoria com filtros (data, usuário, ação)
+
+### 5. Componentes novos
+
+| Componente | Descrição |
+|---|---|
+| `QRCodeModal.tsx` | Modal que gera e exibe QR Code de um local |
+| `RegistrarPontoPage.tsx` | Página `/registrar-ponto` |
+| `HistoricoQRPonto.tsx` | Tabela de histórico de registros QR |
+| `AuditoriaPonto.tsx` | Tabela de log de auditoria |
+
+### 6. Utilitários
+
+- `src/lib/hashSHA256.ts` — função para gerar hash SHA-256 via Web Crypto API
+- Hooks: `useRegistrarPonto.ts`, `useHistoricoPonto.ts`, `useAuditoriaPonto.ts`
+
+---
+
+## Fase 2 — Não incluída agora (melhorias futuras)
+
+- 2FA por email
+- Google Maps integrado (usaremos OpenStreetMap/Nominatim existente)
+- Detecção de fraude / padrões impossíveis
+- Relatórios avançados e exportação
+
+---
+
+## Detalhes Técnicos
+
+- QR Code será gerado client-side com a lib `qrcode`
+- Hash SHA-256 usa Web Crypto API nativa do browser (sem dependências)
+- Rate limiting: query no banco verificando último registro < 5 minutos
+- Segurança: RLS por `organization_id`, autenticação obrigatória
+- Interface mobile-first na página de registro (botões grandes, textos claros)
+- Reutiliza `geolocation.ts` (Haversine, getCurrentPosition) já existente
 
