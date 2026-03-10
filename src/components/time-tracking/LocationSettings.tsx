@@ -18,6 +18,7 @@ export function LocationSettings() {
   const { toast } = useToast();
   const queryClient = useQueryClient();
   const [dialogOpen, setDialogOpen] = useState(false);
+  const [qrLocation, setQrLocation] = useState<typeof locations[0] | null>(null);
 
   const { data: orgSettings } = useQuery({
     queryKey: ["org-geolocation-settings", organizationId],
