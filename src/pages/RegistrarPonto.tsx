@@ -63,8 +63,8 @@ export default function RegistrarPonto() {
             </Alert>
           ) : result === "success" && successData ? (
             <div className="text-center space-y-3">
-              <div className="mx-auto flex items-center justify-center size-16 rounded-full bg-green-100 dark:bg-green-900/30">
-                <CheckCircle2 className="size-8 text-green-600 dark:text-green-400" />
+              <div className="mx-auto flex items-center justify-center size-16 rounded-full bg-primary/10">
+                <CheckCircle2 className="size-8 text-primary" />
               </div>
               <h3 className="font-semibold text-lg">Ponto registrado!</h3>
               <div className="space-y-1 text-sm text-muted-foreground">
