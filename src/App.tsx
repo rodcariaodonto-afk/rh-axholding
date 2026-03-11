@@ -81,6 +81,9 @@ const Audit = lazy(() => import("./pages/Audit"));
 const NewEmployeePage = lazy(() => import("./pages/NewEmployeePage"));
 const Dashboard = lazy(() => import("./pages/Dashboard"));
 const EmployeeOnboarding = lazy(() => import("./pages/EmployeeOnboarding"));
+const Documents = lazy(() => import("./pages/Documents"));
+const Goals = lazy(() => import("./pages/Goals"));
+const TrainingCatalog = lazy(() => import("./pages/TrainingCatalog"));
 
 const queryClient = new QueryClient({
   defaultOptions: {
