@@ -102,32 +102,50 @@ export default function NewEmployeePage() {
 
     setSaving(true);
     try {
-      await createEmployee.mutateAsync({
+      const empType = contractType === "pj" ? "contractor" : contractType === "intern" ? "intern" : "full_time";
+      const result = await createEmployee.mutateAsync({
         full_name: fullName.trim(),
         email: corporateEmail.trim(),
-        department_id: departmentId || undefined,
-        base_position_id: positionId || undefined,
-        position_level_detail: seniority || undefined,
-        unit_id: unitId || undefined,
-        manager_id: managerId || undefined,
-        employment_type: contractType as any,
-        hire_date: hireDate || undefined,
-        base_salary: baseSalary ? parseFloat(baseSalary) : undefined,
-        contract_type: contractType as any,
-        weekly_hours: weeklyHours ? parseFloat(weeklyHours) : 44,
-        birth_date: birthDate || undefined,
-        gender: gender || undefined,
-        nationality: nationality || undefined,
-        cpf: cpf.replace(/\D/g, "") || undefined,
-        cbo_code: cboCode || undefined,
-        personal_email: personalEmail || undefined,
-        personal_phone: phone || undefined,
-        transportation_voucher: transportVoucher ? parseFloat(transportVoucher) : undefined,
-        meal_voucher: mealVoucher ? parseFloat(mealVoucher) : undefined,
-        health_insurance: healthInsurance ? parseFloat(healthInsurance) : undefined,
-        dental_insurance: dentalInsurance ? parseFloat(dentalInsurance) : undefined,
-        other_benefits: otherBenefits ? parseFloat(otherBenefits) : undefined,
+        skip_invite: true,
+        department_id: departmentId || null,
+        base_position_id: positionId || null,
+        position_level_detail: seniority || null,
+        unit_id: unitId || null,
+        manager_id: managerId || null,
+        employment_type: empType,
+        hire_date: hireDate || null,
+        base_salary: baseSalary ? parseFloat(baseSalary) : null,
+        contract_type: contractType || null,
       });
+
+      // Update extra fields on the created employee (cpf, cbo, etc.)
+      const employeeId = result?.employee_id;
+      if (employeeId) {
+        const updates: Record<string, any> = {};
+        if (cpf) updates.cpf = cpf.replace(/\D/g, "");
+        if (cboCode) updates.cbo_code = cboCode;
+        if (birthDate) updates.birth_date = birthDate;
+        if (gender) updates.gender = gender;
+        if (nationality) updates.nationality = nationality;
+        if (weeklyHours) updates.weekly_hours = parseFloat(weeklyHours);
+        
+        if (Object.keys(updates).length > 0) {
+          await supabase.from("employees").update(updates).eq("id", employeeId);
+        }
+
+        // Update contract benefits
+        const benefitUpdates: Record<string, any> = {};
+        if (transportVoucher) benefitUpdates.transportation_voucher = parseFloat(transportVoucher);
+        if (mealVoucher) benefitUpdates.meal_voucher = parseFloat(mealVoucher);
+        if (healthInsurance) benefitUpdates.health_insurance = parseFloat(healthInsurance);
+        if (dentalInsurance) benefitUpdates.dental_insurance = parseFloat(dentalInsurance);
+        if (otherBenefits) benefitUpdates.other_benefits = parseFloat(otherBenefits);
+        
+        if (Object.keys(benefitUpdates).length > 0) {
+          await supabase.from("employees_contracts").update(benefitUpdates).eq("user_id", employeeId).eq("is_active", true);
+        }
+      }
+
       toast.success("Colaborador cadastrado com sucesso!");
       navigate("/employees");
     } catch (error) {
