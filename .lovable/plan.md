@@ -1,68 +1,29 @@
 
 
-# Visualizacoes Avancadas para Gestao de Ponto
+# Unidades nao aparecem no dropdown
 
-## Visao Geral
+## Problema
 
-Adicionar uma nova aba **"Visao Geral"** na tela admin de Gestao de Ponto com 3 componentes visuais usando Recharts (ja instalado no projeto):
+A tabela `units` esta **vazia** no banco de dados. Os dados de seed (`Remoto`, `Sao Paulo - Sede`) do arquivo `migration-dump/02-units.sql` nunca foram executados no banco. Por isso o dropdown nao mostra nenhuma opcao.
 
-### 1. Grafico de Barras Semanal - Horas por Dia
+O codigo do hook `useUnits` e do componente estao corretos -- o problema e apenas falta de dados.
 
-Um grafico de barras empilhadas mostrando, para cada dia da semana, as horas trabalhadas vs. horas esperadas. Barras com cores indicando:
-- Verde: dentro da meta
-- Vermelho: abaixo da meta
-- Azul: horas extras
+## Solucao
 
-Filtro por colaborador ou "todos" (agregado). Facilita identificar dias com mais ou menos carga.
+Executar uma migracao SQL para inserir as unidades vinculadas a organizacao "AXholding" (`23d91189-f511-46a0-94e3-2c0e368e43a6`):
 
-### 2. Heatmap Mensal (Grid de Quadrados)
+```sql
+INSERT INTO public.units (name, city, state, country, is_active, organization_id) VALUES
+  ('Remoto', 'N/A', 'N/A', 'BR', true, '23d91189-f511-46a0-94e3-2c0e368e43a6'),
+  ('São Paulo - Sede', 'São Paulo', 'SP', 'BR', true, '23d91189-f511-46a0-94e3-2c0e368e43a6');
+```
 
-Uma grade estilo calendario (similar ao contribution graph do GitHub) onde cada celula e um dia do mes. A intensidade da cor indica a quantidade de horas trabalhadas naquele dia:
-- Cinza claro: sem registro
-- Verde claro a verde escuro: de poucas a muitas horas
-- Vermelho: deficit significativo
+## Complemento
 
-Permite visualizar rapidamente padroes ao longo do mes.
+Tambem seria util adicionar uma pagina ou secao em **Configuracoes da Empresa** (`/company-settings`) para gerenciar unidades (CRUD), para que no futuro o usuario possa adicionar/editar unidades sem precisar de migracao.
 
-### 3. Ranking de Colaboradores - Horas Trabalhadas no Mes
+## Arquivos impactados
 
-Um grafico de barras horizontais mostrando o total de horas trabalhadas por cada colaborador no mes, com uma linha de referencia indicando a meta esperada. Facilita comparar a equipe.
-
----
-
-## Detalhes Tecnicos
-
-### Novos arquivos
-
-1. **`src/components/time-tracking/WeeklyHoursChart.tsx`**
-   - Usa `BarChart` do Recharts com `ResponsiveContainer`
-   - Recebe `time_entries` da semana e agrupa por dia
-   - Calcula horas esperadas com base em `weekly_hours / 5` (media diaria)
-   - Barras: `worked` (horas trabalhadas) e `expected` (referencia como linha ou barra secundaria)
-
-2. **`src/components/time-tracking/MonthlyHeatmap.tsx`**
-   - Componente custom com grid CSS (7 colunas x ~5 linhas)
-   - Cada celula recebe `total_minutes` do dia e aplica escala de cor via Tailwind (`bg-green-100` ate `bg-green-700`)
-   - Tooltip mostrando data e horas ao passar o mouse
-
-3. **`src/components/time-tracking/TeamHoursRanking.tsx`**
-   - `BarChart` horizontal do Recharts
-   - Agrupa `time_entries` do mes por `employee_id`
-   - Exibe nome do colaborador no eixo Y e horas no eixo X
-   - Linha de referencia vertical (`ReferenceLine`) para a meta mensal
-
-### Hook adicional
-
-4. **`src/hooks/useMonthlyTimeEntries.ts`**
-   - Busca todas as `time_entries` do mes corrente para a organizacao (sem filtro de employee)
-   - Reutilizado pelos 3 componentes visuais
-
-### Alteracoes em arquivos existentes
-
-5. **`src/pages/TimeTracking.tsx`**
-   - Adicionar nova aba "Visao Geral" no `TabsList` da visao admin
-   - `TabsContent` renderiza os 3 componentes visuais em grid
-
-### Dependencias
-- Nenhuma nova -- usa Recharts (ja instalado) e Tailwind para o heatmap
+- **Migracao SQL**: Inserir as 2 unidades
+- Nenhuma alteracao de codigo necessaria (o dropdown ja funciona, so faltavam dados)
 
