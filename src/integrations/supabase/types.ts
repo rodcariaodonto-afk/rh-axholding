@@ -212,6 +212,118 @@ export type Database = {
           },
         ]
       }
+      candidate_interactions: {
+        Row: {
+          action: string
+          candidate_id: string
+          created_at: string
+          id: string
+          notes: string | null
+          user_id: string
+        }
+        Insert: {
+          action: string
+          candidate_id: string
+          created_at?: string
+          id?: string
+          notes?: string | null
+          user_id: string
+        }
+        Update: {
+          action?: string
+          candidate_id?: string
+          created_at?: string
+          id?: string
+          notes?: string | null
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "candidate_interactions_candidate_id_fkey"
+            columns: ["candidate_id"]
+            isOneToOne: false
+            referencedRelation: "candidates"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      candidates: {
+        Row: {
+          applied_at: string
+          created_at: string
+          email: string
+          id: string
+          job_id: string | null
+          name: string
+          notes: string | null
+          organization_id: string
+          phone: string | null
+          resume_url: string | null
+          source: string | null
+          status: string
+          updated_at: string
+        }
+        Insert: {
+          applied_at?: string
+          created_at?: string
+          email: string
+          id?: string
+          job_id?: string | null
+          name: string
+          notes?: string | null
+          organization_id: string
+          phone?: string | null
+          resume_url?: string | null
+          source?: string | null
+          status?: string
+          updated_at?: string
+        }
+        Update: {
+          applied_at?: string
+          created_at?: string
+          email?: string
+          id?: string
+          job_id?: string | null
+          name?: string
+          notes?: string | null
+          organization_id?: string
+          phone?: string | null
+          resume_url?: string | null
+          source?: string | null
+          status?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "candidates_job_id_fkey"
+            columns: ["job_id"]
+            isOneToOne: false
+            referencedRelation: "jobs"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "candidates_job_id_fkey"
+            columns: ["job_id"]
+            isOneToOne: false
+            referencedRelation: "jobs_public"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "candidates_organization_id_fkey"
+            columns: ["organization_id"]
+            isOneToOne: false
+            referencedRelation: "organizations"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "candidates_organization_id_fkey"
+            columns: ["organization_id"]
+            isOneToOne: false
+            referencedRelation: "organizations_public"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       company_cost_settings: {
         Row: {
           created_at: string | null
@@ -833,6 +945,8 @@ export type Database = {
           base_position_id: string | null
           birth_date: string | null
           birthplace: string | null
+          cbo_code: string | null
+          cpf: string | null
           created_at: string
           department_id: string | null
           education_course: string | null
@@ -870,11 +984,16 @@ export type Database = {
             | null
           unit_id: string | null
           updated_at: string
+          weekly_hours: number | null
+          work_policy_id: string | null
+          work_schedule_id: string | null
         }
         Insert: {
           base_position_id?: string | null
           birth_date?: string | null
           birthplace?: string | null
+          cbo_code?: string | null
+          cpf?: string | null
           created_at?: string
           department_id?: string | null
           education_course?: string | null
@@ -914,11 +1033,16 @@ export type Database = {
             | null
           unit_id?: string | null
           updated_at?: string
+          weekly_hours?: number | null
+          work_policy_id?: string | null
+          work_schedule_id?: string | null
         }
         Update: {
           base_position_id?: string | null
           birth_date?: string | null
           birthplace?: string | null
+          cbo_code?: string | null
+          cpf?: string | null
           created_at?: string
           department_id?: string | null
           education_course?: string | null
@@ -958,6 +1082,9 @@ export type Database = {
             | null
           unit_id?: string | null
           updated_at?: string
+          weekly_hours?: number | null
+          work_policy_id?: string | null
+          work_schedule_id?: string | null
         }
         Relationships: [
           {
@@ -1002,6 +1129,20 @@ export type Database = {
             referencedRelation: "units"
             referencedColumns: ["id"]
           },
+          {
+            foreignKeyName: "employees_work_policy_id_fkey"
+            columns: ["work_policy_id"]
+            isOneToOne: false
+            referencedRelation: "work_policies"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "employees_work_schedule_id_fkey"
+            columns: ["work_schedule_id"]
+            isOneToOne: false
+            referencedRelation: "work_schedules"
+            referencedColumns: ["id"]
+          },
         ]
       }
       employees_contact: {
@@ -1012,6 +1153,8 @@ export type Database = {
           bank_name: string | null
           city: string
           complement: string | null
+          corporate_email: string | null
+          corporate_phone: string | null
           country: string
           cpf: string | null
           created_at: string | null
@@ -1022,6 +1165,7 @@ export type Database = {
           neighborhood: string | null
           number: string
           personal_email: string | null
+          personal_phone: string | null
           pix_key: string | null
           rg: string | null
           rg_issuer: string | null
@@ -1038,6 +1182,8 @@ export type Database = {
           bank_name?: string | null
           city: string
           complement?: string | null
+          corporate_email?: string | null
+          corporate_phone?: string | null
           country?: string
           cpf?: string | null
           created_at?: string | null
@@ -1048,6 +1194,7 @@ export type Database = {
           neighborhood?: string | null
           number: string
           personal_email?: string | null
+          personal_phone?: string | null
           pix_key?: string | null
           rg?: string | null
           rg_issuer?: string | null
@@ -1064,6 +1211,8 @@ export type Database = {
           bank_name?: string | null
           city?: string
           complement?: string | null
+          corporate_email?: string | null
+          corporate_phone?: string | null
           country?: string
           cpf?: string | null
           created_at?: string | null
@@ -1074,6 +1223,7 @@ export type Database = {
           neighborhood?: string | null
           number?: string
           personal_email?: string | null
+          personal_phone?: string | null
           pix_key?: string | null
           rg?: string | null
           rg_issuer?: string | null
@@ -1672,6 +1822,57 @@ export type Database = {
           },
           {
             foreignKeyName: "hard_skills_organization_id_fkey"
+            columns: ["organization_id"]
+            isOneToOne: false
+            referencedRelation: "organizations_public"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      import_logs: {
+        Row: {
+          created_at: string
+          error_details: Json | null
+          error_rows: number
+          file_name: string
+          id: string
+          organization_id: string
+          success_rows: number
+          total_rows: number
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          error_details?: Json | null
+          error_rows?: number
+          file_name: string
+          id?: string
+          organization_id: string
+          success_rows?: number
+          total_rows?: number
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          error_details?: Json | null
+          error_rows?: number
+          file_name?: string
+          id?: string
+          organization_id?: string
+          success_rows?: number
+          total_rows?: number
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "import_logs_organization_id_fkey"
+            columns: ["organization_id"]
+            isOneToOne: false
+            referencedRelation: "organizations"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "import_logs_organization_id_fkey"
             columns: ["organization_id"]
             isOneToOne: false
             referencedRelation: "organizations_public"
@@ -3945,6 +4146,117 @@ export type Database = {
           },
           {
             foreignKeyName: "units_organization_id_fkey"
+            columns: ["organization_id"]
+            isOneToOne: false
+            referencedRelation: "organizations_public"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      work_policies: {
+        Row: {
+          created_at: string
+          description: string | null
+          id: string
+          in_office_days_per_month: number | null
+          in_office_days_per_week: number | null
+          name: string
+          organization_id: string
+          type: string
+          updated_at: string
+        }
+        Insert: {
+          created_at?: string
+          description?: string | null
+          id?: string
+          in_office_days_per_month?: number | null
+          in_office_days_per_week?: number | null
+          name: string
+          organization_id: string
+          type?: string
+          updated_at?: string
+        }
+        Update: {
+          created_at?: string
+          description?: string | null
+          id?: string
+          in_office_days_per_month?: number | null
+          in_office_days_per_week?: number | null
+          name?: string
+          organization_id?: string
+          type?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "work_policies_organization_id_fkey"
+            columns: ["organization_id"]
+            isOneToOne: false
+            referencedRelation: "organizations"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "work_policies_organization_id_fkey"
+            columns: ["organization_id"]
+            isOneToOne: false
+            referencedRelation: "organizations_public"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      work_schedules: {
+        Row: {
+          created_at: string
+          hour_bank_rules: Json | null
+          hours_per_day: number
+          hours_per_week: number
+          id: string
+          late_tolerance_minutes: number
+          name: string
+          organization_id: string
+          overtime_rules: Json | null
+          type: string
+          updated_at: string
+          work_days: Json
+        }
+        Insert: {
+          created_at?: string
+          hour_bank_rules?: Json | null
+          hours_per_day?: number
+          hours_per_week?: number
+          id?: string
+          late_tolerance_minutes?: number
+          name: string
+          organization_id: string
+          overtime_rules?: Json | null
+          type?: string
+          updated_at?: string
+          work_days?: Json
+        }
+        Update: {
+          created_at?: string
+          hour_bank_rules?: Json | null
+          hours_per_day?: number
+          hours_per_week?: number
+          id?: string
+          late_tolerance_minutes?: number
+          name?: string
+          organization_id?: string
+          overtime_rules?: Json | null
+          type?: string
+          updated_at?: string
+          work_days?: Json
+        }
+        Relationships: [
+          {
+            foreignKeyName: "work_schedules_organization_id_fkey"
+            columns: ["organization_id"]
+            isOneToOne: false
+            referencedRelation: "organizations"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "work_schedules_organization_id_fkey"
             columns: ["organization_id"]
             isOneToOne: false
             referencedRelation: "organizations_public"
