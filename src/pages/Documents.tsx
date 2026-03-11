@@ -137,7 +137,6 @@ export default function Documents() {
                 </CardContent>
               </Card>
             )}
-            )}
           </div>
         )}
 
