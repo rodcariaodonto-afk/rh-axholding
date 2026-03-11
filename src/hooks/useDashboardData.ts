@@ -59,7 +59,7 @@ export function useDashboardData() {
         .from("time_off_requests")
         .select("id")
         .eq("organization_id", organizationId!)
-        .eq("status", "pending");
+        .eq("status", "pending_people");
       if (error) throw error;
       return data ?? [];
     },
