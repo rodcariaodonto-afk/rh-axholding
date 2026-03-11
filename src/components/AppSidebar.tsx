@@ -138,7 +138,7 @@ const menuGroups: MenuGroup[] = [
     label: "RELATÓRIOS & DASHBOARDS",
     showFor: "people",
     items: [
-      { icon: LayoutDashboard, label: "Dashboard", href: "/people-analytics" },
+      { icon: LayoutDashboard, label: "Dashboard", href: "/dashboard" },
       { icon: ClipboardCheck, label: "Relatórios de Ponto", href: "/time-reports" },
       { icon: FileText, label: "Auditoria", href: "/audit" },
     ],
