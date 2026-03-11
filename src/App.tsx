@@ -195,6 +195,13 @@ const App = () => (
             <Route path="/my-evaluations/received/:cycleId" element={<EvaluationResultPage />} />
             <Route path="/theme-editor" element={<ThemeEditor />} />
             <Route path="/time-tracking" element={<TimeTracking />} />
+            <Route path="/candidates" element={<Candidates />} />
+            <Route path="/selection-funnel" element={<SelectionFunnel />} />
+            <Route path="/work-schedules" element={<WorkSchedules />} />
+            <Route path="/work-policies" element={<WorkPolicies />} />
+            <Route path="/payroll" element={<Payroll />} />
+            <Route path="/time-reports" element={<TimeReports />} />
+            <Route path="/audit" element={<Audit />} />
 
             {/* People-only routes */}
             <Route path="/people-analytics" element={<PeopleRoute><PeopleAnalytics /></PeopleRoute>} />
