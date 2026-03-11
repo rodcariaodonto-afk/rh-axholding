@@ -111,6 +111,8 @@ const menuGroups: MenuGroup[] = [
       { icon: MessageSquare, label: "Feedbacks", href: "/feedbacks" },
       { icon: Award, label: "Competências", href: "/skills-management" },
       { icon: Heart, label: "Cultura", href: "/culture" },
+      { icon: TrendingUp, label: "Metas & OKRs", href: "/goals" },
+      { icon: BookOpen, label: "Catálogo de Treinamentos", href: "/training-catalog" },
     ],
   },
   {
