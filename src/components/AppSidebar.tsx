@@ -134,6 +134,7 @@ const menuGroups: MenuGroup[] = [
       { icon: Building2, label: "Departamentos", href: "/departments" },
       { icon: Network, label: "Organograma", href: "/organogram" },
       { icon: Calendar, label: "Políticas de Trabalho", href: "/work-policies" },
+      { icon: FileText, label: "Documentos", href: "/documents" },
     ],
   },
   {
