@@ -210,6 +210,9 @@ const App = () => (
             <Route path="/payroll" element={<Payroll />} />
             <Route path="/time-reports" element={<TimeReports />} />
             <Route path="/audit" element={<Audit />} />
+            <Route path="/documents" element={<PeopleRoute><Documents /></PeopleRoute>} />
+            <Route path="/goals" element={<PeopleRoute><Goals /></PeopleRoute>} />
+            <Route path="/training-catalog" element={<PeopleRoute><TrainingCatalog /></PeopleRoute>} />
 
             {/* People-only routes */}
             <Route path="/people-analytics" element={<PeopleRoute><PeopleAnalytics /></PeopleRoute>} />

@@ -63,6 +63,7 @@ import {
   CalendarClock,
   ClipboardCheck,
   type LucideIcon,
+  BookOpen,
 } from "lucide-react";
 
 interface MenuItem {
