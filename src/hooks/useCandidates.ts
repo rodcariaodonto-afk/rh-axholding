@@ -53,11 +53,20 @@ export function useCreateCandidate() {
   const { organizationId } = useCurrentOrganization();
 
   return useMutation({
-    mutationFn: async (input: Partial<Candidate>) => {
+    mutationFn: async (input: { name: string; email: string; phone?: string; job_id?: string; source?: string; notes?: string; resume_url?: string }) => {
       if (!organizationId) throw new Error("Organização não encontrada");
       const { data, error } = await supabase
         .from("candidates")
-        .insert({ ...input, organization_id: organizationId })
+        .insert({
+          name: input.name,
+          email: input.email,
+          phone: input.phone || null,
+          job_id: input.job_id || null,
+          source: input.source || null,
+          notes: input.notes || null,
+          resume_url: input.resume_url || null,
+          organization_id: organizationId,
+        })
         .select()
         .single();
       if (error) throw error;

@@ -39,11 +39,18 @@ export function useCreateWorkPolicy() {
   const { organizationId } = useCurrentOrganization();
 
   return useMutation({
-    mutationFn: async (input: Partial<WorkPolicy>) => {
+    mutationFn: async (input: { name: string; type?: string; description?: string; in_office_days_per_week?: number; in_office_days_per_month?: number }) => {
       if (!organizationId) throw new Error("Organização não encontrada");
       const { data, error } = await supabase
         .from("work_policies")
-        .insert({ ...input, organization_id: organizationId })
+        .insert({
+          name: input.name,
+          type: input.type || "presencial",
+          description: input.description || null,
+          in_office_days_per_week: input.in_office_days_per_week ?? null,
+          in_office_days_per_month: input.in_office_days_per_month ?? null,
+          organization_id: organizationId,
+        })
         .select()
         .single();
       if (error) throw error;
