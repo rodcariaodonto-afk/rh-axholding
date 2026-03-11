@@ -42,11 +42,19 @@ export function useCreateWorkSchedule() {
   const { organizationId } = useCurrentOrganization();
 
   return useMutation({
-    mutationFn: async (input: Partial<WorkSchedule>) => {
+    mutationFn: async (input: { name: string; type?: string; hours_per_week?: number; work_days?: string[]; hours_per_day?: number; late_tolerance_minutes?: number }) => {
       if (!organizationId) throw new Error("Organização não encontrada");
       const { data, error } = await supabase
         .from("work_schedules")
-        .insert({ ...input, organization_id: organizationId })
+        .insert({
+          name: input.name,
+          type: input.type || "standard",
+          hours_per_week: input.hours_per_week ?? 44,
+          work_days: input.work_days || ["mon","tue","wed","thu","fri"],
+          hours_per_day: input.hours_per_day ?? 8,
+          late_tolerance_minutes: input.late_tolerance_minutes ?? 10,
+          organization_id: organizationId,
+        })
         .select()
         .single();
       if (error) throw error;
