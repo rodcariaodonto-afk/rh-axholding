@@ -71,6 +71,14 @@ const EvaluationAnswerPage = lazy(() => import("./pages/EvaluationAnswerPage"));
 const EvaluationResultPage = lazy(() => import("./pages/EvaluationResultPage"));
 const ResetPassword = lazy(() => import("./pages/ResetPassword"));
 const RegistrarPonto = lazy(() => import("./pages/RegistrarPonto"));
+const Candidates = lazy(() => import("./pages/Candidates"));
+const SelectionFunnel = lazy(() => import("./pages/SelectionFunnel"));
+const WorkSchedules = lazy(() => import("./pages/WorkSchedules"));
+const WorkPolicies = lazy(() => import("./pages/WorkPolicies"));
+const Payroll = lazy(() => import("./pages/Payroll"));
+const TimeReports = lazy(() => import("./pages/TimeReports"));
+const Audit = lazy(() => import("./pages/Audit"));
+const NewEmployeePage = lazy(() => import("./pages/NewEmployeePage"));
 
 const queryClient = new QueryClient({
   defaultOptions: {
