@@ -63,6 +63,7 @@ import {
   CalendarClock,
   ClipboardCheck,
   type LucideIcon,
+  BookOpen,
 } from "lucide-react";
 
 interface MenuItem {
@@ -111,6 +112,8 @@ const menuGroups: MenuGroup[] = [
       { icon: MessageSquare, label: "Feedbacks", href: "/feedbacks" },
       { icon: Award, label: "Competências", href: "/skills-management" },
       { icon: Heart, label: "Cultura", href: "/culture" },
+      { icon: TrendingUp, label: "Metas & OKRs", href: "/goals" },
+      { icon: BookOpen, label: "Catálogo de Treinamentos", href: "/training-catalog" },
     ],
   },
   {
@@ -132,6 +135,7 @@ const menuGroups: MenuGroup[] = [
       { icon: Building2, label: "Departamentos", href: "/departments" },
       { icon: Network, label: "Organograma", href: "/organogram" },
       { icon: Calendar, label: "Políticas de Trabalho", href: "/work-policies" },
+      { icon: FileText, label: "Documentos", href: "/documents" },
     ],
   },
   {

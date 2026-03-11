@@ -81,6 +81,9 @@ const Audit = lazy(() => import("./pages/Audit"));
 const NewEmployeePage = lazy(() => import("./pages/NewEmployeePage"));
 const Dashboard = lazy(() => import("./pages/Dashboard"));
 const EmployeeOnboarding = lazy(() => import("./pages/EmployeeOnboarding"));
+const Documents = lazy(() => import("./pages/Documents"));
+const Goals = lazy(() => import("./pages/Goals"));
+const TrainingCatalog = lazy(() => import("./pages/TrainingCatalog"));
 
 const queryClient = new QueryClient({
   defaultOptions: {
@@ -207,6 +210,9 @@ const App = () => (
             <Route path="/payroll" element={<Payroll />} />
             <Route path="/time-reports" element={<TimeReports />} />
             <Route path="/audit" element={<Audit />} />
+            <Route path="/documents" element={<PeopleRoute><Documents /></PeopleRoute>} />
+            <Route path="/goals" element={<PeopleRoute><Goals /></PeopleRoute>} />
+            <Route path="/training-catalog" element={<PeopleRoute><TrainingCatalog /></PeopleRoute>} />
 
             {/* People-only routes */}
             <Route path="/people-analytics" element={<PeopleRoute><PeopleAnalytics /></PeopleRoute>} />

@@ -720,6 +720,7 @@ export type Database = {
           created_at: string
           description: string | null
           employee_id: string
+          expires_at: string | null
           file_name: string
           file_size: number | null
           file_type: string | null
@@ -733,6 +734,7 @@ export type Database = {
           created_at?: string
           description?: string | null
           employee_id: string
+          expires_at?: string | null
           file_name: string
           file_size?: number | null
           file_type?: string | null
@@ -746,6 +748,7 @@ export type Database = {
           created_at?: string
           description?: string | null
           employee_id?: string
+          expires_at?: string | null
           file_name?: string
           file_size?: number | null
           file_type?: string | null
@@ -851,6 +854,7 @@ export type Database = {
       employee_trainings: {
         Row: {
           career_points: number | null
+          catalog_item_id: string | null
           certificate_url: string | null
           completion_date: string
           cost: number | null
@@ -865,12 +869,14 @@ export type Database = {
           name: string
           pdi_goal_id: string | null
           pdi_id: string | null
+          request_status: string | null
           sponsor: string
           training_type: string
           updated_at: string
         }
         Insert: {
           career_points?: number | null
+          catalog_item_id?: string | null
           certificate_url?: string | null
           completion_date: string
           cost?: number | null
@@ -885,12 +891,14 @@ export type Database = {
           name: string
           pdi_goal_id?: string | null
           pdi_id?: string | null
+          request_status?: string | null
           sponsor?: string
           training_type?: string
           updated_at?: string
         }
         Update: {
           career_points?: number | null
+          catalog_item_id?: string | null
           certificate_url?: string | null
           completion_date?: string
           cost?: number | null
@@ -905,11 +913,19 @@ export type Database = {
           name?: string
           pdi_goal_id?: string | null
           pdi_id?: string | null
+          request_status?: string | null
           sponsor?: string
           training_type?: string
           updated_at?: string
         }
         Relationships: [
+          {
+            foreignKeyName: "employee_trainings_catalog_item_id_fkey"
+            columns: ["catalog_item_id"]
+            isOneToOne: false
+            referencedRelation: "training_catalog"
+            referencedColumns: ["id"]
+          },
           {
             foreignKeyName: "employee_trainings_created_by_fkey"
             columns: ["created_by"]
@@ -1244,6 +1260,7 @@ export type Database = {
           contract_type: Database["public"]["Enums"]["contract_type"]
           created_at: string | null
           dental_insurance: number | null
+          document_url: string | null
           health_insurance: number | null
           hire_date: string
           id: string
@@ -1252,6 +1269,7 @@ export type Database = {
           modified_by: string | null
           other_benefits: number | null
           probation_days: number | null
+          signed_at: string | null
           transportation_voucher: number | null
           updated_at: string | null
           user_id: string
@@ -1265,6 +1283,7 @@ export type Database = {
           contract_type: Database["public"]["Enums"]["contract_type"]
           created_at?: string | null
           dental_insurance?: number | null
+          document_url?: string | null
           health_insurance?: number | null
           hire_date: string
           id?: string
@@ -1273,6 +1292,7 @@ export type Database = {
           modified_by?: string | null
           other_benefits?: number | null
           probation_days?: number | null
+          signed_at?: string | null
           transportation_voucher?: number | null
           updated_at?: string | null
           user_id: string
@@ -1286,6 +1306,7 @@ export type Database = {
           contract_type?: Database["public"]["Enums"]["contract_type"]
           created_at?: string | null
           dental_insurance?: number | null
+          document_url?: string | null
           health_insurance?: number | null
           hire_date?: string
           id?: string
@@ -1294,6 +1315,7 @@ export type Database = {
           modified_by?: string | null
           other_benefits?: number | null
           probation_days?: number | null
+          signed_at?: string | null
           transportation_voucher?: number | null
           updated_at?: string | null
           user_id?: string
@@ -1758,6 +1780,83 @@ export type Database = {
             columns: ["sender_id"]
             isOneToOne: false
             referencedRelation: "employees"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      goals: {
+        Row: {
+          created_at: string
+          created_by: string | null
+          current_value: number | null
+          description: string | null
+          due_date: string | null
+          employee_id: string
+          id: string
+          organization_id: string
+          period: string
+          status: string
+          target_value: number | null
+          title: string
+          updated_at: string
+        }
+        Insert: {
+          created_at?: string
+          created_by?: string | null
+          current_value?: number | null
+          description?: string | null
+          due_date?: string | null
+          employee_id: string
+          id?: string
+          organization_id: string
+          period?: string
+          status?: string
+          target_value?: number | null
+          title: string
+          updated_at?: string
+        }
+        Update: {
+          created_at?: string
+          created_by?: string | null
+          current_value?: number | null
+          description?: string | null
+          due_date?: string | null
+          employee_id?: string
+          id?: string
+          organization_id?: string
+          period?: string
+          status?: string
+          target_value?: number | null
+          title?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "goals_created_by_fkey"
+            columns: ["created_by"]
+            isOneToOne: false
+            referencedRelation: "employees"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "goals_employee_id_fkey"
+            columns: ["employee_id"]
+            isOneToOne: false
+            referencedRelation: "employees"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "goals_organization_id_fkey"
+            columns: ["organization_id"]
+            isOneToOne: false
+            referencedRelation: "organizations"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "goals_organization_id_fkey"
+            columns: ["organization_id"]
+            isOneToOne: false
+            referencedRelation: "organizations_public"
             referencedColumns: ["id"]
           },
         ]
@@ -3933,6 +4032,7 @@ export type Database = {
           created_by: string
           description: string | null
           duration_hours: number | null
+          format: string | null
           id: string
           is_active: boolean
           is_mandatory: boolean
@@ -3941,6 +4041,7 @@ export type Database = {
           provider: string | null
           skill_ids: string[] | null
           updated_at: string
+          url: string | null
         }
         Insert: {
           career_points?: number | null
@@ -3950,6 +4051,7 @@ export type Database = {
           created_by: string
           description?: string | null
           duration_hours?: number | null
+          format?: string | null
           id?: string
           is_active?: boolean
           is_mandatory?: boolean
@@ -3958,6 +4060,7 @@ export type Database = {
           provider?: string | null
           skill_ids?: string[] | null
           updated_at?: string
+          url?: string | null
         }
         Update: {
           career_points?: number | null
@@ -3967,6 +4070,7 @@ export type Database = {
           created_by?: string
           description?: string | null
           duration_hours?: number | null
+          format?: string | null
           id?: string
           is_active?: boolean
           is_mandatory?: boolean
@@ -3975,6 +4079,7 @@ export type Database = {
           provider?: string | null
           skill_ids?: string[] | null
           updated_at?: string
+          url?: string | null
         }
         Relationships: [
           {
