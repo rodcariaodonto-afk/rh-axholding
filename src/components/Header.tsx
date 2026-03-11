@@ -7,6 +7,7 @@ import { Badge } from "@/components/ui/badge";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Link } from "react-router-dom";
 import { ThemeToggle } from "@/components/ThemeToggle";
+import { NotificationBell } from "@/components/NotificationBell";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -56,7 +57,8 @@ const Header = () => {
           </span>
         </Link>
         
-        <div className="flex items-center gap-4">
+        <div className="flex items-center gap-2">
+          <NotificationBell />
           {user && (
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
