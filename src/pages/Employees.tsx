@@ -280,10 +280,24 @@ export default function Employees() {
                   </ToggleGroupItem>
                 </ToggleGroup>
                 {canEdit && (
-                  <Button size="sm" onClick={() => setShowNewEmployeeDialog(true)}>
-                    <Plus className="h-4 w-4 mr-2" />
-                    Convidar
-                  </Button>
+                  <>
+                    <Button size="sm" asChild>
+                      <Link to="/employees/new">
+                        <Plus className="h-4 w-4 mr-2" />
+                        Novo Colaborador
+                      </Link>
+                    </Button>
+                    <Button size="sm" variant="secondary" onClick={() => setShowNewEmployeeDialog(true)}>
+                      <Plus className="h-4 w-4 mr-2" />
+                      Convidar
+                    </Button>
+                    <Button size="sm" variant="outline" asChild>
+                      <Link to="/import-employees">
+                        <Download className="h-4 w-4 mr-2" />
+                        Importar CSV
+                      </Link>
+                    </Button>
+                  </>
                 )}
                 <Button size="sm" variant="outline" onClick={handleExportCsv}>
                   <Download className="h-4 w-4 mr-2" />

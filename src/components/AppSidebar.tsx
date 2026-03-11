@@ -29,7 +29,6 @@ import { useUserRole } from "@/hooks/useUserRole";
 import { useUserOrganizations } from "@/hooks/useUserOrganizations";
 import {
   Package,
-  
   Users,
   Building2,
   Briefcase,
@@ -57,6 +56,12 @@ import {
   Shield,
   Eye,
   EyeOff,
+  Calendar,
+  FileText,
+  Filter,
+  UserPlus,
+  CalendarClock,
+  ClipboardCheck,
   type LucideIcon,
 } from "lucide-react";
 
@@ -65,7 +70,7 @@ interface MenuItem {
   label: string;
   href: string;
   badge?: string;
-  hideFor?: ("admin" | "people")[]; // Hide this item for specific roles
+  hideFor?: ("admin" | "people")[];
 }
 
 interface MenuGroup {
@@ -88,37 +93,61 @@ const menuGroups: MenuGroup[] = [
     ],
   },
   {
-    label: "GESTÃO DE PESSOAS",
+    label: "DEPARTAMENTO PESSOAL",
     showFor: "people",
     items: [
-      { icon: LayoutDashboard, label: "Dashboard", href: "/people-analytics" },
-      { icon: Users, label: "Colaboradores", href: "/employees" },
-      { icon: Network, label: "Organograma", href: "/organogram" },
-      { icon: Building2, label: "Departamentos", href: "/departments" },
-      { icon: Briefcase, label: "Cargos", href: "/positions" },
-      { icon: ClipboardList, label: "Vagas", href: "/vagas" },
-      { icon: Archive, label: "Banco de Talentos", href: "/talent-bank" },
+      { icon: Clock, label: "Gestão de Ponto", href: "/time-tracking" },
+      { icon: Palmtree, label: "Gestão de Férias", href: "/time-off" },
+      { icon: CalendarClock, label: "Escalas", href: "/work-schedules" },
+      { icon: FileText, label: "Folha de Pagamento", href: "/payroll" },
       { icon: UserMinus, label: "Desligamentos", href: "/terminations" },
     ],
   },
   {
-    label: "DESENVOLVIMENTO",
+    label: "GESTÃO & DESENVOLVIMENTO",
     showFor: "people",
     items: [
       { icon: Target, label: "Avaliação de Desempenho", href: "/performance-evaluation" },
       { icon: MessageSquare, label: "Feedbacks", href: "/feedbacks" },
-      { icon: Palmtree, label: "Gestão de Férias", href: "/time-off" },
+      { icon: Award, label: "Competências", href: "/skills-management" },
       { icon: Heart, label: "Cultura", href: "/culture" },
-      { icon: Clock, label: "Gestão de Ponto", href: "/time-tracking" },
+    ],
+  },
+  {
+    label: "RECRUTAMENTO & VAGAS",
+    showFor: "people",
+    items: [
+      { icon: ClipboardList, label: "Vagas", href: "/vagas" },
+      { icon: UserPlus, label: "Candidatos", href: "/candidates" },
+      { icon: Filter, label: "Funil de Seleção", href: "/selection-funnel" },
+      { icon: Archive, label: "Banco de Talentos", href: "/talent-bank" },
+    ],
+  },
+  {
+    label: "CADASTROS",
+    showFor: "people",
+    items: [
+      { icon: Users, label: "Colaboradores", href: "/employees" },
+      { icon: Briefcase, label: "Cargos", href: "/positions" },
+      { icon: Building2, label: "Departamentos", href: "/departments" },
+      { icon: Network, label: "Organograma", href: "/organogram" },
+      { icon: Calendar, label: "Políticas de Trabalho", href: "/work-policies" },
+    ],
+  },
+  {
+    label: "RELATÓRIOS & DASHBOARDS",
+    showFor: "people",
+    items: [
+      { icon: LayoutDashboard, label: "Dashboard", href: "/people-analytics" },
+      { icon: ClipboardCheck, label: "Relatórios de Ponto", href: "/time-reports" },
+      { icon: FileText, label: "Auditoria", href: "/audit" },
     ],
   },
   {
     label: "ADMINISTRAÇÃO",
     showFor: "people",
     items: [
-      
       { icon: Building2, label: "Empresa", href: "/company-settings" },
-      { icon: Award, label: "Competências", href: "/skills-management" },
       { icon: Plug, label: "Integrações", href: "/company-settings/integrations" },
       { icon: Shield, label: "Gestão de Acessos", href: "/access-management" },
       { icon: DollarSign, label: "Custos", href: "/company-costs" },

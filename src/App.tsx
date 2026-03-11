@@ -71,6 +71,14 @@ const EvaluationAnswerPage = lazy(() => import("./pages/EvaluationAnswerPage"));
 const EvaluationResultPage = lazy(() => import("./pages/EvaluationResultPage"));
 const ResetPassword = lazy(() => import("./pages/ResetPassword"));
 const RegistrarPonto = lazy(() => import("./pages/RegistrarPonto"));
+const Candidates = lazy(() => import("./pages/Candidates"));
+const SelectionFunnel = lazy(() => import("./pages/SelectionFunnel"));
+const WorkSchedules = lazy(() => import("./pages/WorkSchedules"));
+const WorkPolicies = lazy(() => import("./pages/WorkPolicies"));
+const Payroll = lazy(() => import("./pages/Payroll"));
+const TimeReports = lazy(() => import("./pages/TimeReports"));
+const Audit = lazy(() => import("./pages/Audit"));
+const NewEmployeePage = lazy(() => import("./pages/NewEmployeePage"));
 
 const queryClient = new QueryClient({
   defaultOptions: {
@@ -165,6 +173,7 @@ const App = () => (
             <Route path="/" element={<Index />} />
             <Route path="/my-pdis" element={<MyPdis />} />
             <Route path="/employees" element={<Employees />} />
+            <Route path="/employees/new" element={<PeopleRoute><NewEmployeePage /></PeopleRoute>} />
             <Route path="/employees/:id" element={<EmployeeProfile />} />
             <Route path="/employees/:id/pdi/:pdiId" element={<PdiDetailPage />} />
             <Route path="/departments" element={<Departments />} />
@@ -187,6 +196,13 @@ const App = () => (
             <Route path="/my-evaluations/received/:cycleId" element={<EvaluationResultPage />} />
             <Route path="/theme-editor" element={<ThemeEditor />} />
             <Route path="/time-tracking" element={<TimeTracking />} />
+            <Route path="/candidates" element={<Candidates />} />
+            <Route path="/selection-funnel" element={<SelectionFunnel />} />
+            <Route path="/work-schedules" element={<WorkSchedules />} />
+            <Route path="/work-policies" element={<WorkPolicies />} />
+            <Route path="/payroll" element={<Payroll />} />
+            <Route path="/time-reports" element={<TimeReports />} />
+            <Route path="/audit" element={<Audit />} />
 
             {/* People-only routes */}
             <Route path="/people-analytics" element={<PeopleRoute><PeopleAnalytics /></PeopleRoute>} />
