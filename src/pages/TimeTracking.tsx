@@ -241,11 +241,14 @@ export default function TimeTracking() {
           </div>
 
           {overviewEmployee === "all" ? (
-            <Card>
-              <CardContent className="py-12 text-center text-muted-foreground">
-                Selecione um colaborador para visualizar os gráficos.
-              </CardContent>
-            </Card>
+            <div className="space-y-6">
+              <TeamHoursRanking entries={monthEntries as any} />
+              <MonthlyHeatmap
+                entries={monthEntries as any}
+                monthStart={overviewStartDate}
+                monthEnd={overviewEndDate}
+              />
+            </div>
           ) : loadingOverview ? (
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
               <Skeleton className="h-80 w-full" />
