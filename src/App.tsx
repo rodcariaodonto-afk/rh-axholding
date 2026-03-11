@@ -173,6 +173,8 @@ const App = () => (
           {/* Protected routes with persistent Layout */}
           <Route element={<ProtectedRoute><SetupEnforcementWrapper><LayoutRoute /></SetupEnforcementWrapper></ProtectedRoute>}>
             <Route path="/" element={<Index />} />
+            <Route path="/dashboard" element={<Dashboard />} />
+            <Route path="/employee-onboarding" element={<EmployeeOnboarding />} />
             <Route path="/my-pdis" element={<MyPdis />} />
             <Route path="/employees" element={<Employees />} />
             <Route path="/employees/new" element={<PeopleRoute><NewEmployeePage /></PeopleRoute>} />
