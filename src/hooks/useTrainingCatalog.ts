@@ -54,11 +54,19 @@ export function useTrainingCatalog() {
     mutationFn: async (params: CreateCatalogParams) => {
       if (!organizationId) throw new Error("Sem organização");
       const { data: { user } } = await supabase.auth.getUser();
-      const { error } = await supabase.from("training_catalog").insert({
-        ...params,
+      if (!user) throw new Error("Não autenticado");
+      const { error } = await supabase.from("training_catalog").insert([{
+        name: params.name,
+        description: params.description ?? null,
+        provider: params.provider ?? null,
+        format: params.format ?? "online",
+        duration_hours: params.duration_hours ?? null,
+        cost: params.cost ?? null,
+        category: params.category ?? null,
+        url: params.url ?? null,
         organization_id: organizationId,
-        created_by: user?.id,
-      });
+        created_by: user.id,
+      }]);
       if (error) throw error;
     },
     onSuccess: () => {

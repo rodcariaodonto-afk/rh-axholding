@@ -137,18 +137,6 @@ export default function Documents() {
                 </CardContent>
               </Card>
             )}
-            {expiringCount > 0 && (
-              <Card className="border-amber-500/50">
-                <CardHeader className="pb-2">
-                  <CardTitle className="text-sm font-medium flex items-center gap-2 text-amber-600 dark:text-amber-400">
-                    <AlertTriangle className="h-4 w-4" />
-                    Vencendo em 30 dias
-                  </CardTitle>
-                </CardHeader>
-                <CardContent>
-                  <p className="text-2xl font-bold">{expiringCount}</p>
-                </CardContent>
-              </Card>
             )}
           </div>
         )}
