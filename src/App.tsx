@@ -173,6 +173,7 @@ const App = () => (
             <Route path="/" element={<Index />} />
             <Route path="/my-pdis" element={<MyPdis />} />
             <Route path="/employees" element={<Employees />} />
+            <Route path="/employees/new" element={<PeopleRoute><NewEmployeePage /></PeopleRoute>} />
             <Route path="/employees/:id" element={<EmployeeProfile />} />
             <Route path="/employees/:id/pdi/:pdiId" element={<PdiDetailPage />} />
             <Route path="/departments" element={<Departments />} />
