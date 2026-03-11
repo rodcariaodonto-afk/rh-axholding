@@ -14,6 +14,7 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { useDepartments } from "@/hooks/useDepartments";
+import { supabase } from "@/integrations/supabase/client";
 import { usePositions } from "@/hooks/usePositions";
 import { useUnits } from "@/hooks/useUnits";
 import { useEmployees } from "@/hooks/useEmployees";
