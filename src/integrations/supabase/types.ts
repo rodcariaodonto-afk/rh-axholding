@@ -531,6 +531,7 @@ export type Database = {
       }
       company_documents: {
         Row: {
+          access_roles: string[] | null
           category: string
           created_at: string
           description: string | null
@@ -542,9 +543,13 @@ export type Database = {
           title: string
           updated_at: string
           uploaded_by: string | null
+          valid_from: string | null
+          valid_until: string | null
           version: string
+          visibility: string
         }
         Insert: {
+          access_roles?: string[] | null
           category?: string
           created_at?: string
           description?: string | null
@@ -556,9 +561,13 @@ export type Database = {
           title: string
           updated_at?: string
           uploaded_by?: string | null
+          valid_from?: string | null
+          valid_until?: string | null
           version?: string
+          visibility?: string
         }
         Update: {
+          access_roles?: string[] | null
           category?: string
           created_at?: string
           description?: string | null
@@ -570,7 +579,10 @@ export type Database = {
           title?: string
           updated_at?: string
           uploaded_by?: string | null
+          valid_from?: string | null
+          valid_until?: string | null
           version?: string
+          visibility?: string
         }
         Relationships: [
           {
