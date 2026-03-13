@@ -64,6 +64,12 @@ import {
   ClipboardCheck,
   type LucideIcon,
   BookOpen,
+  Landmark,
+  FileStack,
+  UserCog,
+  AlertTriangle,
+  CreditCard,
+  Compass,
 } from "lucide-react";
 
 interface MenuItem {
@@ -82,26 +88,47 @@ interface MenuGroup {
 
 const menuGroups: MenuGroup[] = [
   {
-    label: "MEU ESPAÇO",
+    label: "PERFIL",
     showFor: "all",
     items: [
       { icon: User, label: "Meu Perfil", href: "/profile" },
       { icon: Brain, label: "Profiler", href: "/profiler-intro" },
       { icon: TrendingUp, label: "Meu PDI", href: "/my-pdis" },
       { icon: Target, label: "Minhas Avaliações", href: "/my-evaluations" },
+      { icon: UserCog, label: "Tipo de Perfil", href: "/profile-type" },
       { icon: Palmtree, label: "Minhas Férias", href: "/time-off", hideFor: ["admin", "people"] },
       { icon: Clock, label: "Meu Ponto", href: "/time-tracking", hideFor: ["admin", "people"] },
+    ],
+  },
+  {
+    label: "CADASTRO",
+    showFor: "people",
+    items: [
+      { icon: Users, label: "Colaboradores", href: "/employees" },
+      { icon: Briefcase, label: "Cargos", href: "/positions" },
+      { icon: DollarSign, label: "Salários", href: "/salary-ranges" },
+      { icon: Building2, label: "Departamentos", href: "/departments" },
+    ],
+  },
+  {
+    label: "ESTRUTURA ORGANIZACIONAL",
+    showFor: "people",
+    items: [
+      { icon: Network, label: "Organograma", href: "/organogram" },
+      { icon: Calendar, label: "Políticas de Trabalho", href: "/work-policies" },
+      { icon: Compass, label: "Identidade Organizacional", href: "/culture" },
     ],
   },
   {
     label: "DEPARTAMENTO PESSOAL",
     showFor: "people",
     items: [
+      { icon: Landmark, label: "Dados Trabalhistas", href: "/labor-data" },
       { icon: Clock, label: "Gestão de Ponto", href: "/time-tracking" },
       { icon: Palmtree, label: "Gestão de Férias", href: "/time-off" },
       { icon: CalendarClock, label: "Escalas", href: "/work-schedules" },
-      { icon: FileText, label: "Folha de Pagamento", href: "/payroll" },
-      { icon: UserMinus, label: "Desligamentos", href: "/terminations" },
+      { icon: AlertTriangle, label: "Absenteísmo", href: "/absenteeism" },
+      { icon: UserMinus, label: "Rescisão Contratual", href: "/terminations" },
     ],
   },
   {
@@ -111,7 +138,6 @@ const menuGroups: MenuGroup[] = [
       { icon: Target, label: "Avaliação de Desempenho", href: "/performance-evaluation" },
       { icon: MessageSquare, label: "Feedbacks", href: "/feedbacks" },
       { icon: Award, label: "Competências", href: "/skills-management" },
-      { icon: Heart, label: "Cultura", href: "/culture" },
       { icon: TrendingUp, label: "Metas & OKRs", href: "/goals" },
       { icon: BookOpen, label: "Catálogo de Treinamentos", href: "/training-catalog" },
     ],
@@ -127,35 +153,34 @@ const menuGroups: MenuGroup[] = [
     ],
   },
   {
-    label: "CADASTROS",
-    showFor: "people",
-    items: [
-      { icon: Users, label: "Colaboradores", href: "/employees" },
-      { icon: Briefcase, label: "Cargos", href: "/positions" },
-      { icon: Building2, label: "Departamentos", href: "/departments" },
-      { icon: Network, label: "Organograma", href: "/organogram" },
-      { icon: Calendar, label: "Políticas de Trabalho", href: "/work-policies" },
-      { icon: FileText, label: "Documentos", href: "/documents" },
-    ],
-  },
-  {
     label: "RELATÓRIOS & DASHBOARDS",
     showFor: "people",
     items: [
       { icon: LayoutDashboard, label: "Dashboard", href: "/dashboard" },
       { icon: ClipboardCheck, label: "Relatórios de Ponto", href: "/time-reports" },
-      { icon: FileText, label: "Auditoria", href: "/audit" },
+      { icon: TrendingUp, label: "People Analytics", href: "/people-analytics" },
+    ],
+  },
+  {
+    label: "FINANCEIRO",
+    showFor: "people",
+    items: [
+      { icon: FileText, label: "Folha de Pagamento", href: "/payroll" },
+      { icon: CreditCard, label: "Programação de Pagamento", href: "/payment-schedule" },
+      { icon: DollarSign, label: "Custos", href: "/company-costs" },
     ],
   },
   {
     label: "ADMINISTRAÇÃO",
     showFor: "people",
     items: [
-      { icon: Building2, label: "Empresa", href: "/company-settings" },
+      { icon: Building2, label: "Dados da Empresa", href: "/company-settings" },
       { icon: Plug, label: "Integrações", href: "/company-settings/integrations" },
       { icon: Shield, label: "Gestão de Acessos", href: "/access-management" },
-      { icon: DollarSign, label: "Custos", href: "/company-costs" },
+      { icon: FileText, label: "Auditoria", href: "/audit" },
+      { icon: FileStack, label: "Documentos da Empresa", href: "/company-documents" },
       { icon: Package, label: "Inventário", href: "/" },
+      { icon: FileText, label: "Documentos de Colaboradores", href: "/documents" },
     ],
   },
 ];
