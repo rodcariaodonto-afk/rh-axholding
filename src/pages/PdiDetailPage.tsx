@@ -8,6 +8,9 @@ import { ScrollArea } from "@/components/ui/scroll-area";
 import { Badge } from "@/components/ui/badge";
 import { Skeleton } from "@/components/ui/skeleton";
 import { ArrowLeft, CheckCircle, XCircle, Trash } from "lucide-react";
+import { PdiApprovalButton } from "@/components/PdiApprovalButton";
+import { PdiVersionHistory } from "@/components/PdiVersionHistory";
+import { PdiActionPlanTab } from "@/components/PdiActionPlanTab";
 import { format, differenceInDays } from "date-fns";
 import { ptBR } from "date-fns/locale";
 import { PdiInfoForm } from "@/components/PdiInfoForm";
@@ -89,6 +92,9 @@ const PdiDetailPage = () => {
             <p className="text-sm text-muted-foreground">
               {(pdi.employee as any)?.full_name} • {(pdi.employee as any)?.department?.name}
             </p>
+            <div className="mt-2">
+              <PdiApprovalButton pdiId={pdiId!} pdi={pdi} />
+            </div>
           </div>
         </div>
 
@@ -168,6 +174,13 @@ const PdiDetailPage = () => {
             <Card>
               <CardContent className="pt-6">
                 <PdiGoalsManager pdiId={pdiId!} pdi={pdi} />
+              </CardContent>
+            </Card>
+
+            {/* Action Plan */}
+            <Card>
+              <CardContent className="pt-6">
+                <PdiActionPlanTab pdiId={pdiId!} pdi={pdi} />
               </CardContent>
             </Card>
 
@@ -257,6 +270,9 @@ const PdiDetailPage = () => {
 
           {/* Right Column - Timeline */}
           <div className="space-y-6">
+            {/* Version History */}
+            <PdiVersionHistory pdiId={pdiId!} />
+
             <Card>
               <CardHeader>
                 <CardTitle>Linha do Tempo</CardTitle>

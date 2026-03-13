@@ -33,7 +33,7 @@ import {
   DialogFooter,
 } from "@/components/ui/dialog";
 import { Textarea } from "@/components/ui/textarea";
-import { Palmtree, Check, X, Clock, MoreHorizontal, Plus, Eye, Pencil, Trash2, CalendarDays } from "lucide-react";
+import { Palmtree, Check, X, Clock, MoreHorizontal, Plus, Eye, Pencil, Trash2, CalendarDays, Calendar, CheckCircle } from "lucide-react";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -50,6 +50,9 @@ import {
   mockTimeOffEmployees,
   type MockTimeOffRequest 
 } from "@/mocks/timeOffData";
+import { TimeOffScheduleCalendar } from "@/components/TimeOffScheduleCalendar";
+import { TimeOffCompletionTab } from "@/components/TimeOffCompletionTab";
+import { useDepartments } from "@/hooks/useDepartments";
 
 type TimeOffStatus = "pending_people" | "approved" | "rejected" | "cancelled";
 
@@ -94,7 +97,8 @@ export default function TimeOff() {
   const [statusFilter, setStatusFilter] = useState<TimeOffStatus | "all">("all");
   const [requestDialogOpen, setRequestDialogOpen] = useState(false);
   const [editingRequest, setEditingRequest] = useState<TimeOffRequest | null>(null);
-  const [activeTab, setActiveTab] = useState<"requests" | "approved" | "balance" | "acquisition">("requests");
+  const [activeTab, setActiveTab] = useState<"requests" | "approved" | "balance" | "acquisition" | "schedule" | "completion">("requests");
+  const { data: departments } = useDepartments();
   const [reviewModal, setReviewModal] = useState<{
     open: boolean;
     request: TimeOffRequest | null;
@@ -473,6 +477,22 @@ export default function TimeOff() {
                 <CalendarDays className="h-4 w-4 mr-2" />
                 Período Aquisitivo
               </Button>
+              <Button
+                variant={activeTab === "schedule" ? "default" : "ghost"}
+                className="rounded-b-none"
+                onClick={() => setActiveTab("schedule")}
+              >
+                <Calendar className="h-4 w-4 mr-2" />
+                Programação
+              </Button>
+              <Button
+                variant={activeTab === "completion" ? "default" : "ghost"}
+                className="rounded-b-none"
+                onClick={() => setActiveTab("completion")}
+              >
+                <CheckCircle className="h-4 w-4 mr-2" />
+                Conclusão
+              </Button>
             </>
           )}
         </div>
@@ -762,6 +782,25 @@ export default function TimeOff() {
               </div>
             </CardContent>
           </Card>
+        )}
+
+        {/* Schedule Calendar Tab */}
+        {activeTab === "schedule" && isManager && (
+          <TimeOffScheduleCalendar
+            requests={requests || []}
+            employees={employees || []}
+            departments={departments || []}
+          />
+        )}
+
+        {/* Completion Tab */}
+        {activeTab === "completion" && isManager && (
+          <TimeOffCompletionTab
+            requests={requests || []}
+            employees={employees || []}
+            isManager={isManager}
+            userId={user?.id}
+          />
         )}
 
         {/* Período Aquisitivo Tab */}

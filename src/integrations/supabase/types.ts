@@ -2945,6 +2945,63 @@ export type Database = {
           },
         ]
       }
+      pdi_action_plans: {
+        Row: {
+          action: string
+          created_at: string
+          end_date: string | null
+          goal_id: string | null
+          id: string
+          notes: string | null
+          pdi_id: string
+          responsible: string
+          start_date: string | null
+          status: string
+          updated_at: string
+        }
+        Insert: {
+          action: string
+          created_at?: string
+          end_date?: string | null
+          goal_id?: string | null
+          id?: string
+          notes?: string | null
+          pdi_id: string
+          responsible: string
+          start_date?: string | null
+          status?: string
+          updated_at?: string
+        }
+        Update: {
+          action?: string
+          created_at?: string
+          end_date?: string | null
+          goal_id?: string | null
+          id?: string
+          notes?: string | null
+          pdi_id?: string
+          responsible?: string
+          start_date?: string | null
+          status?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "pdi_action_plans_goal_id_fkey"
+            columns: ["goal_id"]
+            isOneToOne: false
+            referencedRelation: "pdi_goals"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "pdi_action_plans_pdi_id_fkey"
+            columns: ["pdi_id"]
+            isOneToOne: false
+            referencedRelation: "pdis"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       pdi_attachments: {
         Row: {
           created_at: string
@@ -3168,8 +3225,49 @@ export type Database = {
           },
         ]
       }
+      pdi_versions: {
+        Row: {
+          change_description: string | null
+          changed_by: string
+          created_at: string
+          id: string
+          pdi_id: string
+          snapshot: Json
+          version_number: number
+        }
+        Insert: {
+          change_description?: string | null
+          changed_by: string
+          created_at?: string
+          id?: string
+          pdi_id: string
+          snapshot: Json
+          version_number?: number
+        }
+        Update: {
+          change_description?: string | null
+          changed_by?: string
+          created_at?: string
+          id?: string
+          pdi_id?: string
+          snapshot?: Json
+          version_number?: number
+        }
+        Relationships: [
+          {
+            foreignKeyName: "pdi_versions_pdi_id_fkey"
+            columns: ["pdi_id"]
+            isOneToOne: false
+            referencedRelation: "pdis"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       pdis: {
         Row: {
+          approval_status: string | null
+          approved_at: string | null
+          approved_by: string | null
           created_at: string
           created_by: string
           current_state: string | null
@@ -3185,10 +3283,14 @@ export type Database = {
           progress: number | null
           start_date: string
           status: Database["public"]["Enums"]["pdi_status"]
+          submitted_for_approval_at: string | null
           title: string
           updated_at: string
         }
         Insert: {
+          approval_status?: string | null
+          approved_at?: string | null
+          approved_by?: string | null
           created_at?: string
           created_by: string
           current_state?: string | null
@@ -3204,10 +3306,14 @@ export type Database = {
           progress?: number | null
           start_date: string
           status?: Database["public"]["Enums"]["pdi_status"]
+          submitted_for_approval_at?: string | null
           title: string
           updated_at?: string
         }
         Update: {
+          approval_status?: string | null
+          approved_at?: string | null
+          approved_by?: string | null
           created_at?: string
           created_by?: string
           current_state?: string | null
@@ -3223,10 +3329,18 @@ export type Database = {
           progress?: number | null
           start_date?: string
           status?: Database["public"]["Enums"]["pdi_status"]
+          submitted_for_approval_at?: string | null
           title?: string
           updated_at?: string
         }
         Relationships: [
+          {
+            foreignKeyName: "pdis_approved_by_fkey"
+            columns: ["approved_by"]
+            isOneToOne: false
+            referencedRelation: "employees"
+            referencedColumns: ["id"]
+          },
           {
             foreignKeyName: "pdis_created_by_fkey"
             columns: ["created_by"]
@@ -4417,6 +4531,9 @@ export type Database = {
           id: string
           notes: string | null
           policy_id: string
+          return_confirmed_by: string | null
+          return_notes: string | null
+          returned_at: string | null
           review_notes: string | null
           reviewed_at: string | null
           reviewed_by: string | null
@@ -4432,6 +4549,9 @@ export type Database = {
           id?: string
           notes?: string | null
           policy_id: string
+          return_confirmed_by?: string | null
+          return_notes?: string | null
+          returned_at?: string | null
           review_notes?: string | null
           reviewed_at?: string | null
           reviewed_by?: string | null
@@ -4447,6 +4567,9 @@ export type Database = {
           id?: string
           notes?: string | null
           policy_id?: string
+          return_confirmed_by?: string | null
+          return_notes?: string | null
+          returned_at?: string | null
           review_notes?: string | null
           reviewed_at?: string | null
           reviewed_by?: string | null
