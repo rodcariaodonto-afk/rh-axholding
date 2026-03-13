@@ -784,6 +784,25 @@ export default function TimeOff() {
           </Card>
         )}
 
+        {/* Schedule Calendar Tab */}
+        {activeTab === "schedule" && isManager && (
+          <TimeOffScheduleCalendar
+            requests={requests || []}
+            employees={employees || []}
+            departments={departments || []}
+          />
+        )}
+
+        {/* Completion Tab */}
+        {activeTab === "completion" && isManager && (
+          <TimeOffCompletionTab
+            requests={requests || []}
+            employees={employees || []}
+            isManager={isManager}
+            userId={user?.id}
+          />
+        )}
+
         {/* Período Aquisitivo Tab */}
         {activeTab === "acquisition" && isManager && (
           <Card>
