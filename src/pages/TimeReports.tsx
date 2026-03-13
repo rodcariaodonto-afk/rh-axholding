@@ -93,6 +93,46 @@ export default function TimeReports() {
     return (totalMin / 60 / daySet.size).toFixed(1);
   }, [monthEntries]);
 
+  // Consolidated report data
+  const consolidatedData = useMemo(() => {
+    const empMap = new Map<string, any>();
+    activeEmployees.forEach(emp => {
+      empMap.set(emp.id, { name: emp.full_name || emp.email, totalHours: 0, absences: 0, delays: 0, certificates: 0, inss: 0 });
+    });
+    (monthEntries as any[]).forEach(e => {
+      const entry = empMap.get(e.employee_id);
+      if (entry) entry.totalHours += (e.total_minutes || 0) / 60;
+    });
+    absenteeismData.forEach((a: any) => {
+      const entry = empMap.get(a.employee_id);
+      if (entry) {
+        if (a.type === "falta") entry.absences++;
+        else if (a.type === "atraso") entry.delays++;
+        else if (a.type === "atestado") entry.certificates++;
+        else if (a.type === "inss") entry.inss++;
+      }
+    });
+    return Array.from(empMap.entries())
+      .map(([id, data]) => ({ id, ...data }))
+      .filter(d => d.totalHours > 0 || d.absences > 0 || d.delays > 0 || d.certificates > 0 || d.inss > 0);
+  }, [activeEmployees, monthEntries, absenteeismData]);
+
+  const handleExportConsolidatedCSV = () => {
+    if (consolidatedData.length === 0) return;
+    const header = "Colaborador,Horas Trabalhadas,Faltas,Atrasos,Atestados,Licenças INSS\n";
+    const rows = consolidatedData.map(d =>
+      `"${d.name}",${d.totalHours.toFixed(1)},${d.absences},${d.delays},${d.certificates},${d.inss}`
+    );
+    const csv = header + rows.join("\n");
+    const blob = new Blob([csv], { type: "text/csv;charset=utf-8" });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement("a");
+    a.href = url;
+    a.download = `relatorio-consolidado-${MONTHS[selectedMonth]}-${selectedYear}.csv`;
+    a.click();
+    URL.revokeObjectURL(url);
+  };
+
   const handleExportCSV = () => {
     if (monthEntries.length === 0) return;
     const header = "Data,Colaborador,Email,Entrada,Saída,Minutos\n";
