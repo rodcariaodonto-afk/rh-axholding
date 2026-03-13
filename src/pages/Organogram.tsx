@@ -128,9 +128,21 @@ const Organogram = () => {
   const totalEmployees = employees.filter((e) => e.status === "active").length;
   const totalInTree = displayTree.reduce((acc, node) => acc + 1 + countAllDescendants(node), 0);
 
-  const handleExportPng = () => {
-    toast.info("Para exportar, use Print Screen ou a ferramenta de captura do seu sistema operacional.");
-  };
+  const handleExportPng = useCallback(async () => {
+    if (!treeRef.current) return;
+    try {
+      const html2canvas = (await import("html2canvas")).default;
+      const canvas = await html2canvas(treeRef.current, { backgroundColor: null, scale: 2 });
+      const url = canvas.toDataURL("image/png");
+      const a = document.createElement("a");
+      a.href = url;
+      a.download = `organograma-${new Date().toISOString().split("T")[0]}.png`;
+      a.click();
+      toast.success("Organograma exportado como PNG!");
+    } catch {
+      toast.error("Erro ao exportar. Tente novamente.");
+    }
+  }, []);
 
   return (
     <Layout>
