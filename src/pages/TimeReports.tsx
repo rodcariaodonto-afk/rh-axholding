@@ -3,14 +3,20 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Button } from "@/components/ui/button";
+import { Badge } from "@/components/ui/badge";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { useEmployees } from "@/hooks/useEmployees";
 import { useMonthlyTimeEntries } from "@/hooks/useMonthlyTimeEntries";
+import { useCurrentOrganization } from "@/hooks/useCurrentOrganization";
+import { useQuery } from "@tanstack/react-query";
+import { supabase } from "@/integrations/supabase/client";
 import { WeeklyHoursChart } from "@/components/time-tracking/WeeklyHoursChart";
 import { MonthlyHeatmap } from "@/components/time-tracking/MonthlyHeatmap";
 import { TeamHoursRanking } from "@/components/time-tracking/TeamHoursRanking";
 import { HoursGanttChart } from "@/components/time-tracking/HoursGanttChart";
 import { format, startOfMonth, endOfMonth } from "date-fns";
-import { Download, BarChart3, Users, Calendar } from "lucide-react";
+import { Download, BarChart3, Users, Calendar, FileText } from "lucide-react";
 
 const MONTHS = [
   "Janeiro", "Fevereiro", "Março", "Abril", "Maio", "Junho",
