@@ -34,6 +34,17 @@ export default function WorkPolicies() {
   const { data: policies, isLoading } = useWorkPolicies();
   const createPolicy = useCreateWorkPolicy();
   const deletePolicy = useDeleteWorkPolicy();
+  const { data: employees = [] } = useEmployees();
+
+  const employeeCountByPolicy = useMemo(() => {
+    const map: Record<string, number> = {};
+    employees.forEach((emp: any) => {
+      if (emp.work_policy_id) {
+        map[emp.work_policy_id] = (map[emp.work_policy_id] || 0) + 1;
+      }
+    });
+    return map;
+  }, [employees]);
 
   const [showDialog, setShowDialog] = useState(false);
   const [name, setName] = useState("");
