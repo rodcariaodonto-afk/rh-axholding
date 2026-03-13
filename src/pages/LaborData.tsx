@@ -140,7 +140,7 @@ const LaborData = () => {
                     </div>
                     <div>
                       <p className="text-sm text-muted-foreground">Tipo</p>
-                      <p className="font-medium">{schedule.schedule_type || "—"}</p>
+                      <p className="font-medium">{(schedule as any).schedule_type || (schedule as any).type || "—"}</p>
                     </div>
                     <div>
                       <p className="text-sm text-muted-foreground">Carga Semanal</p>
