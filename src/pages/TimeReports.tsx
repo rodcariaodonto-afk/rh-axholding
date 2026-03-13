@@ -27,7 +27,9 @@ export default function TimeReports() {
   const [selectedMonth, setSelectedMonth] = useState(new Date().getMonth());
   const [selectedYear, setSelectedYear] = useState(new Date().getFullYear());
   const [selectedEmployee, setSelectedEmployee] = useState("all");
+  const [activeTab, setActiveTab] = useState("charts");
 
+  const { organizationId } = useCurrentOrganization();
   const yearOptions = [selectedYear - 1, selectedYear, selectedYear + 1];
 
   const monthStart = format(startOfMonth(new Date(selectedYear, selectedMonth)), "yyyy-MM-dd");
@@ -49,6 +51,24 @@ export default function TimeReports() {
     customStartDate: monthStart,
     customEndDate: monthEnd,
     employeeId: selectedEmployee !== "all" ? selectedEmployee : undefined,
+  });
+
+  // Fetch absenteeism data for consolidated report
+  const { data: absenteeismData = [] } = useQuery({
+    queryKey: ["absenteeism-report", organizationId, monthStart, monthEnd],
+    queryFn: async () => {
+      if (!organizationId) return [];
+      const { data, error } = await supabase
+        .from("absenteeism")
+        .select("*, employee:employee_id(id, full_name)")
+        .eq("organization_id", organizationId)
+        .gte("date", monthStart)
+        .lte("date", monthEnd)
+        .order("date");
+      if (error) throw error;
+      return data;
+    },
+    enabled: !!organizationId,
   });
 
   // KPIs
