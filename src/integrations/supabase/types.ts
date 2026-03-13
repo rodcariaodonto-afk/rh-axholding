@@ -14,6 +14,97 @@ export type Database = {
   }
   public: {
     Tables: {
+      absenteeism: {
+        Row: {
+          cid_code: string | null
+          created_at: string
+          date: string
+          doctor_name: string | null
+          document_name: string | null
+          document_url: string | null
+          employee_id: string
+          end_time: string | null
+          id: string
+          inss_end_date: string | null
+          inss_protocol: string | null
+          inss_start_date: string | null
+          minutes_lost: number | null
+          organization_id: string
+          reason: string | null
+          registered_by: string | null
+          start_time: string | null
+          status: string
+          type: string
+          updated_at: string
+        }
+        Insert: {
+          cid_code?: string | null
+          created_at?: string
+          date: string
+          doctor_name?: string | null
+          document_name?: string | null
+          document_url?: string | null
+          employee_id: string
+          end_time?: string | null
+          id?: string
+          inss_end_date?: string | null
+          inss_protocol?: string | null
+          inss_start_date?: string | null
+          minutes_lost?: number | null
+          organization_id: string
+          reason?: string | null
+          registered_by?: string | null
+          start_time?: string | null
+          status?: string
+          type: string
+          updated_at?: string
+        }
+        Update: {
+          cid_code?: string | null
+          created_at?: string
+          date?: string
+          doctor_name?: string | null
+          document_name?: string | null
+          document_url?: string | null
+          employee_id?: string
+          end_time?: string | null
+          id?: string
+          inss_end_date?: string | null
+          inss_protocol?: string | null
+          inss_start_date?: string | null
+          minutes_lost?: number | null
+          organization_id?: string
+          reason?: string | null
+          registered_by?: string | null
+          start_time?: string | null
+          status?: string
+          type?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "absenteeism_employee_id_fkey"
+            columns: ["employee_id"]
+            isOneToOne: false
+            referencedRelation: "employees"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "absenteeism_organization_id_fkey"
+            columns: ["organization_id"]
+            isOneToOne: false
+            referencedRelation: "organizations"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "absenteeism_organization_id_fkey"
+            columns: ["organization_id"]
+            isOneToOne: false
+            referencedRelation: "organizations_public"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       audit_log: {
         Row: {
           action: string
@@ -3825,6 +3916,100 @@ export type Database = {
           },
           {
             foreignKeyName: "soft_skills_organization_id_fkey"
+            columns: ["organization_id"]
+            isOneToOne: false
+            referencedRelation: "organizations_public"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      termination_details: {
+        Row: {
+          created_at: string
+          employee_id: string
+          fgts_balance: number | null
+          fgts_penalty_amount: number | null
+          fgts_penalty_pct: number | null
+          id: string
+          notes: string | null
+          notice_amount: number | null
+          notice_days: number | null
+          notice_type: string | null
+          organization_id: string
+          other_credits: number | null
+          other_debits: number | null
+          pending_vacation_days: number | null
+          proportional_13th_months: number | null
+          proportional_vacation_days: number | null
+          term_generated_at: string | null
+          thirteenth_amount: number | null
+          total_amount: number | null
+          updated_at: string
+          vacation_amount: number | null
+        }
+        Insert: {
+          created_at?: string
+          employee_id: string
+          fgts_balance?: number | null
+          fgts_penalty_amount?: number | null
+          fgts_penalty_pct?: number | null
+          id?: string
+          notes?: string | null
+          notice_amount?: number | null
+          notice_days?: number | null
+          notice_type?: string | null
+          organization_id: string
+          other_credits?: number | null
+          other_debits?: number | null
+          pending_vacation_days?: number | null
+          proportional_13th_months?: number | null
+          proportional_vacation_days?: number | null
+          term_generated_at?: string | null
+          thirteenth_amount?: number | null
+          total_amount?: number | null
+          updated_at?: string
+          vacation_amount?: number | null
+        }
+        Update: {
+          created_at?: string
+          employee_id?: string
+          fgts_balance?: number | null
+          fgts_penalty_amount?: number | null
+          fgts_penalty_pct?: number | null
+          id?: string
+          notes?: string | null
+          notice_amount?: number | null
+          notice_days?: number | null
+          notice_type?: string | null
+          organization_id?: string
+          other_credits?: number | null
+          other_debits?: number | null
+          pending_vacation_days?: number | null
+          proportional_13th_months?: number | null
+          proportional_vacation_days?: number | null
+          term_generated_at?: string | null
+          thirteenth_amount?: number | null
+          total_amount?: number | null
+          updated_at?: string
+          vacation_amount?: number | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "termination_details_employee_id_fkey"
+            columns: ["employee_id"]
+            isOneToOne: true
+            referencedRelation: "employees"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "termination_details_organization_id_fkey"
+            columns: ["organization_id"]
+            isOneToOne: false
+            referencedRelation: "organizations"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "termination_details_organization_id_fkey"
             columns: ["organization_id"]
             isOneToOne: false
             referencedRelation: "organizations_public"
