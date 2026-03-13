@@ -84,6 +84,12 @@ const EmployeeOnboarding = lazy(() => import("./pages/EmployeeOnboarding"));
 const Documents = lazy(() => import("./pages/Documents"));
 const Goals = lazy(() => import("./pages/Goals"));
 const TrainingCatalog = lazy(() => import("./pages/TrainingCatalog"));
+const ProfileType = lazy(() => import("./pages/ProfileType"));
+const SalaryRanges = lazy(() => import("./pages/SalaryRanges"));
+const CompanyDocuments = lazy(() => import("./pages/CompanyDocuments"));
+const LaborData = lazy(() => import("./pages/LaborData"));
+const Absenteeism = lazy(() => import("./pages/Absenteeism"));
+const PaymentSchedule = lazy(() => import("./pages/PaymentSchedule"));
 
 const queryClient = new QueryClient({
   defaultOptions: {
@@ -213,6 +219,12 @@ const App = () => (
             <Route path="/documents" element={<PeopleRoute><Documents /></PeopleRoute>} />
             <Route path="/goals" element={<PeopleRoute><Goals /></PeopleRoute>} />
             <Route path="/training-catalog" element={<PeopleRoute><TrainingCatalog /></PeopleRoute>} />
+            <Route path="/profile-type" element={<ProfileType />} />
+            <Route path="/salary-ranges" element={<PeopleRoute><SalaryRanges /></PeopleRoute>} />
+            <Route path="/company-documents" element={<PeopleRoute><CompanyDocuments /></PeopleRoute>} />
+            <Route path="/labor-data" element={<PeopleRoute><LaborData /></PeopleRoute>} />
+            <Route path="/absenteeism" element={<PeopleRoute><Absenteeism /></PeopleRoute>} />
+            <Route path="/payment-schedule" element={<PeopleRoute><PaymentSchedule /></PeopleRoute>} />
 
             {/* People-only routes */}
             <Route path="/people-analytics" element={<PeopleRoute><PeopleAnalytics /></PeopleRoute>} />

@@ -1,134 +1,68 @@
 
 
-# Gap Analysis: Documento CRM vs Plataforma Atual
+# Visualizacoes Avancadas para Gestao de Ponto
 
-## Resumo da Analise
+## Visao Geral
 
-Apos comparar as 19 paginas do documento com o estado atual da plataforma, identifiquei **8 modulos novos** a criar, **6 modulos existentes** a expandir/mover, e **1 reorganizacao completa do menu lateral**.
+Adicionar uma nova aba **"Visao Geral"** na tela admin de Gestao de Ponto com 3 componentes visuais usando Recharts (ja instalado no projeto):
 
----
+### 1. Grafico de Barras Semanal - Horas por Dia
 
-## O QUE JA EXISTE (nenhuma acao necessaria)
+Um grafico de barras empilhadas mostrando, para cada dia da semana, as horas trabalhadas vs. horas esperadas. Barras com cores indicando:
+- Verde: dentro da meta
+- Vermelho: abaixo da meta
+- Azul: horas extras
 
-- Meu Perfil, Meu PDI, Minhas Avaliacoes
-- Colaboradores, Cargos, Departamentos, Organograma
-- Politicas de Trabalho, Cultura
-- Gestao de Ponto, Gestao de Ferias, Escalas
-- Folha de Pagamento, Desligamentos
-- Avaliacao de Desempenho, Feedbacks, Competencias
-- Metas & OKRs, Catalogo de Treinamentos
-- Vagas, Candidatos, Funil de Selecao, Banco de Talentos
-- Dashboard, Relatorios de Ponto, Auditoria
-- Empresa, Integracoes, Gestao de Acessos, Custos, Documentos
+Filtro por colaborador ou "todos" (agregado). Facilita identificar dias com mais ou menos carga.
 
----
+### 2. Heatmap Mensal (Grid de Quadrados)
 
-## O QUE FALTA IMPLEMENTAR
+Uma grade estilo calendario (similar ao contribution graph do GitHub) onde cada celula e um dia do mes. A intensidade da cor indica a quantidade de horas trabalhadas naquele dia:
+- Cinza claro: sem registro
+- Verde claro a verde escuro: de poucas a muitas horas
+- Vermelho: deficit significativo
 
-### FASE 1 -- Menu + Modulos Base
+Permite visualizar rapidamente padroes ao longo do mes.
 
-**1. Reorganizar Menu Lateral**
-Reestruturar os blocos conforme documento:
-- PERFIL: Meu Perfil, Meu PDI, Tipo de Perfil (novo)
-- CADASTRO: Colaboradores, Cargos, Salarios (novo), Departamentos, Documentos da Empresa (novo)
-- ESTRUTURA ORGANIZACIONAL (novo bloco): Organograma, Politicas de Trabalho, Identidade Organizacional (renomear Cultura)
-- DEPARTAMENTO PESSOAL: Dados Trabalhistas (novo), Gestao de Ferias, Absenteismo (novo), Banco de Horas, Rescisao Contratual (novo)
-- GESTAO & DESENVOLVIMENTO: PDI, Avaliacao, Feedbacks, Matriz SWOT (novo)
-- RECRUTAMENTO: manter como esta
-- RELATORIOS: Dashboard, Relatorio de Ponto
-- FINANCEIRO (novo bloco): Folha de Pagamento, Programacao de Pagamento (novo), Custos
-- ADMINISTRACAO: Dados da Empresa (renomear), Integracoes, Gestao de Acessos, Auditoria (mover), Documentos da Empresa, Inventario
+### 3. Ranking de Colaboradores - Horas Trabalhadas no Mes
 
-**2. Criar pagina "Tipo de Perfil"**
-- Mostrar tipo do usuario logado (Colaborador, Supervisor, Coordenador, Gerente, RH, Admin)
-- Card com permissoes, modulos acessiveis, data de atribuicao
-- Tabela: `profile_types` (user_id, type, assigned_at)
-
-**3. Criar modulo "Salarios"**
-- CRUD de faixas salariais por cargo e senioridade
-- Campos: cargo, senioridade, salario base, adicionais (noturno, insalubridade, periculosidade), beneficios, vigencia
-- Tabela: `salary_ranges`
-
-**4. Criar "Documentos da Empresa" (em Administracao)**
-- Diferente do /documents existente (que e para docs de colaboradores)
-- Upload de politicas, normas, manuais com controle de versao
-- Tabela: `company_documents`
-
-### FASE 2 -- Departamento Pessoal
-
-**5. Criar modulo "Dados Trabalhistas"**
-- Centralizar escala, salario e beneficios por colaborador
-- 3 abas: Escala de Trabalho, Salario, Beneficios
-- Historico de alteracoes para cada aba
-- Tabela: `employee_labor_data` + `employee_benefits`
-
-**6. Expandir "Gestao de Ferias"**
-- Novas abas: Periodo de Aquisicao, Programacao de Ferias (calendario), Saldo de Ferias, Conclusao de Ferias
-- Novos campos: dias acumulados, dias em uso, saldo, data retorno
-
-**7. Criar modulo "Absenteismo"**
-- 4 abas: Faltas, Atrasos, Atestados, Licencas INSS
-- CRUD com upload de arquivos (atestados)
-- Tabela: `absenteeism`
-
-**8. Criar modulo "Rescisao Contratual"**
-- Formulario completo com calculo de valores (ferias, 13o, multa FGTS)
-- Geracao de termo PDF
-- Integracao com desligamentos existentes
-- Tabela: `terminations_details` (complementar a tabela existente)
-
-### FASE 3 -- Gestao, Financeiro e Relatorios
-
-**9. Expandir PDI**
-- Novas secoes: Competencias Esperadas (nivel esperado vs atual), Metas e OKRs dentro do PDI, Plano de Acao, Historico de versoes
-
-**10. Criar "Matriz SWOT"**
-- Analise por colaborador ou equipe
-- 4 quadrantes com CRUD de itens (descricao, impacto, acao relacionada)
-- Exportar PDF
-- Tabela: `swot_analysis`
-
-**11. Criar "Programacao de Pagamento"**
-- Calendario de pagamentos agendados
-- Campos: colaborador, valor, forma (PIX, transferencia), data, status
-- Tabela: `payment_schedule`
-
-**12. Consolidar Relatorio de Ponto**
-- Novo relatorio unificado com: horas, faltas, atrasos, atestados, licencas, banco de horas
-- Exportar CSV/PDF
-
-**13. Renomear e mover itens**
-- "Cultura" → "Identidade Organizacional"
-- "Empresa" → "Dados da Empresa"
-- Auditoria → mover para bloco Administracao
-- Folha/Custos → mover para bloco Financeiro
+Um grafico de barras horizontais mostrando o total de horas trabalhadas por cada colaborador no mes, com uma linha de referencia indicando a meta esperada. Facilita comparar a equipe.
 
 ---
 
 ## Detalhes Tecnicos
 
-### Novas tabelas (via migracoes SQL)
-- `salary_ranges` - faixas salariais
-- `company_documents` - documentos da empresa com versionamento
-- `employee_labor_data` - dados trabalhistas (escala, salario, beneficios)
-- `employee_benefits` - beneficios por colaborador
-- `absenteeism` - faltas, atrasos, atestados, licencas
-- `termination_details` - detalhes de rescisao contratual
-- `swot_analysis` - itens da matriz SWOT
-- `payment_schedule` - programacao de pagamentos
+### Novos arquivos
 
-Todas com `organization_id`, RLS policies e foreign keys para `employees`.
+1. **`src/components/time-tracking/WeeklyHoursChart.tsx`**
+   - Usa `BarChart` do Recharts com `ResponsiveContainer`
+   - Recebe `time_entries` da semana e agrupa por dia
+   - Calcula horas esperadas com base em `weekly_hours / 5` (media diaria)
+   - Barras: `worked` (horas trabalhadas) e `expected` (referencia como linha ou barra secundaria)
 
-### Novos arquivos (estimativa ~25 arquivos)
-- 8 novas paginas em `src/pages/`
-- ~15 componentes em `src/components/`
-- ~5 hooks em `src/hooks/`
-- Atualizacao de rotas em `App.tsx`
-- Atualizacao do `AppSidebar.tsx`
+2. **`src/components/time-tracking/MonthlyHeatmap.tsx`**
+   - Componente custom com grid CSS (7 colunas x ~5 linhas)
+   - Cada celula recebe `total_minutes` do dia e aplica escala de cor via Tailwind (`bg-green-100` ate `bg-green-700`)
+   - Tooltip mostrando data e horas ao passar o mouse
 
----
+3. **`src/components/time-tracking/TeamHoursRanking.tsx`**
+   - `BarChart` horizontal do Recharts
+   - Agrupa `time_entries` do mes por `employee_id`
+   - Exibe nome do colaborador no eixo Y e horas no eixo X
+   - Linha de referencia vertical (`ReferenceLine`) para a meta mensal
 
-## Proposta de Execucao
+### Hook adicional
 
-Dado o tamanho, sugiro implementar **uma fase por vez**, comecando pela Fase 1 (menu + modulos base). Deseja que eu comece pela Fase 1?
+4. **`src/hooks/useMonthlyTimeEntries.ts`**
+   - Busca todas as `time_entries` do mes corrente para a organizacao (sem filtro de employee)
+   - Reutilizado pelos 3 componentes visuais
+
+### Alteracoes em arquivos existentes
+
+5. **`src/pages/TimeTracking.tsx`**
+   - Adicionar nova aba "Visao Geral" no `TabsList` da visao admin
+   - `TabsContent` renderiza os 3 componentes visuais em grid
+
+### Dependencias
+- Nenhuma nova -- usa Recharts (ja instalado) e Tailwind para o heatmap
 
