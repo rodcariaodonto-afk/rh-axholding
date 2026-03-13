@@ -62,7 +62,7 @@ const CompanyDocuments = () => {
     queryKey: ["company-documents", organizationId],
     queryFn: async () => {
       if (!organizationId) return [];
-      const { data, error } = await supabase
+      const { data, error } = await (supabase as any)
         .from("company_documents")
         .select("*")
         .eq("organization_id", organizationId)
