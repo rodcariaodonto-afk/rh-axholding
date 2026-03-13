@@ -785,7 +785,7 @@ export default function TimeOff() {
                   <TableBody>
                     {employees?.filter(e => e.status === "active").map((emp) => {
                       // Simplified: use created_at as hire date proxy
-                      const hireDate = new Date(emp.created_at);
+                      const hireDate = new Date((emp as any).created_at || Date.now());
                       const now = new Date();
                       const yearsDiff = Math.floor((now.getTime() - hireDate.getTime()) / (365.25 * 24 * 60 * 60 * 1000));
                       const currentPeriodStart = new Date(hireDate);
