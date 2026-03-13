@@ -239,13 +239,37 @@ const SalaryRanges = () => {
                   {canEdit && (
                     <TableCell>
                       <div className="flex gap-1">
-                        <Button variant="ghost" size="icon" onClick={() => openEdit(r)}>
+                        <Button variant="ghost" size="icon" onClick={() => openEdit(r)} title="Editar">
                           <Pencil className="size-4" />
                         </Button>
                         <Button
                           variant="ghost"
                           size="icon"
+                          title="Duplicar"
+                          onClick={() => {
+                            setEditingId(null);
+                            setForm({
+                              position_id: r.position_id || "",
+                              seniority: r.seniority,
+                              base_salary_min: r.base_salary_min,
+                              base_salary_max: r.base_salary_max,
+                              night_shift_pct: r.night_shift_pct,
+                              hazard_pct: r.hazard_pct,
+                              unhealthy_pct: r.unhealthy_pct,
+                              benefits_total: r.benefits_total,
+                              effective_from: new Date().toISOString().split("T")[0],
+                              effective_until: "",
+                            });
+                            setDialogOpen(true);
+                          }}
+                        >
+                          <Copy className="size-4" />
+                        </Button>
+                        <Button
+                          variant="ghost"
+                          size="icon"
                           onClick={() => deleteMutation.mutate(r.id)}
+                          title="Excluir"
                         >
                           <Trash2 className="size-4 text-destructive" />
                         </Button>
