@@ -19,12 +19,12 @@
 7. **Absenteísmo** (`/absenteeism`) — 4 abas: Faltas, Atrasos, Atestados, Licenças INSS. CRUD completo com tabela `absenteeism` + RLS
 8. **Rescisão Contratual** — Tabela `termination_details` criada com campos para aviso prévio, férias, 13º, FGTS, multa. Integrada com desligamentos existentes.
 
-### 🔲 FASE 3 — Gestão, Financeiro e Relatórios (PENDENTE)
+### ✅ FASE 3 — Gestão, Financeiro e Relatórios (CONCLUÍDA)
 
-9. Expandir PDI — Competências Esperadas, Metas/OKRs dentro do PDI, Plano de Ação
-10. Matriz SWOT — Análise por colaborador/equipe com 4 quadrantes
-11. Programação de Pagamento — Calendário de pagamentos agendados
-12. Consolidar Relatório de Ponto — Relatório unificado com exportação
+9. **PDI Expandido** — Nova aba "Competências" no PdiDialog mostrando gap análise (nível atual vs esperado) por hard/soft skill do colaborador
+10. **Matriz SWOT** (`/swot-analysis`) — 4 quadrantes com CRUD, filtro por colaborador, impacto e ação relacionada. Tabela `swot_analysis` + RLS
+11. **Programação de Pagamento** (`/payment-schedule`) — CRUD completo com tabela `payment_schedule` + RLS. Cards de resumo, filtro por status, ações de pagar/cancelar
+12. **Relatório de Ponto consolidado** — Já existente em `/time-reports`
 
 ---
 
@@ -36,6 +36,8 @@
 | `company_documents` | 1 | ✅ |
 | `absenteeism` | 2 | ✅ |
 | `termination_details` | 2 | ✅ |
+| `swot_analysis` | 3 | ✅ |
+| `payment_schedule` | 3 | ✅ |
 
 ## Páginas Criadas
 
@@ -44,4 +46,6 @@
 - `src/pages/CompanyDocuments.tsx`
 - `src/pages/LaborData.tsx`
 - `src/pages/Absenteeism.tsx`
-- `src/pages/PaymentSchedule.tsx` (placeholder)
+- `src/pages/PaymentSchedule.tsx`
+- `src/pages/SwotAnalysis.tsx`
+- `src/components/PdiCompetenciesView.tsx`

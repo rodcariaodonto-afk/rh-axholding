@@ -4,6 +4,7 @@ import { usePdiById } from "@/hooks/usePdiById";
 import { PdiInfoForm } from "./PdiInfoForm";
 import { PdiGoalsManager } from "./PdiGoalsManager";
 import { PdiProgressView } from "./PdiProgressView";
+import { PdiCompetenciesView } from "./PdiCompetenciesView";
 import { Skeleton } from "@/components/ui/skeleton";
 import { useState } from "react";
 
@@ -38,10 +39,13 @@ export const PdiDialog = ({ employeeId, pdiId, open, onOpenChange }: PdiDialogPr
           </div>
         ) : (
           <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
-            <TabsList className="grid w-full grid-cols-3">
+            <TabsList className="grid w-full grid-cols-4">
               <TabsTrigger value="info">Informações</TabsTrigger>
               <TabsTrigger value="goals" disabled={!pdiId}>
                 Metas
+              </TabsTrigger>
+              <TabsTrigger value="competencies" disabled={!pdiId}>
+                Competências
               </TabsTrigger>
               <TabsTrigger value="progress" disabled={!pdiId}>
                 Progresso
@@ -58,6 +62,10 @@ export const PdiDialog = ({ employeeId, pdiId, open, onOpenChange }: PdiDialogPr
 
             <TabsContent value="goals" className="space-y-4 mt-4">
               {pdiId && <PdiGoalsManager pdiId={pdiId} pdi={pdi} />}
+            </TabsContent>
+
+            <TabsContent value="competencies" className="space-y-4 mt-4">
+              {pdiId && pdi && <PdiCompetenciesView pdiId={pdiId} pdi={pdi} />}
             </TabsContent>
 
             <TabsContent value="progress" className="space-y-4 mt-4">

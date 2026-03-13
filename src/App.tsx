@@ -90,6 +90,7 @@ const CompanyDocuments = lazy(() => import("./pages/CompanyDocuments"));
 const LaborData = lazy(() => import("./pages/LaborData"));
 const Absenteeism = lazy(() => import("./pages/Absenteeism"));
 const PaymentSchedule = lazy(() => import("./pages/PaymentSchedule"));
+const SwotAnalysis = lazy(() => import("./pages/SwotAnalysis"));
 
 const queryClient = new QueryClient({
   defaultOptions: {
@@ -225,6 +226,7 @@ const App = () => (
             <Route path="/labor-data" element={<PeopleRoute><LaborData /></PeopleRoute>} />
             <Route path="/absenteeism" element={<PeopleRoute><Absenteeism /></PeopleRoute>} />
             <Route path="/payment-schedule" element={<PeopleRoute><PaymentSchedule /></PeopleRoute>} />
+            <Route path="/swot-analysis" element={<PeopleRoute><SwotAnalysis /></PeopleRoute>} />
 
             {/* People-only routes */}
             <Route path="/people-analytics" element={<PeopleRoute><PeopleAnalytics /></PeopleRoute>} />
