@@ -84,6 +84,12 @@ const EmployeeOnboarding = lazy(() => import("./pages/EmployeeOnboarding"));
 const Documents = lazy(() => import("./pages/Documents"));
 const Goals = lazy(() => import("./pages/Goals"));
 const TrainingCatalog = lazy(() => import("./pages/TrainingCatalog"));
+const ProfileType = lazy(() => import("./pages/ProfileType"));
+const SalaryRanges = lazy(() => import("./pages/SalaryRanges"));
+const CompanyDocuments = lazy(() => import("./pages/CompanyDocuments"));
+const LaborData = lazy(() => import("./pages/LaborData"));
+const Absenteeism = lazy(() => import("./pages/Absenteeism"));
+const PaymentSchedule = lazy(() => import("./pages/PaymentSchedule"));
 
 const queryClient = new QueryClient({
   defaultOptions: {
