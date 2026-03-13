@@ -39,10 +39,13 @@ export const PdiDialog = ({ employeeId, pdiId, open, onOpenChange }: PdiDialogPr
           </div>
         ) : (
           <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
-            <TabsList className="grid w-full grid-cols-3">
+            <TabsList className="grid w-full grid-cols-4">
               <TabsTrigger value="info">Informações</TabsTrigger>
               <TabsTrigger value="goals" disabled={!pdiId}>
                 Metas
+              </TabsTrigger>
+              <TabsTrigger value="competencies" disabled={!pdiId}>
+                Competências
               </TabsTrigger>
               <TabsTrigger value="progress" disabled={!pdiId}>
                 Progresso
