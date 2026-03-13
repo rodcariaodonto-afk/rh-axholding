@@ -113,7 +113,7 @@ const CompanyDocuments = () => {
 
   const deleteMutation = useMutation({
     mutationFn: async (id: string) => {
-      const { error } = await supabase.from("company_documents").delete().eq("id", id);
+      const { error } = await (supabase as any).from("company_documents").delete().eq("id", id);
       if (error) throw error;
     },
     onSuccess: () => {

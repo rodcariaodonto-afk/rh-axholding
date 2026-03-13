@@ -135,7 +135,7 @@ const SalaryRanges = () => {
 
   const deleteMutation = useMutation({
     mutationFn: async (id: string) => {
-      const { error } = await supabase.from("salary_ranges").delete().eq("id", id);
+      const { error } = await (supabase as any).from("salary_ranges").delete().eq("id", id);
       if (error) throw error;
     },
     onSuccess: () => {
