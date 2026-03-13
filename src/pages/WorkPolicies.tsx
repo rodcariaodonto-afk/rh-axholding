@@ -22,7 +22,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { Plus, Trash2, Building2, Laptop, Home } from "lucide-react";
+import { Plus, Trash2, Building2, Laptop, Home, Users } from "lucide-react";
 
 const TYPE_CONFIG: Record<string, { label: string; icon: typeof Building2; variant: "default" | "secondary" | "outline" }> = {
   presencial: { label: "Presencial", icon: Building2, variant: "default" },
