@@ -87,13 +87,13 @@ const SalaryRanges = () => {
     queryKey: ["salary-ranges", organizationId],
     queryFn: async () => {
       if (!organizationId) return [];
-      const { data, error } = await supabase
+      const { data, error } = await (supabase as any)
         .from("salary_ranges")
         .select("*, positions(title)")
         .eq("organization_id", organizationId)
         .order("seniority");
       if (error) throw error;
-      return data as SalaryRange[];
+      return (data || []) as SalaryRange[];
     },
     enabled: !!organizationId,
   });
