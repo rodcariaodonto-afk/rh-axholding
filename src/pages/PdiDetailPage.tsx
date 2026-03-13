@@ -270,6 +270,9 @@ const PdiDetailPage = () => {
 
           {/* Right Column - Timeline */}
           <div className="space-y-6">
+            {/* Version History */}
+            <PdiVersionHistory pdiId={pdiId!} />
+
             <Card>
               <CardHeader>
                 <CardTitle>Linha do Tempo</CardTitle>
