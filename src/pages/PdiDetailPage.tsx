@@ -92,6 +92,9 @@ const PdiDetailPage = () => {
             <p className="text-sm text-muted-foreground">
               {(pdi.employee as any)?.full_name} • {(pdi.employee as any)?.department?.name}
             </p>
+            <div className="mt-2">
+              <PdiApprovalButton pdiId={pdiId!} pdi={pdi} />
+            </div>
           </div>
         </div>
 
