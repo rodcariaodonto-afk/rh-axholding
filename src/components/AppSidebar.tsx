@@ -140,6 +140,7 @@ const menuGroups: MenuGroup[] = [
       { icon: Award, label: "Competências", href: "/skills-management" },
       { icon: TrendingUp, label: "Metas & OKRs", href: "/goals" },
       { icon: BookOpen, label: "Catálogo de Treinamentos", href: "/training-catalog" },
+      { icon: Compass, label: "Matriz SWOT", href: "/swot-analysis" },
     ],
   },
   {

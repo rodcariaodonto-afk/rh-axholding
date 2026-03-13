@@ -226,6 +226,7 @@ const App = () => (
             <Route path="/labor-data" element={<PeopleRoute><LaborData /></PeopleRoute>} />
             <Route path="/absenteeism" element={<PeopleRoute><Absenteeism /></PeopleRoute>} />
             <Route path="/payment-schedule" element={<PeopleRoute><PaymentSchedule /></PeopleRoute>} />
+            <Route path="/swot-analysis" element={<PeopleRoute><SwotAnalysis /></PeopleRoute>} />
 
             {/* People-only routes */}
             <Route path="/people-analytics" element={<PeopleRoute><PeopleAnalytics /></PeopleRoute>} />
