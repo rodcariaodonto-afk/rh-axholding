@@ -88,7 +88,7 @@ const CompanyDocuments = () => {
         .from("employee-documents")
         .getPublicUrl(path);
 
-      const { error: insertErr } = await supabase.from("company_documents").insert({
+      const { error: insertErr } = await (supabase as any).from("company_documents").insert({
         organization_id: organizationId,
         title,
         description: description || null,
