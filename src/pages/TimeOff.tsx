@@ -438,7 +438,7 @@ export default function TimeOff() {
         )}
 
         {/* Tab Navigation */}
-        <div className="flex gap-2 border-b">
+        <div className="flex gap-2 border-b overflow-x-auto">
           <Button
             variant={activeTab === "requests" ? "default" : "ghost"}
             className="rounded-b-none"
@@ -455,6 +455,26 @@ export default function TimeOff() {
             <CalendarDays className="h-4 w-4 mr-2" />
             Férias Aprovadas
           </Button>
+          {isManager && (
+            <>
+              <Button
+                variant={activeTab === "balance" ? "default" : "ghost"}
+                className="rounded-b-none"
+                onClick={() => setActiveTab("balance")}
+              >
+                <Palmtree className="h-4 w-4 mr-2" />
+                Saldo de Férias
+              </Button>
+              <Button
+                variant={activeTab === "acquisition" ? "default" : "ghost"}
+                className="rounded-b-none"
+                onClick={() => setActiveTab("acquisition")}
+              >
+                <CalendarDays className="h-4 w-4 mr-2" />
+                Período Aquisitivo
+              </Button>
+            </>
+          )}
         </div>
 
         {/* Requests Tab */}
