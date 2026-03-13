@@ -716,6 +716,106 @@ export default function TimeOff() {
             </CardContent>
           </Card>
         )}
+
+        {/* Saldo de Férias Tab */}
+        {activeTab === "balance" && isManager && (
+          <Card>
+            <CardHeader>
+              <CardTitle>Saldo de Férias por Colaborador</CardTitle>
+            </CardHeader>
+            <CardContent>
+              <div className="rounded-md border">
+                <Table>
+                  <TableHeader>
+                    <TableRow className="bg-muted/50">
+                      <TableHead className="font-semibold">Colaborador</TableHead>
+                      <TableHead className="font-semibold">Admissão</TableHead>
+                      <TableHead className="font-semibold text-center">Dias de Direito</TableHead>
+                      <TableHead className="font-semibold text-center">Dias Usados</TableHead>
+                      <TableHead className="font-semibold text-center">Saldo</TableHead>
+                    </TableRow>
+                  </TableHeader>
+                  <TableBody>
+                    {employees?.filter(e => e.status === "active").map((emp) => {
+                      const empRequests = requests?.filter(
+                        r => r.employee_id === emp.id && r.status === "approved"
+                      ) || [];
+                      const usedDays = empRequests.reduce((sum, r) => sum + r.total_days, 0);
+                      const rightDays = 30; // CLT default
+                      const balance = rightDays - usedDays;
+                      return (
+                        <TableRow key={emp.id}>
+                          <TableCell className="font-medium">{emp.full_name || emp.email}</TableCell>
+                          <TableCell className="text-muted-foreground">—</TableCell>
+                          <TableCell className="text-center">{rightDays}</TableCell>
+                          <TableCell className="text-center">{usedDays}</TableCell>
+                          <TableCell className="text-center">
+                            <Badge variant={balance > 0 ? "default" : "destructive"}>
+                              {balance} dias
+                            </Badge>
+                          </TableCell>
+                        </TableRow>
+                      );
+                    })}
+                  </TableBody>
+                </Table>
+              </div>
+            </CardContent>
+          </Card>
+        )}
+
+        {/* Período Aquisitivo Tab */}
+        {activeTab === "acquisition" && isManager && (
+          <Card>
+            <CardHeader>
+              <CardTitle>Período Aquisitivo</CardTitle>
+            </CardHeader>
+            <CardContent>
+              <div className="rounded-md border">
+                <Table>
+                  <TableHeader>
+                    <TableRow className="bg-muted/50">
+                      <TableHead className="font-semibold">Colaborador</TableHead>
+                      <TableHead className="font-semibold">Início do Período</TableHead>
+                      <TableHead className="font-semibold">Fim do Período</TableHead>
+                      <TableHead className="font-semibold">Limite Concessivo</TableHead>
+                      <TableHead className="font-semibold">Status</TableHead>
+                    </TableRow>
+                  </TableHeader>
+                  <TableBody>
+                    {employees?.filter(e => e.status === "active").map((emp) => {
+                      // Simplified: use created_at as hire date proxy
+                      const hireDate = new Date(emp.created_at);
+                      const now = new Date();
+                      const yearsDiff = Math.floor((now.getTime() - hireDate.getTime()) / (365.25 * 24 * 60 * 60 * 1000));
+                      const currentPeriodStart = new Date(hireDate);
+                      currentPeriodStart.setFullYear(hireDate.getFullYear() + yearsDiff);
+                      const currentPeriodEnd = new Date(currentPeriodStart);
+                      currentPeriodEnd.setFullYear(currentPeriodStart.getFullYear() + 1);
+                      const concessiveLimit = new Date(currentPeriodEnd);
+                      concessiveLimit.setFullYear(currentPeriodEnd.getFullYear() + 1);
+                      const isOverdue = now > concessiveLimit;
+
+                      return (
+                        <TableRow key={emp.id}>
+                          <TableCell className="font-medium">{emp.full_name || emp.email}</TableCell>
+                          <TableCell>{format(currentPeriodStart, "dd/MM/yyyy")}</TableCell>
+                          <TableCell>{format(currentPeriodEnd, "dd/MM/yyyy")}</TableCell>
+                          <TableCell>{format(concessiveLimit, "dd/MM/yyyy")}</TableCell>
+                          <TableCell>
+                            <Badge variant={isOverdue ? "destructive" : "secondary"}>
+                              {isOverdue ? "Vencido" : "Regular"}
+                            </Badge>
+                          </TableCell>
+                        </TableRow>
+                      );
+                    })}
+                  </TableBody>
+                </Table>
+              </div>
+            </CardContent>
+          </Card>
+        )}
       </div>
 
       {/* Review Modal */}
