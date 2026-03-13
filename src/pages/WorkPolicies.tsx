@@ -1,5 +1,6 @@
-import { useState } from "react";
+import { useState, useMemo } from "react";
 import { useWorkPolicies, useCreateWorkPolicy, useDeleteWorkPolicy } from "@/hooks/useWorkPolicies";
+import { useEmployees } from "@/hooks/useEmployees";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -21,7 +22,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { Plus, Trash2, Building2, Laptop, Home } from "lucide-react";
+import { Plus, Trash2, Building2, Laptop, Home, Users } from "lucide-react";
 
 const TYPE_CONFIG: Record<string, { label: string; icon: typeof Building2; variant: "default" | "secondary" | "outline" }> = {
   presencial: { label: "Presencial", icon: Building2, variant: "default" },
@@ -33,6 +34,17 @@ export default function WorkPolicies() {
   const { data: policies, isLoading } = useWorkPolicies();
   const createPolicy = useCreateWorkPolicy();
   const deletePolicy = useDeleteWorkPolicy();
+  const { data: employees = [] } = useEmployees();
+
+  const employeeCountByPolicy = useMemo(() => {
+    const map: Record<string, number> = {};
+    employees.forEach((emp: any) => {
+      if (emp.work_policy_id) {
+        map[emp.work_policy_id] = (map[emp.work_policy_id] || 0) + 1;
+      }
+    });
+    return map;
+  }, [employees]);
 
   const [showDialog, setShowDialog] = useState(false);
   const [name, setName] = useState("");
@@ -130,6 +142,10 @@ export default function WorkPolicies() {
                         <span className="font-medium">{p.in_office_days_per_month}</span>
                       </div>
                     )}
+                  </div>
+                  <div className="flex items-center gap-1 mt-2 text-sm text-muted-foreground">
+                    <Users className="h-3.5 w-3.5" />
+                    <span>{employeeCountByPolicy[p.id] || 0} colaboradores vinculados</span>
                   </div>
                 </CardContent>
               </Card>

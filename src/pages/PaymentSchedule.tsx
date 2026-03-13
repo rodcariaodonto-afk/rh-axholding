@@ -6,7 +6,8 @@ import { Input } from "@/components/ui/input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
-import { Plus, Check, X, CreditCard, DollarSign, Clock, CheckCircle } from "lucide-react";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { Plus, Check, X, CreditCard, DollarSign, Clock, CheckCircle, Calendar, List } from "lucide-react";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/useAuth";
@@ -19,6 +20,7 @@ import { DatePickerWithYearMonth } from "@/components/ui/date-picker-with-year-m
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { CalendarIcon } from "lucide-react";
 import { cn } from "@/lib/utils";
+import { PaymentCalendarView } from "@/components/PaymentCalendarView";
 
 type PaymentStatus = "pending" | "paid" | "cancelled";
 type PaymentMethod = "pix" | "transfer" | "deposit" | "cash";
@@ -172,19 +174,32 @@ const PaymentSchedule = () => {
         </Card>
       </div>
 
-      <div className="flex gap-2">
-        <Select value={statusFilter} onValueChange={setStatusFilter}>
-          <SelectTrigger className="w-[180px]">
-            <SelectValue placeholder="Filtrar status" />
-          </SelectTrigger>
-          <SelectContent>
-            <SelectItem value="all">Todos</SelectItem>
-            <SelectItem value="pending">Pendentes</SelectItem>
-            <SelectItem value="paid">Pagos</SelectItem>
-            <SelectItem value="cancelled">Cancelados</SelectItem>
-          </SelectContent>
-        </Select>
-      </div>
+      <Tabs defaultValue="list">
+        <TabsList>
+          <TabsTrigger value="list" className="gap-2">
+            <List className="size-4" />
+            Lista
+          </TabsTrigger>
+          <TabsTrigger value="calendar" className="gap-2">
+            <Calendar className="size-4" />
+            Calendário
+          </TabsTrigger>
+        </TabsList>
+
+        <TabsContent value="list" className="space-y-4">
+          <div className="flex gap-2">
+            <Select value={statusFilter} onValueChange={setStatusFilter}>
+              <SelectTrigger className="w-[180px]">
+                <SelectValue placeholder="Filtrar status" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="all">Todos</SelectItem>
+                <SelectItem value="pending">Pendentes</SelectItem>
+                <SelectItem value="paid">Pagos</SelectItem>
+                <SelectItem value="cancelled">Cancelados</SelectItem>
+              </SelectContent>
+            </Select>
+          </div>
 
       <Card>
         <CardContent className="p-0">
@@ -241,6 +256,12 @@ const PaymentSchedule = () => {
           </Table>
         </CardContent>
       </Card>
+        </TabsContent>
+
+        <TabsContent value="calendar">
+          <PaymentCalendarView payments={payments} />
+        </TabsContent>
+      </Tabs>
 
       <Dialog open={dialogOpen} onOpenChange={setDialogOpen}>
         <DialogContent>

@@ -3,14 +3,20 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Button } from "@/components/ui/button";
+import { Badge } from "@/components/ui/badge";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { useEmployees } from "@/hooks/useEmployees";
 import { useMonthlyTimeEntries } from "@/hooks/useMonthlyTimeEntries";
+import { useCurrentOrganization } from "@/hooks/useCurrentOrganization";
+import { useQuery } from "@tanstack/react-query";
+import { supabase } from "@/integrations/supabase/client";
 import { WeeklyHoursChart } from "@/components/time-tracking/WeeklyHoursChart";
 import { MonthlyHeatmap } from "@/components/time-tracking/MonthlyHeatmap";
 import { TeamHoursRanking } from "@/components/time-tracking/TeamHoursRanking";
 import { HoursGanttChart } from "@/components/time-tracking/HoursGanttChart";
 import { format, startOfMonth, endOfMonth } from "date-fns";
-import { Download, BarChart3, Users, Calendar } from "lucide-react";
+import { Download, BarChart3, Users, Calendar, FileText } from "lucide-react";
 
 const MONTHS = [
   "Janeiro", "Fevereiro", "Março", "Abril", "Maio", "Junho",
@@ -21,7 +27,9 @@ export default function TimeReports() {
   const [selectedMonth, setSelectedMonth] = useState(new Date().getMonth());
   const [selectedYear, setSelectedYear] = useState(new Date().getFullYear());
   const [selectedEmployee, setSelectedEmployee] = useState("all");
+  const [activeTab, setActiveTab] = useState("charts");
 
+  const { organizationId } = useCurrentOrganization();
   const yearOptions = [selectedYear - 1, selectedYear, selectedYear + 1];
 
   const monthStart = format(startOfMonth(new Date(selectedYear, selectedMonth)), "yyyy-MM-dd");
@@ -45,6 +53,24 @@ export default function TimeReports() {
     employeeId: selectedEmployee !== "all" ? selectedEmployee : undefined,
   });
 
+  // Fetch absenteeism data for consolidated report
+  const { data: absenteeismData = [] } = useQuery({
+    queryKey: ["absenteeism-report", organizationId, monthStart, monthEnd],
+    queryFn: async () => {
+      if (!organizationId) return [];
+      const { data, error } = await supabase
+        .from("absenteeism")
+        .select("*, employee:employee_id(id, full_name)")
+        .eq("organization_id", organizationId)
+        .gte("date", monthStart)
+        .lte("date", monthEnd)
+        .order("date");
+      if (error) throw error;
+      return data;
+    },
+    enabled: !!organizationId,
+  });
+
   // KPIs
   const totalHours = useMemo(() => {
     const totalMin = monthEntries.reduce((sum: number, e: any) => sum + (e.total_minutes || 0), 0);
@@ -66,6 +92,46 @@ export default function TimeReports() {
     const totalMin = monthEntries.reduce((sum: number, e: any) => sum + (e.total_minutes || 0), 0);
     return (totalMin / 60 / daySet.size).toFixed(1);
   }, [monthEntries]);
+
+  // Consolidated report data
+  const consolidatedData = useMemo(() => {
+    const empMap = new Map<string, any>();
+    activeEmployees.forEach(emp => {
+      empMap.set(emp.id, { name: emp.full_name || emp.email, totalHours: 0, absences: 0, delays: 0, certificates: 0, inss: 0 });
+    });
+    (monthEntries as any[]).forEach(e => {
+      const entry = empMap.get(e.employee_id);
+      if (entry) entry.totalHours += (e.total_minutes || 0) / 60;
+    });
+    absenteeismData.forEach((a: any) => {
+      const entry = empMap.get(a.employee_id);
+      if (entry) {
+        if (a.type === "falta") entry.absences++;
+        else if (a.type === "atraso") entry.delays++;
+        else if (a.type === "atestado") entry.certificates++;
+        else if (a.type === "inss") entry.inss++;
+      }
+    });
+    return Array.from(empMap.entries())
+      .map(([id, data]) => ({ id, ...data }))
+      .filter(d => d.totalHours > 0 || d.absences > 0 || d.delays > 0 || d.certificates > 0 || d.inss > 0);
+  }, [activeEmployees, monthEntries, absenteeismData]);
+
+  const handleExportConsolidatedCSV = () => {
+    if (consolidatedData.length === 0) return;
+    const header = "Colaborador,Horas Trabalhadas,Faltas,Atrasos,Atestados,Licenças INSS\n";
+    const rows = consolidatedData.map(d =>
+      `"${d.name}",${d.totalHours.toFixed(1)},${d.absences},${d.delays},${d.certificates},${d.inss}`
+    );
+    const csv = header + rows.join("\n");
+    const blob = new Blob([csv], { type: "text/csv;charset=utf-8" });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement("a");
+    a.href = url;
+    a.download = `relatorio-consolidado-${MONTHS[selectedMonth]}-${selectedYear}.csv`;
+    a.click();
+    URL.revokeObjectURL(url);
+  };
 
   const handleExportCSV = () => {
     if (monthEntries.length === 0) return;
@@ -192,7 +258,20 @@ export default function TimeReports() {
         </Card>
       </div>
 
-      {/* Charts */}
+      {/* Charts / Consolidated Tabs */}
+      <Tabs value={activeTab} onValueChange={setActiveTab}>
+        <TabsList>
+          <TabsTrigger value="charts" className="gap-2">
+            <BarChart3 className="size-4" />
+            Gráficos
+          </TabsTrigger>
+          <TabsTrigger value="consolidated" className="gap-2">
+            <FileText className="size-4" />
+            Consolidado
+          </TabsTrigger>
+        </TabsList>
+
+        <TabsContent value="charts" className="space-y-6 mt-4">
       {isLoading ? (
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
           <Skeleton className="h-80" />
@@ -231,7 +310,61 @@ export default function TimeReports() {
             )}
           </div>
         </div>
-      )}
+        )}
+        </TabsContent>
+
+        <TabsContent value="consolidated" className="space-y-4 mt-4">
+          <div className="flex justify-end">
+            <Button variant="outline" size="sm" onClick={handleExportConsolidatedCSV} disabled={consolidatedData.length === 0}>
+              <Download className="size-4 mr-1.5" />
+              Exportar CSV Consolidado
+            </Button>
+          </div>
+          <Card>
+            <CardHeader>
+              <CardTitle className="text-base">Relatório Consolidado — {MONTHS[selectedMonth]} {selectedYear}</CardTitle>
+            </CardHeader>
+            <CardContent>
+              {consolidatedData.length === 0 ? (
+                <p className="text-center text-muted-foreground py-8">Nenhum dado para o período selecionado.</p>
+              ) : (
+                <Table>
+                  <TableHeader>
+                    <TableRow>
+                      <TableHead>Colaborador</TableHead>
+                      <TableHead className="text-right">Horas Trab.</TableHead>
+                      <TableHead className="text-center">Faltas</TableHead>
+                      <TableHead className="text-center">Atrasos</TableHead>
+                      <TableHead className="text-center">Atestados</TableHead>
+                      <TableHead className="text-center">INSS</TableHead>
+                    </TableRow>
+                  </TableHeader>
+                  <TableBody>
+                    {consolidatedData.map(d => (
+                      <TableRow key={d.id}>
+                        <TableCell className="font-medium">{d.name}</TableCell>
+                        <TableCell className="text-right font-mono">{d.totalHours.toFixed(1)}h</TableCell>
+                        <TableCell className="text-center">
+                          {d.absences > 0 ? <Badge variant="destructive">{d.absences}</Badge> : "0"}
+                        </TableCell>
+                        <TableCell className="text-center">
+                          {d.delays > 0 ? <Badge variant="warning">{d.delays}</Badge> : "0"}
+                        </TableCell>
+                        <TableCell className="text-center">
+                          {d.certificates > 0 ? <Badge variant="secondary">{d.certificates}</Badge> : "0"}
+                        </TableCell>
+                        <TableCell className="text-center">
+                          {d.inss > 0 ? <Badge variant="outline">{d.inss}</Badge> : "0"}
+                        </TableCell>
+                      </TableRow>
+                    ))}
+                  </TableBody>
+                </Table>
+              )}
+            </CardContent>
+          </Card>
+        </TabsContent>
+      </Tabs>
     </div>
   );
 }

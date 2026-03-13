@@ -7,28 +7,15 @@ import { Badge } from "@/components/ui/badge";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Textarea } from "@/components/ui/textarea";
 import {
-  Dialog,
-  DialogContent,
-  DialogHeader,
-  DialogTitle,
-  DialogFooter,
+  Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter,
 } from "@/components/ui/dialog";
 import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
+  Select, SelectContent, SelectItem, SelectTrigger, SelectValue,
 } from "@/components/ui/select";
 import {
-  Table,
-  TableBody,
-  TableCell,
-  TableHead,
-  TableHeader,
-  TableRow,
+  Table, TableBody, TableCell, TableHead, TableHeader, TableRow,
 } from "@/components/ui/table";
-import { Plus, Download, Trash2, FileStack, Upload } from "lucide-react";
+import { Plus, Download, Trash2, FileStack, Upload, Eye, Lock, Globe } from "lucide-react";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { useCurrentOrganization } from "@/hooks/useCurrentOrganization";
@@ -45,6 +32,18 @@ const categories = [
   { value: "other", label: "Outro" },
 ];
 
+const visibilityOptions = [
+  { value: "public", label: "Público", icon: Globe },
+  { value: "restricted", label: "Restrito", icon: Eye },
+  { value: "private", label: "Privado", icon: Lock },
+];
+
+const visibilityBadge: Record<string, "default" | "secondary" | "destructive"> = {
+  public: "default",
+  restricted: "secondary",
+  private: "destructive",
+};
+
 const CompanyDocuments = () => {
   const { organizationId } = useCurrentOrganization();
   const { canEdit } = useUserRole();
@@ -55,6 +54,9 @@ const CompanyDocuments = () => {
   const [description, setDescription] = useState("");
   const [category, setCategory] = useState("policy");
   const [version, setVersion] = useState("1.0");
+  const [visibility, setVisibility] = useState("public");
+  const [validFrom, setValidFrom] = useState("");
+  const [validUntil, setValidUntil] = useState("");
   const [file, setFile] = useState<File | null>(null);
   const [uploading, setUploading] = useState(false);
 
@@ -94,6 +96,9 @@ const CompanyDocuments = () => {
         description: description || null,
         category,
         version,
+        visibility,
+        valid_from: validFrom || null,
+        valid_until: validUntil || null,
         file_url: urlData.publicUrl,
         file_name: file.name,
         file_size: file.size,
@@ -125,15 +130,16 @@ const CompanyDocuments = () => {
 
   const closeDialog = () => {
     setDialogOpen(false);
-    setTitle("");
-    setDescription("");
-    setCategory("policy");
-    setVersion("1.0");
+    setTitle(""); setDescription(""); setCategory("policy"); setVersion("1.0");
+    setVisibility("public"); setValidFrom(""); setValidUntil("");
     setFile(null);
   };
 
   const getCategoryLabel = (val: string) =>
     categories.find((c) => c.value === val)?.label || val;
+
+  const getVisibilityLabel = (val: string) =>
+    visibilityOptions.find((v) => v.value === val)?.label || val;
 
   const formatFileSize = (bytes: number | null) => {
     if (!bytes) return "—";
@@ -175,7 +181,9 @@ const CompanyDocuments = () => {
               <TableRow>
                 <TableHead>Título</TableHead>
                 <TableHead>Categoria</TableHead>
+                <TableHead>Visibilidade</TableHead>
                 <TableHead>Versão</TableHead>
+                <TableHead>Vigência</TableHead>
                 <TableHead>Tamanho</TableHead>
                 <TableHead>Data</TableHead>
                 <TableHead className="w-24" />
@@ -197,7 +205,17 @@ const CompanyDocuments = () => {
                   <TableCell>
                     <Badge variant="secondary">{getCategoryLabel(doc.category)}</Badge>
                   </TableCell>
+                  <TableCell>
+                    <Badge variant={visibilityBadge[doc.visibility] || "default"}>
+                      {getVisibilityLabel(doc.visibility)}
+                    </Badge>
+                  </TableCell>
                   <TableCell className="font-mono text-sm">{doc.version}</TableCell>
+                  <TableCell className="text-sm text-muted-foreground">
+                    {doc.valid_from
+                      ? `${new Date(doc.valid_from).toLocaleDateString("pt-BR")}${doc.valid_until ? ` — ${new Date(doc.valid_until).toLocaleDateString("pt-BR")}` : " — atual"}`
+                      : "—"}
+                  </TableCell>
                   <TableCell className="text-sm text-muted-foreground">
                     {formatFileSize(doc.file_size)}
                   </TableCell>
@@ -214,11 +232,7 @@ const CompanyDocuments = () => {
                         </Button>
                       )}
                       {canEdit && (
-                        <Button
-                          variant="ghost"
-                          size="icon"
-                          onClick={() => deleteMutation.mutate(doc.id)}
-                        >
+                        <Button variant="ghost" size="icon" onClick={() => deleteMutation.mutate(doc.id)}>
                           <Trash2 className="size-4 text-destructive" />
                         </Button>
                       )}
@@ -228,7 +242,7 @@ const CompanyDocuments = () => {
               ))}
               {docs.length === 0 && (
                 <TableRow>
-                  <TableCell colSpan={6} className="text-center py-12 text-muted-foreground">
+                  <TableCell colSpan={8} className="text-center py-12 text-muted-foreground">
                     <FileStack className="size-10 mx-auto mb-2 opacity-30" />
                     Nenhum documento cadastrado.
                   </TableCell>
@@ -253,7 +267,7 @@ const CompanyDocuments = () => {
               <Label>Descrição</Label>
               <Textarea value={description} onChange={(e) => setDescription(e.target.value)} rows={2} />
             </div>
-            <div className="grid grid-cols-2 gap-3">
+            <div className="grid grid-cols-3 gap-3">
               <div>
                 <Label>Categoria</Label>
                 <Select value={category} onValueChange={setCategory}>
@@ -266,8 +280,29 @@ const CompanyDocuments = () => {
                 </Select>
               </div>
               <div>
+                <Label>Visibilidade</Label>
+                <Select value={visibility} onValueChange={setVisibility}>
+                  <SelectTrigger><SelectValue /></SelectTrigger>
+                  <SelectContent>
+                    {visibilityOptions.map((v) => (
+                      <SelectItem key={v.value} value={v.value}>{v.label}</SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              </div>
+              <div>
                 <Label>Versão</Label>
                 <Input value={version} onChange={(e) => setVersion(e.target.value)} />
+              </div>
+            </div>
+            <div className="grid grid-cols-2 gap-3">
+              <div>
+                <Label>Vigência Início</Label>
+                <Input type="date" value={validFrom} onChange={(e) => setValidFrom(e.target.value)} />
+              </div>
+              <div>
+                <Label>Vigência Fim</Label>
+                <Input type="date" value={validUntil} onChange={(e) => setValidUntil(e.target.value)} />
               </div>
             </div>
             <div>
@@ -277,11 +312,7 @@ const CompanyDocuments = () => {
                   <label className="cursor-pointer">
                     <Upload className="size-4 mr-2" />
                     {file ? file.name : "Selecionar arquivo"}
-                    <input
-                      type="file"
-                      className="hidden"
-                      onChange={(e) => setFile(e.target.files?.[0] || null)}
-                    />
+                    <input type="file" className="hidden" onChange={(e) => setFile(e.target.files?.[0] || null)} />
                   </label>
                 </Button>
               </div>
