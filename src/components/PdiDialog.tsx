@@ -64,6 +64,10 @@ export const PdiDialog = ({ employeeId, pdiId, open, onOpenChange }: PdiDialogPr
               {pdiId && <PdiGoalsManager pdiId={pdiId} pdi={pdi} />}
             </TabsContent>
 
+            <TabsContent value="competencies" className="space-y-4 mt-4">
+              {pdiId && pdi && <PdiCompetenciesView pdiId={pdiId} pdi={pdi} />}
+            </TabsContent>
+
             <TabsContent value="progress" className="space-y-4 mt-4">
               {pdiId && <PdiProgressView pdiId={pdiId} pdi={pdi} />}
             </TabsContent>
