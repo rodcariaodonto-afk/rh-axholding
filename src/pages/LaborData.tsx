@@ -144,7 +144,7 @@ const LaborData = () => {
                     </div>
                     <div>
                       <p className="text-sm text-muted-foreground">Carga Semanal</p>
-                      <p className="font-medium">{selectedEmployee?.weekly_hours || contract?.weekly_hours || 44}h</p>
+                      <p className="font-medium">{(selectedEmployee as any)?.weekly_hours || contract?.weekly_hours || 44}h</p>
                     </div>
                   </div>
                 ) : (
