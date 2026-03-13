@@ -438,6 +438,66 @@ export type Database = {
           },
         ]
       }
+      company_documents: {
+        Row: {
+          category: string
+          created_at: string
+          description: string | null
+          file_name: string
+          file_size: number | null
+          file_url: string
+          id: string
+          organization_id: string
+          title: string
+          updated_at: string
+          uploaded_by: string | null
+          version: string
+        }
+        Insert: {
+          category?: string
+          created_at?: string
+          description?: string | null
+          file_name: string
+          file_size?: number | null
+          file_url: string
+          id?: string
+          organization_id: string
+          title: string
+          updated_at?: string
+          uploaded_by?: string | null
+          version?: string
+        }
+        Update: {
+          category?: string
+          created_at?: string
+          description?: string | null
+          file_name?: string
+          file_size?: number | null
+          file_url?: string
+          id?: string
+          organization_id?: string
+          title?: string
+          updated_at?: string
+          uploaded_by?: string | null
+          version?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "company_documents_organization_id_fkey"
+            columns: ["organization_id"]
+            isOneToOne: false
+            referencedRelation: "organizations"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "company_documents_organization_id_fkey"
+            columns: ["organization_id"]
+            isOneToOne: false
+            referencedRelation: "organizations_public"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       compensation_history: {
         Row: {
           approved_at: string | null
@@ -3587,6 +3647,79 @@ export type Database = {
             columns: ["organization_id"]
             isOneToOne: false
             referencedRelation: "organizations_public"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      salary_ranges: {
+        Row: {
+          base_salary_max: number
+          base_salary_min: number
+          benefits_total: number
+          created_at: string
+          effective_from: string
+          effective_until: string | null
+          hazard_pct: number
+          id: string
+          night_shift_pct: number
+          organization_id: string
+          position_id: string | null
+          seniority: string
+          unhealthy_pct: number
+          updated_at: string
+        }
+        Insert: {
+          base_salary_max?: number
+          base_salary_min?: number
+          benefits_total?: number
+          created_at?: string
+          effective_from?: string
+          effective_until?: string | null
+          hazard_pct?: number
+          id?: string
+          night_shift_pct?: number
+          organization_id: string
+          position_id?: string | null
+          seniority?: string
+          unhealthy_pct?: number
+          updated_at?: string
+        }
+        Update: {
+          base_salary_max?: number
+          base_salary_min?: number
+          benefits_total?: number
+          created_at?: string
+          effective_from?: string
+          effective_until?: string | null
+          hazard_pct?: number
+          id?: string
+          night_shift_pct?: number
+          organization_id?: string
+          position_id?: string | null
+          seniority?: string
+          unhealthy_pct?: number
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "salary_ranges_organization_id_fkey"
+            columns: ["organization_id"]
+            isOneToOne: false
+            referencedRelation: "organizations"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "salary_ranges_organization_id_fkey"
+            columns: ["organization_id"]
+            isOneToOne: false
+            referencedRelation: "organizations_public"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "salary_ranges_position_id_fkey"
+            columns: ["position_id"]
+            isOneToOne: false
+            referencedRelation: "positions"
             referencedColumns: ["id"]
           },
         ]
