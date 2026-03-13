@@ -143,6 +143,10 @@ export default function WorkPolicies() {
                       </div>
                     )}
                   </div>
+                  <div className="flex items-center gap-1 mt-2 text-sm text-muted-foreground">
+                    <Users className="h-3.5 w-3.5" />
+                    <span>{employeeCountByPolicy[p.id] || 0} colaboradores vinculados</span>
+                  </div>
                 </CardContent>
               </Card>
             );
