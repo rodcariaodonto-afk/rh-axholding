@@ -477,6 +477,22 @@ export default function TimeOff() {
                 <CalendarDays className="h-4 w-4 mr-2" />
                 Período Aquisitivo
               </Button>
+              <Button
+                variant={activeTab === "schedule" ? "default" : "ghost"}
+                className="rounded-b-none"
+                onClick={() => setActiveTab("schedule")}
+              >
+                <Calendar className="h-4 w-4 mr-2" />
+                Programação
+              </Button>
+              <Button
+                variant={activeTab === "completion" ? "default" : "ghost"}
+                className="rounded-b-none"
+                onClick={() => setActiveTab("completion")}
+              >
+                <CheckCircle className="h-4 w-4 mr-2" />
+                Conclusão
+              </Button>
             </>
           )}
         </div>
