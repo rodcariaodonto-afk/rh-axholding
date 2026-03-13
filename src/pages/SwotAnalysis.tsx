@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useMemo } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
@@ -6,13 +6,14 @@ import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
-import { Plus, Edit, Trash, TrendingUp, TrendingDown, Eye, ShieldAlert } from "lucide-react";
+import { Plus, Edit, Trash, TrendingUp, TrendingDown, Eye, ShieldAlert, FileDown, BarChart3 } from "lucide-react";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/useAuth";
 import { useCurrentOrganization } from "@/hooks/useCurrentOrganization";
 import { useToast } from "@/hooks/use-toast";
 import { Skeleton } from "@/components/ui/skeleton";
+import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, Cell } from "recharts";
 
 type Quadrant = "strength" | "weakness" | "opportunity" | "threat";
 type Impact = "low" | "medium" | "high";
@@ -41,6 +42,12 @@ const impactLabels: Record<Impact, { label: string; variant: "outline" | "destru
   high: { label: "Alto", variant: "destructive" },
 };
 
+const IMPACT_COLORS: Record<Impact, string> = {
+  high: "hsl(var(--destructive))",
+  medium: "hsl(var(--primary))",
+  low: "hsl(var(--muted-foreground))",
+};
+
 const SwotAnalysis = () => {
   const { user } = useAuth();
   const { organizationId } = useCurrentOrganization();
@@ -50,6 +57,7 @@ const SwotAnalysis = () => {
   const [editingItem, setEditingItem] = useState<SwotItem | null>(null);
   const [formData, setFormData] = useState({ quadrant: "strength" as Quadrant, description: "", impact: "medium" as Impact, related_action: "" });
   const [filterEmployee, setFilterEmployee] = useState<string>("all");
+  const [showChart, setShowChart] = useState(false);
 
   const { data: items = [], isLoading } = useQuery({
     queryKey: ["swot-analysis", organizationId],
@@ -166,8 +174,57 @@ const SwotAnalysis = () => {
   };
 
   const filteredItems = filterEmployee === "all" ? items : items.filter(i => i.employee_id === filterEmployee);
-
   const getQuadrantItems = (q: Quadrant) => filteredItems.filter(i => i.quadrant === q);
+
+  // Impact distribution chart data
+  const impactChartData = useMemo(() => {
+    const data = (["high", "medium", "low"] as Impact[]).map(impact => ({
+      name: impactLabels[impact].label,
+      impact,
+      count: filteredItems.filter(i => i.impact === impact).length,
+    }));
+    return data;
+  }, [filteredItems]);
+
+  // Executive summary
+  const executiveSummary = useMemo(() => {
+    const s = getQuadrantItems("strength").length;
+    const w = getQuadrantItems("weakness").length;
+    const o = getQuadrantItems("opportunity").length;
+    const t = getQuadrantItems("threat").length;
+    const highImpact = filteredItems.filter(i => i.impact === "high").length;
+    return { s, w, o, t, total: filteredItems.length, highImpact };
+  }, [filteredItems]);
+
+  // Export as text/PDF summary
+  const handleExportSummary = () => {
+    const lines: string[] = [
+      "ANÁLISE SWOT — RESUMO EXECUTIVO",
+      `Data: ${new Date().toLocaleDateString("pt-BR")}`,
+      `Total de itens: ${executiveSummary.total}`,
+      `Itens de alto impacto: ${executiveSummary.highImpact}`,
+      "",
+      `FORÇAS (${executiveSummary.s}):`,
+      ...getQuadrantItems("strength").map(i => `  • ${i.description}${i.impact ? ` [${impactLabels[i.impact as Impact].label}]` : ""}`),
+      "",
+      `FRAQUEZAS (${executiveSummary.w}):`,
+      ...getQuadrantItems("weakness").map(i => `  • ${i.description}${i.impact ? ` [${impactLabels[i.impact as Impact].label}]` : ""}`),
+      "",
+      `OPORTUNIDADES (${executiveSummary.o}):`,
+      ...getQuadrantItems("opportunity").map(i => `  • ${i.description}${i.impact ? ` [${impactLabels[i.impact as Impact].label}]` : ""}`),
+      "",
+      `AMEAÇAS (${executiveSummary.t}):`,
+      ...getQuadrantItems("threat").map(i => `  • ${i.description}${i.impact ? ` [${impactLabels[i.impact as Impact].label}]` : ""}`),
+    ];
+    const blob = new Blob([lines.join("\n")], { type: "text/plain;charset=utf-8" });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement("a");
+    a.href = url;
+    a.download = `analise-swot-${new Date().toISOString().split("T")[0]}.txt`;
+    a.click();
+    URL.revokeObjectURL(url);
+    toast({ title: "Resumo executivo exportado!" });
+  };
 
   if (isLoading) {
     return (
@@ -187,18 +244,82 @@ const SwotAnalysis = () => {
           <h1 className="text-2xl font-bold text-foreground">Matriz SWOT</h1>
           <p className="text-muted-foreground">Análise estratégica por colaborador ou organização.</p>
         </div>
-        <Select value={filterEmployee} onValueChange={setFilterEmployee}>
-          <SelectTrigger className="w-[240px]">
-            <SelectValue placeholder="Filtrar por colaborador" />
-          </SelectTrigger>
-          <SelectContent>
-            <SelectItem value="all">Toda organização</SelectItem>
-            {employees.map(e => (
-              <SelectItem key={e.id} value={e.id}>{e.full_name}</SelectItem>
-            ))}
-          </SelectContent>
-        </Select>
+        <div className="flex items-center gap-2">
+          <Select value={filterEmployee} onValueChange={setFilterEmployee}>
+            <SelectTrigger className="w-[200px]">
+              <SelectValue placeholder="Filtrar por colaborador" />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="all">Toda organização</SelectItem>
+              {employees.map(e => (
+                <SelectItem key={e.id} value={e.id}>{e.full_name}</SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
+          <Button variant="outline" size="sm" onClick={() => setShowChart(!showChart)}>
+            <BarChart3 className="size-4 mr-1" />
+            {showChart ? "Ocultar" : "Gráfico"}
+          </Button>
+          <Button variant="outline" size="sm" onClick={handleExportSummary} disabled={filteredItems.length === 0}>
+            <FileDown className="size-4 mr-1" />
+            Exportar
+          </Button>
+        </div>
       </div>
+
+      {/* Executive Summary */}
+      {filteredItems.length > 0 && (
+        <Card>
+          <CardContent className="pt-4">
+            <div className="grid grid-cols-2 md:grid-cols-5 gap-4 text-center">
+              <div>
+                <p className="text-2xl font-bold text-emerald-600">{executiveSummary.s}</p>
+                <p className="text-xs text-muted-foreground">Forças</p>
+              </div>
+              <div>
+                <p className="text-2xl font-bold text-red-600">{executiveSummary.w}</p>
+                <p className="text-xs text-muted-foreground">Fraquezas</p>
+              </div>
+              <div>
+                <p className="text-2xl font-bold text-blue-600">{executiveSummary.o}</p>
+                <p className="text-xs text-muted-foreground">Oportunidades</p>
+              </div>
+              <div>
+                <p className="text-2xl font-bold text-amber-600">{executiveSummary.t}</p>
+                <p className="text-xs text-muted-foreground">Ameaças</p>
+              </div>
+              <div>
+                <p className="text-2xl font-bold text-destructive">{executiveSummary.highImpact}</p>
+                <p className="text-xs text-muted-foreground">Alto Impacto</p>
+              </div>
+            </div>
+          </CardContent>
+        </Card>
+      )}
+
+      {/* Impact Distribution Chart */}
+      {showChart && filteredItems.length > 0 && (
+        <Card>
+          <CardHeader>
+            <CardTitle className="text-base">Distribuição por Impacto</CardTitle>
+          </CardHeader>
+          <CardContent>
+            <ResponsiveContainer width="100%" height={200}>
+              <BarChart data={impactChartData}>
+                <CartesianGrid strokeDasharray="3 3" />
+                <XAxis dataKey="name" />
+                <YAxis allowDecimals={false} />
+                <Tooltip />
+                <Bar dataKey="count" name="Itens" radius={[4, 4, 0, 0]}>
+                  {impactChartData.map((entry, index) => (
+                    <Cell key={`cell-${index}`} fill={IMPACT_COLORS[entry.impact]} />
+                  ))}
+                </Bar>
+              </BarChart>
+            </ResponsiveContainer>
+          </CardContent>
+        </Card>
+      )}
 
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
         {(["strength", "weakness", "opportunity", "threat"] as Quadrant[]).map(q => {
