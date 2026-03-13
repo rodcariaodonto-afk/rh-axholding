@@ -26,6 +26,14 @@
 11. **Programação de Pagamento** (`/payment-schedule`) — CRUD completo com tabela `payment_schedule` + RLS. Cards de resumo, filtro por status, ações de pagar/cancelar
 12. **Relatório de Ponto consolidado** — Já existente em `/time-reports`
 
+### ✅ LOTE A — Férias + PDI (CONCLUÍDO)
+
+13. **Programação de Férias** — Calendário visual mensal com férias agendadas, filtro por departamento, detecção de conflitos (3+ ausentes)
+14. **Conclusão de Férias** — Registrar retorno de colaborador, confirmar conclusão com observações
+15. **PDI Plano de Ação** — Nova aba com CRUD de ações (ação, responsável, início/fim, status, meta vinculada). Tabela `pdi_action_plans` + RLS
+16. **PDI Enviar para Aprovação** — Workflow draft → pending → approved/rejected com botões contextuais por role
+17. **PDI Histórico de Versões** — Tabela `pdi_versions` com snapshots, exibição na timeline lateral
+
 ---
 
 ## Tabelas Criadas
@@ -38,14 +46,18 @@
 | `termination_details` | 2 | ✅ |
 | `swot_analysis` | 3 | ✅ |
 | `payment_schedule` | 3 | ✅ |
+| `pdi_action_plans` | A | ✅ |
+| `pdi_versions` | A | ✅ |
 
-## Páginas Criadas
+## O QUE AINDA FALTA
 
-- `src/pages/ProfileType.tsx`
-- `src/pages/SalaryRanges.tsx`
-- `src/pages/CompanyDocuments.tsx`
-- `src/pages/LaborData.tsx`
-- `src/pages/Absenteeism.tsx`
-- `src/pages/PaymentSchedule.tsx`
-- `src/pages/SwotAnalysis.tsx`
-- `src/components/PdiCompetenciesView.tsx`
+### Lote B — Documentos + SWOT + Pagamentos
+- Visibilidade e perfis de acesso nos Documentos da Empresa
+- Exportação PDF, resumo executivo e gráfico no SWOT
+- Calendário visual no Programação de Pagamento
+
+### Lote C — Relatórios + Melhorias menores
+- Relatório de ponto consolidado
+- Duplicar/histórico em Salários
+- Histórico de alterações em Dados Trabalhistas
+- Melhorias no Organograma (filtro + export) e Políticas (colaboradores por política)
