@@ -310,7 +310,61 @@ export default function TimeReports() {
             )}
           </div>
         </div>
-      )}
+        )}
+        </TabsContent>
+
+        <TabsContent value="consolidated" className="space-y-4 mt-4">
+          <div className="flex justify-end">
+            <Button variant="outline" size="sm" onClick={handleExportConsolidatedCSV} disabled={consolidatedData.length === 0}>
+              <Download className="size-4 mr-1.5" />
+              Exportar CSV Consolidado
+            </Button>
+          </div>
+          <Card>
+            <CardHeader>
+              <CardTitle className="text-base">Relatório Consolidado — {MONTHS[selectedMonth]} {selectedYear}</CardTitle>
+            </CardHeader>
+            <CardContent>
+              {consolidatedData.length === 0 ? (
+                <p className="text-center text-muted-foreground py-8">Nenhum dado para o período selecionado.</p>
+              ) : (
+                <Table>
+                  <TableHeader>
+                    <TableRow>
+                      <TableHead>Colaborador</TableHead>
+                      <TableHead className="text-right">Horas Trab.</TableHead>
+                      <TableHead className="text-center">Faltas</TableHead>
+                      <TableHead className="text-center">Atrasos</TableHead>
+                      <TableHead className="text-center">Atestados</TableHead>
+                      <TableHead className="text-center">INSS</TableHead>
+                    </TableRow>
+                  </TableHeader>
+                  <TableBody>
+                    {consolidatedData.map(d => (
+                      <TableRow key={d.id}>
+                        <TableCell className="font-medium">{d.name}</TableCell>
+                        <TableCell className="text-right font-mono">{d.totalHours.toFixed(1)}h</TableCell>
+                        <TableCell className="text-center">
+                          {d.absences > 0 ? <Badge variant="destructive">{d.absences}</Badge> : "0"}
+                        </TableCell>
+                        <TableCell className="text-center">
+                          {d.delays > 0 ? <Badge variant="warning">{d.delays}</Badge> : "0"}
+                        </TableCell>
+                        <TableCell className="text-center">
+                          {d.certificates > 0 ? <Badge variant="secondary">{d.certificates}</Badge> : "0"}
+                        </TableCell>
+                        <TableCell className="text-center">
+                          {d.inss > 0 ? <Badge variant="outline">{d.inss}</Badge> : "0"}
+                        </TableCell>
+                      </TableRow>
+                    ))}
+                  </TableBody>
+                </Table>
+              )}
+            </CardContent>
+          </Card>
+        </TabsContent>
+      </Tabs>
     </div>
   );
 }
