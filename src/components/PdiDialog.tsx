@@ -4,6 +4,7 @@ import { usePdiById } from "@/hooks/usePdiById";
 import { PdiInfoForm } from "./PdiInfoForm";
 import { PdiGoalsManager } from "./PdiGoalsManager";
 import { PdiProgressView } from "./PdiProgressView";
+import { PdiCompetenciesView } from "./PdiCompetenciesView";
 import { Skeleton } from "@/components/ui/skeleton";
 import { useState } from "react";
 
