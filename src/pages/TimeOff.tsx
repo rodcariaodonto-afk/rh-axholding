@@ -50,6 +50,9 @@ import {
   mockTimeOffEmployees,
   type MockTimeOffRequest 
 } from "@/mocks/timeOffData";
+import { TimeOffScheduleCalendar } from "@/components/TimeOffScheduleCalendar";
+import { TimeOffCompletionTab } from "@/components/TimeOffCompletionTab";
+import { useDepartments } from "@/hooks/useDepartments";
 
 type TimeOffStatus = "pending_people" | "approved" | "rejected" | "cancelled";
 
