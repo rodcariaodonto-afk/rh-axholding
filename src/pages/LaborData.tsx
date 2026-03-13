@@ -51,7 +51,7 @@ const LaborData = () => {
     queryKey: ["employee-schedule", selectedEmployeeId],
     queryFn: async () => {
       if (!selectedEmployeeId) return null;
-      const emp = employees.find((e: any) => e.id === selectedEmployeeId);
+      const emp = employees.find((e: any) => e.id === selectedEmployeeId) as any;
       if (!emp?.work_schedule_id) return null;
       const { data, error } = await supabase
         .from("work_schedules")
