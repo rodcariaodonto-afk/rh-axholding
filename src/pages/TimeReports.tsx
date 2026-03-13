@@ -258,7 +258,20 @@ export default function TimeReports() {
         </Card>
       </div>
 
-      {/* Charts */}
+      {/* Charts / Consolidated Tabs */}
+      <Tabs value={activeTab} onValueChange={setActiveTab}>
+        <TabsList>
+          <TabsTrigger value="charts" className="gap-2">
+            <BarChart3 className="size-4" />
+            Gráficos
+          </TabsTrigger>
+          <TabsTrigger value="consolidated" className="gap-2">
+            <FileText className="size-4" />
+            Consolidado
+          </TabsTrigger>
+        </TabsList>
+
+        <TabsContent value="charts" className="space-y-6 mt-4">
       {isLoading ? (
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
           <Skeleton className="h-80" />
