@@ -177,6 +177,13 @@ const PdiDetailPage = () => {
               </CardContent>
             </Card>
 
+            {/* Action Plan */}
+            <Card>
+              <CardContent className="pt-6">
+                <PdiActionPlanTab pdiId={pdiId!} pdi={pdi} />
+              </CardContent>
+            </Card>
+
             {/* Action Buttons */}
             <div className="flex flex-wrap gap-2">
               {!isFinalized && pdi.status === "entregue" && (
