@@ -256,6 +256,12 @@ const PaymentSchedule = () => {
           </Table>
         </CardContent>
       </Card>
+        </TabsContent>
+
+        <TabsContent value="calendar">
+          <PaymentCalendarView payments={payments} />
+        </TabsContent>
+      </Tabs>
 
       <Dialog open={dialogOpen} onOpenChange={setDialogOpen}>
         <DialogContent>
