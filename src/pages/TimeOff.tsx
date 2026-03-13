@@ -33,7 +33,7 @@ import {
   DialogFooter,
 } from "@/components/ui/dialog";
 import { Textarea } from "@/components/ui/textarea";
-import { Palmtree, Check, X, Clock, MoreHorizontal, Plus, Eye, Pencil, Trash2, CalendarDays } from "lucide-react";
+import { Palmtree, Check, X, Clock, MoreHorizontal, Plus, Eye, Pencil, Trash2, CalendarDays, Calendar, CheckCircle } from "lucide-react";
 import {
   DropdownMenu,
   DropdownMenuContent,
