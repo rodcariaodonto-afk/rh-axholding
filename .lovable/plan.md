@@ -1,68 +1,47 @@
 
 
-# Visualizacoes Avancadas para Gestao de Ponto
+# Gap Analysis: Documento CRM vs Plataforma Atual
 
-## Visao Geral
+## Status de Implementação
 
-Adicionar uma nova aba **"Visao Geral"** na tela admin de Gestao de Ponto com 3 componentes visuais usando Recharts (ja instalado no projeto):
+### ✅ FASE 1 — Menu + Módulos Base (CONCLUÍDA)
 
-### 1. Grafico de Barras Semanal - Horas por Dia
+1. **Menu Lateral reorganizado** — Blocos: PERFIL, CADASTRO, ESTRUTURA ORGANIZACIONAL, DEPARTAMENTO PESSOAL, GESTÃO & DESENVOLVIMENTO, RECRUTAMENTO, RELATÓRIOS, FINANCEIRO, ADMINISTRAÇÃO
+2. **Tipo de Perfil** (`/profile-type`) — Exibe role, permissões por módulo, data de entrada
+3. **Salários** (`/salary-ranges`) — CRUD completo com tabela `salary_ranges` + RLS
+4. **Documentos da Empresa** (`/company-documents`) — Upload com versionamento, tabela `company_documents` + RLS
+5. **Renomeações** — Cultura → Identidade Organizacional, Empresa → Dados da Empresa, Auditoria → Administração, Financeiro separado
 
-Um grafico de barras empilhadas mostrando, para cada dia da semana, as horas trabalhadas vs. horas esperadas. Barras com cores indicando:
-- Verde: dentro da meta
-- Vermelho: abaixo da meta
-- Azul: horas extras
+### ✅ FASE 2 — Departamento Pessoal (CONCLUÍDA)
 
-Filtro por colaborador ou "todos" (agregado). Facilita identificar dias com mais ou menos carga.
+5. **Dados Trabalhistas** (`/labor-data`) — 3 abas: Escala de Trabalho, Salário, Benefícios com dados do contrato ativo
+6. **Gestão de Férias expandida** — Novas abas: Saldo de Férias (dias usados/disponíveis), Período Aquisitivo (com cálculo CLT e status vencido/regular)
+7. **Absenteísmo** (`/absenteeism`) — 4 abas: Faltas, Atrasos, Atestados, Licenças INSS. CRUD completo com tabela `absenteeism` + RLS
+8. **Rescisão Contratual** — Tabela `termination_details` criada com campos para aviso prévio, férias, 13º, FGTS, multa. Integrada com desligamentos existentes.
 
-### 2. Heatmap Mensal (Grid de Quadrados)
+### 🔲 FASE 3 — Gestão, Financeiro e Relatórios (PENDENTE)
 
-Uma grade estilo calendario (similar ao contribution graph do GitHub) onde cada celula e um dia do mes. A intensidade da cor indica a quantidade de horas trabalhadas naquele dia:
-- Cinza claro: sem registro
-- Verde claro a verde escuro: de poucas a muitas horas
-- Vermelho: deficit significativo
-
-Permite visualizar rapidamente padroes ao longo do mes.
-
-### 3. Ranking de Colaboradores - Horas Trabalhadas no Mes
-
-Um grafico de barras horizontais mostrando o total de horas trabalhadas por cada colaborador no mes, com uma linha de referencia indicando a meta esperada. Facilita comparar a equipe.
+9. Expandir PDI — Competências Esperadas, Metas/OKRs dentro do PDI, Plano de Ação
+10. Matriz SWOT — Análise por colaborador/equipe com 4 quadrantes
+11. Programação de Pagamento — Calendário de pagamentos agendados
+12. Consolidar Relatório de Ponto — Relatório unificado com exportação
 
 ---
 
-## Detalhes Tecnicos
+## Tabelas Criadas
 
-### Novos arquivos
+| Tabela | Fase | RLS |
+|--------|------|-----|
+| `salary_ranges` | 1 | ✅ |
+| `company_documents` | 1 | ✅ |
+| `absenteeism` | 2 | ✅ |
+| `termination_details` | 2 | ✅ |
 
-1. **`src/components/time-tracking/WeeklyHoursChart.tsx`**
-   - Usa `BarChart` do Recharts com `ResponsiveContainer`
-   - Recebe `time_entries` da semana e agrupa por dia
-   - Calcula horas esperadas com base em `weekly_hours / 5` (media diaria)
-   - Barras: `worked` (horas trabalhadas) e `expected` (referencia como linha ou barra secundaria)
+## Páginas Criadas
 
-2. **`src/components/time-tracking/MonthlyHeatmap.tsx`**
-   - Componente custom com grid CSS (7 colunas x ~5 linhas)
-   - Cada celula recebe `total_minutes` do dia e aplica escala de cor via Tailwind (`bg-green-100` ate `bg-green-700`)
-   - Tooltip mostrando data e horas ao passar o mouse
-
-3. **`src/components/time-tracking/TeamHoursRanking.tsx`**
-   - `BarChart` horizontal do Recharts
-   - Agrupa `time_entries` do mes por `employee_id`
-   - Exibe nome do colaborador no eixo Y e horas no eixo X
-   - Linha de referencia vertical (`ReferenceLine`) para a meta mensal
-
-### Hook adicional
-
-4. **`src/hooks/useMonthlyTimeEntries.ts`**
-   - Busca todas as `time_entries` do mes corrente para a organizacao (sem filtro de employee)
-   - Reutilizado pelos 3 componentes visuais
-
-### Alteracoes em arquivos existentes
-
-5. **`src/pages/TimeTracking.tsx`**
-   - Adicionar nova aba "Visao Geral" no `TabsList` da visao admin
-   - `TabsContent` renderiza os 3 componentes visuais em grid
-
-### Dependencias
-- Nenhuma nova -- usa Recharts (ja instalado) e Tailwind para o heatmap
-
+- `src/pages/ProfileType.tsx`
+- `src/pages/SalaryRanges.tsx`
+- `src/pages/CompanyDocuments.tsx`
+- `src/pages/LaborData.tsx`
+- `src/pages/Absenteeism.tsx`
+- `src/pages/PaymentSchedule.tsx` (placeholder)
