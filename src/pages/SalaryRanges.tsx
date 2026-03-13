@@ -115,13 +115,13 @@ const SalaryRanges = () => {
       };
 
       if (editingId) {
-        const { error } = await supabase
+        const { error } = await (supabase as any)
           .from("salary_ranges")
           .update(payload)
           .eq("id", editingId);
         if (error) throw error;
       } else {
-        const { error } = await supabase.from("salary_ranges").insert(payload);
+        const { error } = await (supabase as any).from("salary_ranges").insert(payload);
         if (error) throw error;
       }
     },
