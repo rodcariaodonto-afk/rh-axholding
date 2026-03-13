@@ -94,7 +94,7 @@ export default function TimeOff() {
   const [statusFilter, setStatusFilter] = useState<TimeOffStatus | "all">("all");
   const [requestDialogOpen, setRequestDialogOpen] = useState(false);
   const [editingRequest, setEditingRequest] = useState<TimeOffRequest | null>(null);
-  const [activeTab, setActiveTab] = useState<"requests" | "approved">("requests");
+  const [activeTab, setActiveTab] = useState<"requests" | "approved" | "balance" | "acquisition">("requests");
   const [reviewModal, setReviewModal] = useState<{
     open: boolean;
     request: TimeOffRequest | null;
