@@ -2878,6 +2878,73 @@ export type Database = {
         }
         Relationships: []
       }
+      payment_schedule: {
+        Row: {
+          amount: number
+          created_at: string
+          created_by: string
+          description: string | null
+          employee_id: string
+          id: string
+          organization_id: string
+          paid_at: string | null
+          payment_date: string
+          payment_method: string
+          status: string
+          updated_at: string
+        }
+        Insert: {
+          amount: number
+          created_at?: string
+          created_by: string
+          description?: string | null
+          employee_id: string
+          id?: string
+          organization_id: string
+          paid_at?: string | null
+          payment_date: string
+          payment_method?: string
+          status?: string
+          updated_at?: string
+        }
+        Update: {
+          amount?: number
+          created_at?: string
+          created_by?: string
+          description?: string | null
+          employee_id?: string
+          id?: string
+          organization_id?: string
+          paid_at?: string | null
+          payment_date?: string
+          payment_method?: string
+          status?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "payment_schedule_employee_id_fkey"
+            columns: ["employee_id"]
+            isOneToOne: false
+            referencedRelation: "employees"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "payment_schedule_organization_id_fkey"
+            columns: ["organization_id"]
+            isOneToOne: false
+            referencedRelation: "organizations"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "payment_schedule_organization_id_fkey"
+            columns: ["organization_id"]
+            isOneToOne: false
+            referencedRelation: "organizations_public"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       pdi_attachments: {
         Row: {
           created_at: string
@@ -3916,6 +3983,77 @@ export type Database = {
           },
           {
             foreignKeyName: "soft_skills_organization_id_fkey"
+            columns: ["organization_id"]
+            isOneToOne: false
+            referencedRelation: "organizations_public"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      swot_analysis: {
+        Row: {
+          created_at: string
+          created_by: string
+          department_id: string | null
+          description: string
+          employee_id: string | null
+          id: string
+          impact: string | null
+          organization_id: string
+          quadrant: string
+          related_action: string | null
+          updated_at: string
+        }
+        Insert: {
+          created_at?: string
+          created_by: string
+          department_id?: string | null
+          description: string
+          employee_id?: string | null
+          id?: string
+          impact?: string | null
+          organization_id: string
+          quadrant: string
+          related_action?: string | null
+          updated_at?: string
+        }
+        Update: {
+          created_at?: string
+          created_by?: string
+          department_id?: string | null
+          description?: string
+          employee_id?: string | null
+          id?: string
+          impact?: string | null
+          organization_id?: string
+          quadrant?: string
+          related_action?: string | null
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "swot_analysis_department_id_fkey"
+            columns: ["department_id"]
+            isOneToOne: false
+            referencedRelation: "departments"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "swot_analysis_employee_id_fkey"
+            columns: ["employee_id"]
+            isOneToOne: false
+            referencedRelation: "employees"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "swot_analysis_organization_id_fkey"
+            columns: ["organization_id"]
+            isOneToOne: false
+            referencedRelation: "organizations"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "swot_analysis_organization_id_fkey"
             columns: ["organization_id"]
             isOneToOne: false
             referencedRelation: "organizations_public"
