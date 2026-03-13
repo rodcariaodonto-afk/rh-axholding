@@ -219,6 +219,12 @@ const App = () => (
             <Route path="/documents" element={<PeopleRoute><Documents /></PeopleRoute>} />
             <Route path="/goals" element={<PeopleRoute><Goals /></PeopleRoute>} />
             <Route path="/training-catalog" element={<PeopleRoute><TrainingCatalog /></PeopleRoute>} />
+            <Route path="/profile-type" element={<ProfileType />} />
+            <Route path="/salary-ranges" element={<PeopleRoute><SalaryRanges /></PeopleRoute>} />
+            <Route path="/company-documents" element={<PeopleRoute><CompanyDocuments /></PeopleRoute>} />
+            <Route path="/labor-data" element={<PeopleRoute><LaborData /></PeopleRoute>} />
+            <Route path="/absenteeism" element={<PeopleRoute><Absenteeism /></PeopleRoute>} />
+            <Route path="/payment-schedule" element={<PeopleRoute><PaymentSchedule /></PeopleRoute>} />
 
             {/* People-only routes */}
             <Route path="/people-analytics" element={<PeopleRoute><PeopleAnalytics /></PeopleRoute>} />
