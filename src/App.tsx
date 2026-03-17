@@ -228,6 +228,7 @@ const App = () => (
             <Route path="/absenteeism" element={<PeopleRoute><Absenteeism /></PeopleRoute>} />
             <Route path="/payment-schedule" element={<PeopleRoute><PaymentSchedule /></PeopleRoute>} />
             <Route path="/swot-analysis" element={<PeopleRoute><SwotAnalysis /></PeopleRoute>} />
+            <Route path="/journey-config" element={<PeopleRoute><JourneyConfig /></PeopleRoute>} />
 
             {/* People-only routes */}
             <Route path="/people-analytics" element={<PeopleRoute><PeopleAnalytics /></PeopleRoute>} />
