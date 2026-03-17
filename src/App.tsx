@@ -91,6 +91,7 @@ const LaborData = lazy(() => import("./pages/LaborData"));
 const Absenteeism = lazy(() => import("./pages/Absenteeism"));
 const PaymentSchedule = lazy(() => import("./pages/PaymentSchedule"));
 const SwotAnalysis = lazy(() => import("./pages/SwotAnalysis"));
+const JourneyConfig = lazy(() => import("./pages/JourneyConfig"));
 
 const queryClient = new QueryClient({
   defaultOptions: {
