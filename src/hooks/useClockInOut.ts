@@ -72,7 +72,7 @@ export function useClockInOut() {
     refetchInterval: 60_000,
   });
 
-  const nextStep = getNextStep(openEntry);
+  const nextStep = getNextStep(openEntry ?? null);
   const isClockedIn = !!openEntry;
 
   const captureGeolocation = async (): Promise<{ position: GeoPosition | null; withinFence: boolean }> => {
