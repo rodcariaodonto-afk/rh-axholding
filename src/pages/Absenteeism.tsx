@@ -154,7 +154,7 @@ const Absenteeism = () => {
   };
 
   const openNew = () => {
-    setForm((f) => ({ ...f, type: activeTab }));
+    setForm((f) => ({ ...f, type: activeTab as AbsenteeismType }));
     setDialogOpen(true);
   };
 
