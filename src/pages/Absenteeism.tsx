@@ -193,12 +193,16 @@ const Absenteeism = () => {
         )}
       </div>
 
-      <Tabs value={activeTab} onValueChange={(v) => setActiveTab(v as AbsenteeismType)}>
+      <Tabs value={activeTab} onValueChange={setActiveTab}>
         <TabsList>
           <TabsTrigger value="absence">Faltas ({tabCounts.absence})</TabsTrigger>
           <TabsTrigger value="late">Atrasos ({tabCounts.late})</TabsTrigger>
           <TabsTrigger value="medical_certificate">Atestados ({tabCounts.medical_certificate})</TabsTrigger>
           <TabsTrigger value="inss_leave">Licenças INSS ({tabCounts.inss_leave})</TabsTrigger>
+          <TabsTrigger value="justificativas">
+            <FileCheck className="mr-1 h-4 w-4" />
+            Justificativas
+          </TabsTrigger>
         </TabsList>
 
         {(["absence", "late", "medical_certificate", "inss_leave"] as AbsenteeismType[]).map(
