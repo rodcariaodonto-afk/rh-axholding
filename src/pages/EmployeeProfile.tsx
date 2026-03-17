@@ -262,6 +262,10 @@ export default function EmployeeProfile() {
                 />
               </TabsContent>
 
+              <TabsContent value="justificativas" className="space-y-4 pt-6">
+                {id && <MyJustificativasSection userId={id} />}
+              </TabsContent>
+
               <TabsContent value="pdi" className="space-y-4 pt-6">
                 {id && <PdiTab employeeId={id} />}
               </TabsContent>
