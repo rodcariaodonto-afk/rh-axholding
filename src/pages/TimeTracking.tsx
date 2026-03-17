@@ -15,6 +15,10 @@ import { DailyTimeline } from "@/components/time-tracking/DailyTimeline";
 import { TimeTrackingDashboard } from "@/components/time-tracking/TimeTrackingDashboard";
 import { TimeEntriesTable } from "@/components/time-tracking/TimeEntriesTable";
 import { TimeBalanceTable } from "@/components/time-tracking/TimeBalanceTable";
+import { BancoHorasEspelho } from "@/components/time-tracking/BancoHorasEspelho";
+import { BancoHorasResumoMensal } from "@/components/time-tracking/BancoHorasResumoMensal";
+import { BancoHorasHistorico } from "@/components/time-tracking/BancoHorasHistorico";
+import { BancoHorasConfig } from "@/components/time-tracking/BancoHorasConfig";
 import { MonthlyHeatmap } from "@/components/time-tracking/MonthlyHeatmap";
 import { TeamHoursRanking } from "@/components/time-tracking/TeamHoursRanking";
 import { DailyVisualControlChart } from "@/components/time-tracking/DailyVisualControlChart";
@@ -296,11 +300,18 @@ export default function TimeTracking() {
         </TabsContent>
 
         <TabsContent value="balance">
-          {loadingBalances ? (
-            <Skeleton className="h-64 w-full" />
-          ) : (
-            <TimeBalanceTable balances={balances as any} />
-          )}
+          <Tabs defaultValue="espelho">
+            <TabsList>
+              <TabsTrigger value="espelho">Espelho Estendido</TabsTrigger>
+              <TabsTrigger value="resumo">Resumo Mensal</TabsTrigger>
+              <TabsTrigger value="historico">Histórico de Saldo</TabsTrigger>
+              <TabsTrigger value="config">Configuração</TabsTrigger>
+            </TabsList>
+            <TabsContent value="espelho"><BancoHorasEspelho /></TabsContent>
+            <TabsContent value="resumo"><BancoHorasResumoMensal /></TabsContent>
+            <TabsContent value="historico"><BancoHorasHistorico /></TabsContent>
+            <TabsContent value="config"><BancoHorasConfig /></TabsContent>
+          </Tabs>
         </TabsContent>
 
         <TabsContent value="locations">

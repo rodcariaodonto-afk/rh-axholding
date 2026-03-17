@@ -127,6 +127,7 @@ const menuGroups: MenuGroup[] = [
       { icon: Clock, label: "Gestão de Ponto", href: "/time-tracking" },
       { icon: Palmtree, label: "Gestão de Férias", href: "/time-off" },
       { icon: CalendarClock, label: "Escalas", href: "/work-schedules" },
+      { icon: ClipboardCheck, label: "Parametrização de Jornada", href: "/journey-config" },
       { icon: AlertTriangle, label: "Absenteísmo", href: "/absenteeism" },
       { icon: UserMinus, label: "Rescisão Contratual", href: "/terminations" },
     ],

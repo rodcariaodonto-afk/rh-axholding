@@ -214,6 +214,176 @@ export type Database = {
           },
         ]
       }
+      banco_horas_registros: {
+        Row: {
+          banco_horas_acumulado_minutos: number | null
+          created_at: string
+          data: string
+          diferenca_minutos: number | null
+          employee_id: string
+          entrada: string | null
+          horas_esperadas: number
+          horas_extras_minutos: number | null
+          horas_trabalhadas_minutos: number | null
+          id: string
+          intervalo_minutos: number | null
+          lunch_out: string | null
+          lunch_return: string | null
+          observacoes: string | null
+          organization_id: string
+          saida: string | null
+          tipo_jornada: string | null
+          tipo_registro: string
+          updated_at: string
+        }
+        Insert: {
+          banco_horas_acumulado_minutos?: number | null
+          created_at?: string
+          data: string
+          diferenca_minutos?: number | null
+          employee_id: string
+          entrada?: string | null
+          horas_esperadas?: number
+          horas_extras_minutos?: number | null
+          horas_trabalhadas_minutos?: number | null
+          id?: string
+          intervalo_minutos?: number | null
+          lunch_out?: string | null
+          lunch_return?: string | null
+          observacoes?: string | null
+          organization_id: string
+          saida?: string | null
+          tipo_jornada?: string | null
+          tipo_registro?: string
+          updated_at?: string
+        }
+        Update: {
+          banco_horas_acumulado_minutos?: number | null
+          created_at?: string
+          data?: string
+          diferenca_minutos?: number | null
+          employee_id?: string
+          entrada?: string | null
+          horas_esperadas?: number
+          horas_extras_minutos?: number | null
+          horas_trabalhadas_minutos?: number | null
+          id?: string
+          intervalo_minutos?: number | null
+          lunch_out?: string | null
+          lunch_return?: string | null
+          observacoes?: string | null
+          organization_id?: string
+          saida?: string | null
+          tipo_jornada?: string | null
+          tipo_registro?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "banco_horas_registros_employee_id_fkey"
+            columns: ["employee_id"]
+            isOneToOne: false
+            referencedRelation: "employees"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "banco_horas_registros_organization_id_fkey"
+            columns: ["organization_id"]
+            isOneToOne: false
+            referencedRelation: "organizations"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "banco_horas_registros_organization_id_fkey"
+            columns: ["organization_id"]
+            isOneToOne: false
+            referencedRelation: "organizations_public"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      banco_horas_totalizadores: {
+        Row: {
+          ano: number
+          atrasados: number | null
+          banco_acumulado_anterior: number | null
+          banco_acumulado_mes: number | null
+          created_at: string
+          employee_id: string
+          entrada_feriado: number | null
+          entrada_feriado_dias: number | null
+          faltas: number | null
+          horas_extras_positivas: number | null
+          horas_presentes: number | null
+          horas_trabalhadas_dias: number | null
+          id: string
+          mes: number
+          organization_id: string
+          saldo_atual: number | null
+          updated_at: string
+        }
+        Insert: {
+          ano: number
+          atrasados?: number | null
+          banco_acumulado_anterior?: number | null
+          banco_acumulado_mes?: number | null
+          created_at?: string
+          employee_id: string
+          entrada_feriado?: number | null
+          entrada_feriado_dias?: number | null
+          faltas?: number | null
+          horas_extras_positivas?: number | null
+          horas_presentes?: number | null
+          horas_trabalhadas_dias?: number | null
+          id?: string
+          mes: number
+          organization_id: string
+          saldo_atual?: number | null
+          updated_at?: string
+        }
+        Update: {
+          ano?: number
+          atrasados?: number | null
+          banco_acumulado_anterior?: number | null
+          banco_acumulado_mes?: number | null
+          created_at?: string
+          employee_id?: string
+          entrada_feriado?: number | null
+          entrada_feriado_dias?: number | null
+          faltas?: number | null
+          horas_extras_positivas?: number | null
+          horas_presentes?: number | null
+          horas_trabalhadas_dias?: number | null
+          id?: string
+          mes?: number
+          organization_id?: string
+          saldo_atual?: number | null
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "banco_horas_totalizadores_employee_id_fkey"
+            columns: ["employee_id"]
+            isOneToOne: false
+            referencedRelation: "employees"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "banco_horas_totalizadores_organization_id_fkey"
+            columns: ["organization_id"]
+            isOneToOne: false
+            referencedRelation: "organizations"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "banco_horas_totalizadores_organization_id_fkey"
+            columns: ["organization_id"]
+            isOneToOne: false
+            referencedRelation: "organizations_public"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       bonuses: {
         Row: {
           amount: number
@@ -933,6 +1103,109 @@ export type Database = {
             columns: ["uploaded_by"]
             isOneToOne: false
             referencedRelation: "employees"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      employee_journey_config: {
+        Row: {
+          compensacao_automatica: boolean
+          created_at: string
+          data_termino: string | null
+          data_vigencia: string
+          dias_trabalho: string[]
+          employee_id: string
+          fator_domingo: number
+          fator_feriado: number
+          fator_hora_extra_normal: number
+          fator_hora_extra_noturna: number
+          fator_sabado: number
+          horas_dia: number
+          horas_semana: number
+          id: string
+          intervalo_padrao: number
+          is_active: boolean
+          limite_saldo_negativo: number
+          observacoes: string | null
+          organization_id: string
+          tipo_jornada: string
+          tolerancia_atraso: number
+          tolerancia_saida_antecipada: number
+          updated_at: string
+          validade_horas_dias: number
+        }
+        Insert: {
+          compensacao_automatica?: boolean
+          created_at?: string
+          data_termino?: string | null
+          data_vigencia?: string
+          dias_trabalho?: string[]
+          employee_id: string
+          fator_domingo?: number
+          fator_feriado?: number
+          fator_hora_extra_normal?: number
+          fator_hora_extra_noturna?: number
+          fator_sabado?: number
+          horas_dia?: number
+          horas_semana?: number
+          id?: string
+          intervalo_padrao?: number
+          is_active?: boolean
+          limite_saldo_negativo?: number
+          observacoes?: string | null
+          organization_id: string
+          tipo_jornada?: string
+          tolerancia_atraso?: number
+          tolerancia_saida_antecipada?: number
+          updated_at?: string
+          validade_horas_dias?: number
+        }
+        Update: {
+          compensacao_automatica?: boolean
+          created_at?: string
+          data_termino?: string | null
+          data_vigencia?: string
+          dias_trabalho?: string[]
+          employee_id?: string
+          fator_domingo?: number
+          fator_feriado?: number
+          fator_hora_extra_normal?: number
+          fator_hora_extra_noturna?: number
+          fator_sabado?: number
+          horas_dia?: number
+          horas_semana?: number
+          id?: string
+          intervalo_padrao?: number
+          is_active?: boolean
+          limite_saldo_negativo?: number
+          observacoes?: string | null
+          organization_id?: string
+          tipo_jornada?: string
+          tolerancia_atraso?: number
+          tolerancia_saida_antecipada?: number
+          updated_at?: string
+          validade_horas_dias?: number
+        }
+        Relationships: [
+          {
+            foreignKeyName: "employee_journey_config_employee_id_fkey"
+            columns: ["employee_id"]
+            isOneToOne: false
+            referencedRelation: "employees"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "employee_journey_config_organization_id_fkey"
+            columns: ["organization_id"]
+            isOneToOne: false
+            referencedRelation: "organizations"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "employee_journey_config_organization_id_fkey"
+            columns: ["organization_id"]
+            isOneToOne: false
+            referencedRelation: "organizations_public"
             referencedColumns: ["id"]
           },
         ]
@@ -2084,6 +2357,70 @@ export type Database = {
           },
           {
             foreignKeyName: "hard_skills_organization_id_fkey"
+            columns: ["organization_id"]
+            isOneToOne: false
+            referencedRelation: "organizations_public"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      historico_saldo_banco_horas: {
+        Row: {
+          ano: number
+          created_at: string
+          employee_id: string
+          horas_acumuladas_mes: number | null
+          horas_compensadas: number | null
+          id: string
+          mes: number
+          organization_id: string
+          saldo_anterior: number | null
+          saldo_atual: number | null
+          updated_at: string
+        }
+        Insert: {
+          ano: number
+          created_at?: string
+          employee_id: string
+          horas_acumuladas_mes?: number | null
+          horas_compensadas?: number | null
+          id?: string
+          mes: number
+          organization_id: string
+          saldo_anterior?: number | null
+          saldo_atual?: number | null
+          updated_at?: string
+        }
+        Update: {
+          ano?: number
+          created_at?: string
+          employee_id?: string
+          horas_acumuladas_mes?: number | null
+          horas_compensadas?: number | null
+          id?: string
+          mes?: number
+          organization_id?: string
+          saldo_anterior?: number | null
+          saldo_atual?: number | null
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "historico_saldo_banco_horas_employee_id_fkey"
+            columns: ["employee_id"]
+            isOneToOne: false
+            referencedRelation: "employees"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "historico_saldo_banco_horas_organization_id_fkey"
+            columns: ["organization_id"]
+            isOneToOne: false
+            referencedRelation: "organizations"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "historico_saldo_banco_horas_organization_id_fkey"
             columns: ["organization_id"]
             isOneToOne: false
             referencedRelation: "organizations_public"
