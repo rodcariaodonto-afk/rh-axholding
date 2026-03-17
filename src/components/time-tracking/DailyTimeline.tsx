@@ -1,10 +1,12 @@
 import { formatTimeBrasilia } from "@/lib/timezone";
-import { Clock, LogIn, LogOut } from "lucide-react";
+import { Clock, LogIn, LogOut, UtensilsCrossed, Coffee } from "lucide-react";
 
 interface TimeEntry {
   id: string;
   clock_in: string;
   clock_out: string | null;
+  lunch_out?: string | null;
+  lunch_return?: string | null;
   total_minutes: number | null;
   notes: string | null;
 }
@@ -34,33 +36,65 @@ export function DailyTimeline({ entries }: DailyTimelineProps) {
   return (
     <div className="space-y-3">
       {entries.map((entry) => (
-        <div key={entry.id} className="flex items-center gap-3 p-3 rounded-lg border bg-card">
-          <div className="flex items-center gap-2 min-w-[100px]">
-            <LogIn className="size-4 text-green-500" />
-            <span className="font-mono text-sm font-medium">
-              {formatTimeBrasilia(entry.clock_in)}
-            </span>
+        <div key={entry.id} className="p-3 rounded-lg border bg-card space-y-2">
+          {/* Row 1: Entrada → Saída Almoço */}
+          <div className="flex items-center gap-3">
+            <div className="flex items-center gap-2 min-w-[100px]">
+              <LogIn className="size-4 text-green-500" />
+              <span className="font-mono text-sm font-medium">
+                {formatTimeBrasilia(entry.clock_in)}
+              </span>
+            </div>
+            <div className="flex-1 h-px bg-border" />
+            <div className="flex items-center gap-2 min-w-[100px]">
+              {entry.lunch_out ? (
+                <>
+                  <UtensilsCrossed className="size-4 text-amber-500" />
+                  <span className="font-mono text-sm font-medium">
+                    {formatTimeBrasilia(entry.lunch_out)}
+                  </span>
+                </>
+              ) : (
+                <span className="text-sm text-muted-foreground italic">—</span>
+              )}
+            </div>
           </div>
 
-          <div className="flex-1 h-px bg-border" />
-
-          <div className="flex items-center gap-2 min-w-[100px]">
-            {entry.clock_out ? (
-              <>
-                <LogOut className="size-4 text-destructive" />
-                <span className="font-mono text-sm font-medium">
-                  {formatTimeBrasilia(entry.clock_out)}
-                </span>
-              </>
-            ) : (
-              <span className="text-sm text-muted-foreground italic">Em aberto</span>
-            )}
+          {/* Row 2: Retorno Almoço → Saída */}
+          <div className="flex items-center gap-3">
+            <div className="flex items-center gap-2 min-w-[100px]">
+              {entry.lunch_return ? (
+                <>
+                  <Coffee className="size-4 text-emerald-500" />
+                  <span className="font-mono text-sm font-medium">
+                    {formatTimeBrasilia(entry.lunch_return)}
+                  </span>
+                </>
+              ) : (
+                <span className="text-sm text-muted-foreground italic ml-6">—</span>
+              )}
+            </div>
+            <div className="flex-1 h-px bg-border" />
+            <div className="flex items-center gap-2 min-w-[100px]">
+              {entry.clock_out ? (
+                <>
+                  <LogOut className="size-4 text-destructive" />
+                  <span className="font-mono text-sm font-medium">
+                    {formatTimeBrasilia(entry.clock_out)}
+                  </span>
+                </>
+              ) : (
+                <span className="text-sm text-muted-foreground italic">Em aberto</span>
+              )}
+            </div>
           </div>
 
           {entry.total_minutes != null && (
-            <span className="text-xs text-muted-foreground bg-muted px-2 py-1 rounded">
-              {formatMinutes(entry.total_minutes)}
-            </span>
+            <div className="text-right">
+              <span className="text-xs text-muted-foreground bg-muted px-2 py-1 rounded">
+                {formatMinutes(entry.total_minutes)}
+              </span>
+            </div>
           )}
         </div>
       ))}
