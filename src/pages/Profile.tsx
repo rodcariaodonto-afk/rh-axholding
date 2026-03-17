@@ -243,6 +243,8 @@ export default function Profile() {
         </CardContent>
       </Card>
 
+      <MyJustificativasSection userId={user?.id || ""} />
+
       <EmployeeDialog
         employeeId={employee.id}
         open={isDialogOpen}

@@ -270,6 +270,9 @@ const Absenteeism = () => {
             </TabsContent>
           )
         )}
+        <TabsContent value="justificativas">
+          <JustificativasAprovacaoTab />
+        </TabsContent>
       </Tabs>
 
       <Dialog open={dialogOpen} onOpenChange={(o) => !o && closeDialog()}>
