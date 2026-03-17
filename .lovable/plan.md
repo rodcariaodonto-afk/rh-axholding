@@ -1,40 +1,42 @@
 
 
-# Gap Analysis: Documento CRM vs Plataforma Atual — COMPLETO ✅
+# Registros de Ponto com 4 Batidas
 
-## Todas as fases implementadas
+## Situacao Atual
+O sistema registra apenas 2 eventos por dia: **Entrada** (`clock_in`) e **Saida** (`clock_out`). O usuario quer 4 batidas: Entrada, Saida Almoco, Retorno Almoco, Saida.
 
-### ✅ FASE 1 — Menu + Módulos Base
-### ✅ FASE 2 — Departamento Pessoal
-### ✅ FASE 3 — Gestão, Financeiro e Relatórios
-### ✅ LOTE A — Férias + PDI
-### ✅ LOTE B — Documentos + SWOT + Pagamentos
-### ✅ LOTE C — Relatórios + Melhorias
+## Plano
 
----
+### 1. Migracao — Adicionar colunas na tabela `time_entries`
+```sql
+ALTER TABLE public.time_entries
+  ADD COLUMN lunch_out TIMESTAMPTZ,
+  ADD COLUMN lunch_return TIMESTAMPTZ;
+```
 
-## Implementações Lote B
+### 2. Atualizar `useClockInOut.ts` — Ciclo de 4 estados
+O botao de ponto passa a ciclar entre 4 estados baseado no que ja foi preenchido no registro aberto:
+- Sem registro aberto → **Registrar Entrada** (cria entry com `clock_in`)
+- `clock_in` preenchido, sem `lunch_out` → **Saida Almoco** (atualiza `lunch_out`)
+- `lunch_out` preenchido, sem `lunch_return` → **Retorno Almoco** (atualiza `lunch_return`)
+- `lunch_return` preenchido, sem `clock_out` → **Saida** (atualiza `clock_out` + calcula `total_minutes` descontando almoco)
 
-- **Documentos da Empresa**: Campos de visibilidade (Público/Restrito/Privado), datas de vigência início/fim
-- **Matriz SWOT**: Resumo executivo com contadores, gráfico de distribuição por impacto (recharts), exportação TXT do resumo
-- **Programação de Pagamento**: Nova aba "Calendário" com visualização mensal dos pagamentos agendados
+O calculo de `total_minutes` passa a descontar o intervalo de almoco:
+`total = (clock_out - clock_in) - (lunch_return - lunch_out)`
 
-## Implementações Lote C
+### 3. Atualizar `ClockInOutButton.tsx` — Labels dinamicos
+Mostrar o label correto para cada estado: "Registrar Entrada", "Saida para Almoco", "Retorno do Almoco", "Registrar Saida". Cores e icones diferentes para cada etapa.
 
-- **Relatório de Ponto Consolidado**: Nova aba "Consolidado" integrando horas trabalhadas + faltas + atrasos + atestados + licenças INSS, com exportação CSV
-- **Salários**: Botão "Duplicar" para criar nova faixa baseada em existente
-- **Organograma**: Exportar como PNG real via html2canvas
-- **Políticas de Trabalho**: Exibe contagem de colaboradores vinculados por política
+### 4. Atualizar `TimeEntriesTable.tsx` — 4 colunas
+Tabela com colunas: Colaborador | Data | Entrada | Saida Almoco | Retorno Almoco | Saida | Total | Status
 
-## Tabelas Criadas/Alteradas
+### 5. Atualizar `DailyTimeline.tsx` — 4 pontos na timeline
+Mostrar os 4 eventos na timeline do colaborador.
 
-| Tabela | Fase | Ação |
-|--------|------|------|
-| `salary_ranges` | 1 | Criada |
-| `company_documents` | 1+B | Criada + colunas visibility, valid_from, valid_until, access_roles |
-| `absenteeism` | 2 | Criada |
-| `termination_details` | 2 | Criada |
-| `swot_analysis` | 3 | Criada |
-| `payment_schedule` | 3 | Criada |
-| `pdi_action_plans` | A | Criada |
-| `pdi_versions` | A | Criada |
+### Arquivos alterados
+- `supabase/migrations/` — nova migracao (2 colunas)
+- `src/hooks/useClockInOut.ts` — logica de 4 estados
+- `src/components/time-tracking/ClockInOutButton.tsx` — labels/icones
+- `src/components/time-tracking/TimeEntriesTable.tsx` — 4 colunas
+- `src/components/time-tracking/DailyTimeline.tsx` — 4 eventos
+
