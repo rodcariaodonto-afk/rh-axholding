@@ -22,6 +22,7 @@ import { useEmployees } from "@/hooks/useEmployees";
 import { usePositionLevels } from "@/hooks/usePositionLevels";
 import { Skeleton } from "@/components/ui/skeleton";
 import { PdiTab } from "@/components/PdiTab";
+import { MyJustificativasSection } from "@/components/MyJustificativasSection";
 import { EmployeeDocumentsTab } from "@/components/EmployeeDocumentsTab";
 import { EmployeeTrainingsTab } from "@/components/EmployeeTrainingsTab";
 import { EmployeeChangesHistory } from "@/components/EmployeeChangesHistory";
