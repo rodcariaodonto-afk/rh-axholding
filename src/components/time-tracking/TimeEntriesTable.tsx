@@ -7,6 +7,8 @@ interface TimeEntry {
   id: string;
   clock_in: string;
   clock_out: string | null;
+  lunch_out?: string | null;
+  lunch_return?: string | null;
   date: string;
   total_minutes: number | null;
   notes: string | null;
@@ -28,6 +30,13 @@ function formatMinutes(minutes: number): string {
   return `${h}h${m.toString().padStart(2, "0")}min`;
 }
 
+function getStatus(entry: TimeEntry) {
+  if (entry.clock_out) return { label: "Finalizado", variant: "secondary" as const };
+  if (entry.lunch_return) return { label: "Trabalhando", variant: "default" as const };
+  if (entry.lunch_out) return { label: "Almoço", variant: "outline" as const };
+  return { label: "Em andamento", variant: "default" as const };
+}
+
 export function TimeEntriesTable({ entries, showEmployee = true }: TimeEntriesTableProps) {
   return (
     <div className="rounded-md border">
@@ -37,6 +46,8 @@ export function TimeEntriesTable({ entries, showEmployee = true }: TimeEntriesTa
             {showEmployee && <TableHead>Colaborador</TableHead>}
             <TableHead>Data</TableHead>
             <TableHead>Entrada</TableHead>
+            <TableHead>Saída Almoço</TableHead>
+            <TableHead>Retorno Almoço</TableHead>
             <TableHead>Saída</TableHead>
             <TableHead>Total</TableHead>
             <TableHead>Status</TableHead>
@@ -45,49 +56,60 @@ export function TimeEntriesTable({ entries, showEmployee = true }: TimeEntriesTa
         <TableBody>
           {entries.length === 0 ? (
             <TableRow>
-              <TableCell colSpan={showEmployee ? 6 : 5} className="text-center text-muted-foreground py-8">
+              <TableCell colSpan={showEmployee ? 8 : 7} className="text-center text-muted-foreground py-8">
                 Nenhum registro encontrado
               </TableCell>
             </TableRow>
           ) : (
-            entries.map((entry) => (
-              <TableRow key={entry.id}>
-                {showEmployee && (
-                  <TableCell>
-                    <div className="flex items-center gap-2">
-                      <Avatar className="size-7">
-                        <AvatarImage src={entry.employees?.photo_url || ""} />
-                        <AvatarFallback className="text-xs">
-                          {(entry.employees?.full_name || entry.employees?.email || "?").slice(0, 2).toUpperCase()}
-                        </AvatarFallback>
-                      </Avatar>
-                      <span className="text-sm font-medium">
-                        {entry.employees?.full_name || entry.employees?.email || "—"}
-                      </span>
-                    </div>
-                  </TableCell>
-                )}
-                <TableCell className="text-sm">
-                  {formatDateBrasilia(entry.date + "T12:00:00Z")}
-                </TableCell>
-                <TableCell className="font-mono text-sm">
-                  {formatTimeBrasilia(entry.clock_in)}
-                </TableCell>
-                <TableCell className="font-mono text-sm">
-                  {entry.clock_out ? formatTimeBrasilia(entry.clock_out) : "—"}
-                </TableCell>
-                <TableCell className="text-sm">
-                  {entry.total_minutes != null ? formatMinutes(entry.total_minutes) : "—"}
-                </TableCell>
-                <TableCell>
-                  {entry.clock_out ? (
-                    <Badge variant="secondary" className="text-xs">Finalizado</Badge>
-                  ) : (
-                    <Badge className="text-xs bg-green-500/10 text-green-600 border-green-200">Em andamento</Badge>
+            entries.map((entry) => {
+              const status = getStatus(entry);
+              return (
+                <TableRow key={entry.id}>
+                  {showEmployee && (
+                    <TableCell>
+                      <div className="flex items-center gap-2">
+                        <Avatar className="size-7">
+                          <AvatarImage src={entry.employees?.photo_url || ""} />
+                          <AvatarFallback className="text-xs">
+                            {(entry.employees?.full_name || entry.employees?.email || "?").slice(0, 2).toUpperCase()}
+                          </AvatarFallback>
+                        </Avatar>
+                        <span className="text-sm font-medium">
+                          {entry.employees?.full_name || entry.employees?.email || "—"}
+                        </span>
+                      </div>
+                    </TableCell>
                   )}
-                </TableCell>
-              </TableRow>
-            ))
+                  <TableCell className="text-sm">
+                    {formatDateBrasilia(entry.date + "T12:00:00Z")}
+                  </TableCell>
+                  <TableCell className="font-mono text-sm">
+                    {formatTimeBrasilia(entry.clock_in)}
+                  </TableCell>
+                  <TableCell className="font-mono text-sm">
+                    {entry.lunch_out ? formatTimeBrasilia(entry.lunch_out) : "—"}
+                  </TableCell>
+                  <TableCell className="font-mono text-sm">
+                    {entry.lunch_return ? formatTimeBrasilia(entry.lunch_return) : "—"}
+                  </TableCell>
+                  <TableCell className="font-mono text-sm">
+                    {entry.clock_out ? formatTimeBrasilia(entry.clock_out) : "—"}
+                  </TableCell>
+                  <TableCell className="text-sm">
+                    {entry.total_minutes != null ? formatMinutes(entry.total_minutes) : "—"}
+                  </TableCell>
+                  <TableCell>
+                    {status.label === "Finalizado" ? (
+                      <Badge variant="secondary" className="text-xs">Finalizado</Badge>
+                    ) : status.label === "Almoço" ? (
+                      <Badge className="text-xs bg-amber-500/10 text-amber-600 border-amber-200">Almoço</Badge>
+                    ) : (
+                      <Badge className="text-xs bg-green-500/10 text-green-600 border-green-200">{status.label}</Badge>
+                    )}
+                  </TableCell>
+                </TableRow>
+              );
+            })
           )}
         </TableBody>
       </Table>

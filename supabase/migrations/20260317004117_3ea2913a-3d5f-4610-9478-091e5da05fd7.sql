@@ -1,0 +1,3 @@
+ALTER TABLE public.time_entries
+  ADD COLUMN IF NOT EXISTS lunch_out TIMESTAMPTZ,
+  ADD COLUMN IF NOT EXISTS lunch_return TIMESTAMPTZ;
