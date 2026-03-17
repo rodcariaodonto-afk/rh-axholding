@@ -296,11 +296,18 @@ export default function TimeTracking() {
         </TabsContent>
 
         <TabsContent value="balance">
-          {loadingBalances ? (
-            <Skeleton className="h-64 w-full" />
-          ) : (
-            <TimeBalanceTable balances={balances as any} />
-          )}
+          <Tabs defaultValue="espelho">
+            <TabsList>
+              <TabsTrigger value="espelho">Espelho Estendido</TabsTrigger>
+              <TabsTrigger value="resumo">Resumo Mensal</TabsTrigger>
+              <TabsTrigger value="historico">Histórico de Saldo</TabsTrigger>
+              <TabsTrigger value="config">Configuração</TabsTrigger>
+            </TabsList>
+            <TabsContent value="espelho"><BancoHorasEspelho /></TabsContent>
+            <TabsContent value="resumo"><BancoHorasResumoMensal /></TabsContent>
+            <TabsContent value="historico"><BancoHorasHistorico /></TabsContent>
+            <TabsContent value="config"><BancoHorasConfig /></TabsContent>
+          </Tabs>
         </TabsContent>
 
         <TabsContent value="locations">
