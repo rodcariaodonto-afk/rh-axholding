@@ -218,10 +218,11 @@ export default function EmployeeProfile() {
         <Card>
           <CardContent className="pt-6">
             <Tabs defaultValue="personal" className="w-full">
-              <TabsList className="grid w-full grid-cols-3 sm:grid-cols-6 h-auto">
+              <TabsList className="grid w-full grid-cols-3 sm:grid-cols-7 h-auto">
                 <TabsTrigger value="personal">Pessoal</TabsTrigger>
                 <TabsTrigger value="contact">Contato</TabsTrigger>
                 <TabsTrigger value="contract">Contrato</TabsTrigger>
+                <TabsTrigger value="justificativas">Justificativas</TabsTrigger>
                 <TabsTrigger value="pdi">PDI</TabsTrigger>
                 <TabsTrigger value="trainings">Treinamentos</TabsTrigger>
                 <TabsTrigger value="documents">Arquivos</TabsTrigger>
