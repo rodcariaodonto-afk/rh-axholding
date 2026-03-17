@@ -4358,6 +4358,8 @@ export type Database = {
           date: string
           employee_id: string
           id: string
+          lunch_out: string | null
+          lunch_return: string | null
           notes: string | null
           organization_id: string
           total_minutes: number | null
@@ -4378,6 +4380,8 @@ export type Database = {
           date?: string
           employee_id: string
           id?: string
+          lunch_out?: string | null
+          lunch_return?: string | null
           notes?: string | null
           organization_id: string
           total_minutes?: number | null
@@ -4398,6 +4402,8 @@ export type Database = {
           date?: string
           employee_id?: string
           id?: string
+          lunch_out?: string | null
+          lunch_return?: string | null
           notes?: string | null
           organization_id?: string
           total_minutes?: number | null
