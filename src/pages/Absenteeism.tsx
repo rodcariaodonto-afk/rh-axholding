@@ -61,7 +61,7 @@ const Absenteeism = () => {
   const { user } = useAuth();
   const { data: employees = [] } = useEmployees();
   const queryClient = useQueryClient();
-  const [activeTab, setActiveTab] = useState<AbsenteeismType>("absence");
+  const [activeTab, setActiveTab] = useState<string>("absence");
   const [dialogOpen, setDialogOpen] = useState(false);
   const [form, setForm] = useState({
     employee_id: "",
