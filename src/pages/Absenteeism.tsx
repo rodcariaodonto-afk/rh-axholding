@@ -138,7 +138,7 @@ const Absenteeism = () => {
     setDialogOpen(false);
     setForm({
       employee_id: "",
-      type: activeTab,
+      type: activeTab as AbsenteeismType,
       date: new Date().toISOString().split("T")[0],
       start_time: "",
       end_time: "",
