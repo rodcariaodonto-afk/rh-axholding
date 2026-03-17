@@ -29,7 +29,8 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
-import { Plus, Trash2, AlertTriangle, Upload } from "lucide-react";
+import { Plus, Trash2, AlertTriangle, Upload, FileCheck } from "lucide-react";
+import { JustificativasAprovacaoTab } from "@/components/JustificativasAprovacaoTab";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { useCurrentOrganization } from "@/hooks/useCurrentOrganization";
@@ -60,7 +61,7 @@ const Absenteeism = () => {
   const { user } = useAuth();
   const { data: employees = [] } = useEmployees();
   const queryClient = useQueryClient();
-  const [activeTab, setActiveTab] = useState<AbsenteeismType>("absence");
+  const [activeTab, setActiveTab] = useState<string>("absence");
   const [dialogOpen, setDialogOpen] = useState(false);
   const [form, setForm] = useState({
     employee_id: "",
@@ -137,7 +138,7 @@ const Absenteeism = () => {
     setDialogOpen(false);
     setForm({
       employee_id: "",
-      type: activeTab,
+      type: activeTab as AbsenteeismType,
       date: new Date().toISOString().split("T")[0],
       start_time: "",
       end_time: "",
@@ -153,7 +154,7 @@ const Absenteeism = () => {
   };
 
   const openNew = () => {
-    setForm((f) => ({ ...f, type: activeTab }));
+    setForm((f) => ({ ...f, type: activeTab as AbsenteeismType }));
     setDialogOpen(true);
   };
 
@@ -192,12 +193,16 @@ const Absenteeism = () => {
         )}
       </div>
 
-      <Tabs value={activeTab} onValueChange={(v) => setActiveTab(v as AbsenteeismType)}>
+      <Tabs value={activeTab} onValueChange={setActiveTab}>
         <TabsList>
           <TabsTrigger value="absence">Faltas ({tabCounts.absence})</TabsTrigger>
           <TabsTrigger value="late">Atrasos ({tabCounts.late})</TabsTrigger>
           <TabsTrigger value="medical_certificate">Atestados ({tabCounts.medical_certificate})</TabsTrigger>
           <TabsTrigger value="inss_leave">Licenças INSS ({tabCounts.inss_leave})</TabsTrigger>
+          <TabsTrigger value="justificativas">
+            <FileCheck className="mr-1 h-4 w-4" />
+            Justificativas
+          </TabsTrigger>
         </TabsList>
 
         {(["absence", "late", "medical_certificate", "inss_leave"] as AbsenteeismType[]).map(
@@ -265,6 +270,9 @@ const Absenteeism = () => {
             </TabsContent>
           )
         )}
+        <TabsContent value="justificativas">
+          <JustificativasAprovacaoTab />
+        </TabsContent>
       </Tabs>
 
       <Dialog open={dialogOpen} onOpenChange={(o) => !o && closeDialog()}>

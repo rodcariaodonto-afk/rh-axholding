@@ -9,6 +9,7 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@
 import { useState, useMemo } from "react";
 import { EmployeeDialog } from "@/components/EmployeeDialog";
 import { MyFeedbacksSection } from "@/components/MyFeedbacksSection";
+import { MyJustificativasSection } from "@/components/MyJustificativasSection";
 import { AvatarUpload } from "@/components/AvatarUpload";
 import { Edit, Mail, Calendar, Briefcase, Package, Fingerprint } from "lucide-react";
 import ProfilerDetailModal from "@/components/ProfilerDetailModal";
@@ -241,6 +242,8 @@ export default function Profile() {
           )}
         </CardContent>
       </Card>
+
+      <MyJustificativasSection userId={user?.id || ""} />
 
       <EmployeeDialog
         employeeId={employee.id}

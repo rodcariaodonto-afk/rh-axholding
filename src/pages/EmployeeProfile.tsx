@@ -22,6 +22,7 @@ import { useEmployees } from "@/hooks/useEmployees";
 import { usePositionLevels } from "@/hooks/usePositionLevels";
 import { Skeleton } from "@/components/ui/skeleton";
 import { PdiTab } from "@/components/PdiTab";
+import { MyJustificativasSection } from "@/components/MyJustificativasSection";
 import { EmployeeDocumentsTab } from "@/components/EmployeeDocumentsTab";
 import { EmployeeTrainingsTab } from "@/components/EmployeeTrainingsTab";
 import { EmployeeChangesHistory } from "@/components/EmployeeChangesHistory";
@@ -217,10 +218,11 @@ export default function EmployeeProfile() {
         <Card>
           <CardContent className="pt-6">
             <Tabs defaultValue="personal" className="w-full">
-              <TabsList className="grid w-full grid-cols-3 sm:grid-cols-6 h-auto">
+              <TabsList className="grid w-full grid-cols-3 sm:grid-cols-7 h-auto">
                 <TabsTrigger value="personal">Pessoal</TabsTrigger>
                 <TabsTrigger value="contact">Contato</TabsTrigger>
                 <TabsTrigger value="contract">Contrato</TabsTrigger>
+                <TabsTrigger value="justificativas">Justificativas</TabsTrigger>
                 <TabsTrigger value="pdi">PDI</TabsTrigger>
                 <TabsTrigger value="trainings">Treinamentos</TabsTrigger>
                 <TabsTrigger value="documents">Arquivos</TabsTrigger>
@@ -258,6 +260,10 @@ export default function EmployeeProfile() {
                   isUpdating={isUpdatingContract}
                   onSubmit={onSubmitContract}
                 />
+              </TabsContent>
+
+              <TabsContent value="justificativas" className="space-y-4 pt-6">
+                {id && <MyJustificativasSection userId={id} />}
               </TabsContent>
 
               <TabsContent value="pdi" className="space-y-4 pt-6">

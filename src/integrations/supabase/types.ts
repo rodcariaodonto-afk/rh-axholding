@@ -2830,6 +2830,104 @@ export type Database = {
           },
         ]
       }
+      justificativas_ponto: {
+        Row: {
+          aprovado_por: string | null
+          arquivo_url: string | null
+          created_at: string
+          data_aprovacao: string | null
+          data_envio: string | null
+          data_evento: string
+          data_rejeicao: string | null
+          descricao_evento: string | null
+          descricao_justificativa: string | null
+          duracao_minutos: number | null
+          employee_id: string
+          horario_evento: string | null
+          id: string
+          motivo: string | null
+          motivo_rejeicao: string | null
+          organization_id: string
+          status: string
+          tipo_documento: string | null
+          tipo_registro: string
+          updated_at: string
+        }
+        Insert: {
+          aprovado_por?: string | null
+          arquivo_url?: string | null
+          created_at?: string
+          data_aprovacao?: string | null
+          data_envio?: string | null
+          data_evento: string
+          data_rejeicao?: string | null
+          descricao_evento?: string | null
+          descricao_justificativa?: string | null
+          duracao_minutos?: number | null
+          employee_id: string
+          horario_evento?: string | null
+          id?: string
+          motivo?: string | null
+          motivo_rejeicao?: string | null
+          organization_id: string
+          status?: string
+          tipo_documento?: string | null
+          tipo_registro: string
+          updated_at?: string
+        }
+        Update: {
+          aprovado_por?: string | null
+          arquivo_url?: string | null
+          created_at?: string
+          data_aprovacao?: string | null
+          data_envio?: string | null
+          data_evento?: string
+          data_rejeicao?: string | null
+          descricao_evento?: string | null
+          descricao_justificativa?: string | null
+          duracao_minutos?: number | null
+          employee_id?: string
+          horario_evento?: string | null
+          id?: string
+          motivo?: string | null
+          motivo_rejeicao?: string | null
+          organization_id?: string
+          status?: string
+          tipo_documento?: string | null
+          tipo_registro?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "justificativas_ponto_aprovado_por_fkey"
+            columns: ["aprovado_por"]
+            isOneToOne: false
+            referencedRelation: "employees"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "justificativas_ponto_employee_id_fkey"
+            columns: ["employee_id"]
+            isOneToOne: false
+            referencedRelation: "employees"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "justificativas_ponto_organization_id_fkey"
+            columns: ["organization_id"]
+            isOneToOne: false
+            referencedRelation: "organizations"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "justificativas_ponto_organization_id_fkey"
+            columns: ["organization_id"]
+            isOneToOne: false
+            referencedRelation: "organizations_public"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       notifications: {
         Row: {
           action_url: string | null
