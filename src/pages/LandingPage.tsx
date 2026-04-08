@@ -123,6 +123,8 @@ const plans = [
 ];
 
 export default function LandingPage() {
+  const WHATSAPP_URL = "https://wa.me/5511960011555?text=Olá! Gostaria de falar com um consultor sobre o RH Smart IA.";
+
   const { toast } = useToast();
   const [mobileMenu, setMobileMenu] = useState(false);
   const [loading, setLoading] = useState(false);
@@ -132,6 +134,8 @@ export default function LandingPage() {
     document.getElementById(id)?.scrollIntoView({ behavior: "smooth" });
     setMobileMenu(false);
   };
+
+  const openWhatsApp = () => window.open(WHATSAPP_URL, "_blank");
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -174,8 +178,8 @@ export default function LandingPage() {
             <Link to="/auth">
               <Button variant="ghost" className="text-gray-300 hover:text-white hover:bg-white/10">Entrar</Button>
             </Link>
-            <Button onClick={() => scrollTo("contato")} className="bg-blue-600 hover:bg-blue-700 text-white">
-              Agendar Demo Gratuita
+            <Button onClick={openWhatsApp} className="bg-green-500 hover:bg-green-600 text-white">
+              <MessageCircle size={16} className="mr-1.5" /> Falar com Consultor
             </Button>
           </div>
 
@@ -198,7 +202,7 @@ export default function LandingPage() {
             <Link to="/auth" className="block">
               <Button variant="outline" className="w-full border-gray-600 text-gray-300">Entrar</Button>
             </Link>
-            <Button onClick={() => scrollTo("contato")} className="w-full bg-blue-600 text-white">Agendar Demo</Button>
+            <Button onClick={openWhatsApp} className="w-full bg-green-500 text-white"><MessageCircle size={16} className="mr-1.5" /> Falar com Consultor</Button>
           </div>
         )}
       </header>
@@ -224,8 +228,8 @@ export default function LandingPage() {
               A única plataforma brasileira que combina automação de departamento pessoal, desenvolvimento de talentos e People Analytics com IA preditiva. ROI comprovado desde o primeiro mês.
             </p>
             <div className="flex flex-wrap gap-3">
-              <Button size="lg" onClick={() => scrollTo("contato")} className="bg-blue-600 hover:bg-blue-700 text-white h-12 px-6 text-base">
-                Agendar Demo Gratuita <ArrowRight size={18} className="ml-2" />
+              <Button size="lg" onClick={openWhatsApp} className="bg-green-500 hover:bg-green-600 text-white h-12 px-6 text-base">
+                <MessageCircle size={18} className="mr-2" /> Falar com Consultor
               </Button>
               <Button size="lg" variant="outline" onClick={() => scrollTo("modulos")} className="border-gray-600 text-gray-300 hover:bg-white/10 h-12 px-6 text-base">
                 Conhecer Módulos
@@ -400,14 +404,14 @@ export default function LandingPage() {
                   ))}
                 </ul>
                 <Button
-                  onClick={() => scrollTo("contato")}
+                  onClick={openWhatsApp}
                   className={`mt-6 w-full ${
                     p.highlighted
                       ? "bg-white text-blue-700 hover:bg-gray-100"
-                      : "bg-blue-600 text-white hover:bg-blue-700"
+                      : "bg-green-500 text-white hover:bg-green-600"
                   }`}
                 >
-                  {p.name === "ENTERPRISE" ? "Falar com Vendas" : "Começar Agora"} <ChevronRight size={16} className="ml-1" />
+                  <MessageCircle size={16} className="mr-1.5" /> Falar com Consultor
                 </Button>
               </div>
             ))}
@@ -536,13 +540,13 @@ export default function LandingPage() {
 
       {/* ═══════ WHATSAPP FLOATING BUTTON ═══════ */}
       <a
-        href="https://wa.me/5511999999999?text=Olá! Gostaria de saber mais sobre o RH Smart IA."
+        href={WHATSAPP_URL}
         target="_blank"
         rel="noopener noreferrer"
         className="fixed bottom-6 right-6 z-50 flex items-center gap-2 bg-green-500 hover:bg-green-600 text-white rounded-full px-5 py-3 shadow-lg shadow-green-500/30 transition-all hover:scale-105"
       >
         <MessageCircle size={22} />
-        <span className="hidden sm:inline text-sm font-semibold">WhatsApp</span>
+        <span className="hidden sm:inline text-sm font-semibold">Falar com Consultor</span>
       </a>
     </div>
   );
