@@ -92,6 +92,7 @@ const Absenteeism = lazy(() => import("./pages/Absenteeism"));
 const PaymentSchedule = lazy(() => import("./pages/PaymentSchedule"));
 const SwotAnalysis = lazy(() => import("./pages/SwotAnalysis"));
 const JourneyConfig = lazy(() => import("./pages/JourneyConfig"));
+const LandingPage = lazy(() => import("./pages/LandingPage"));
 
 const queryClient = new QueryClient({
   defaultOptions: {
@@ -117,6 +118,11 @@ const App = () => (
         <Routes>
           {/* Public routes (no layout) */}
           <Route path="/auth" element={<Auth />} />
+          <Route path="/landing" element={
+            <Suspense fallback={<div className="min-h-screen flex items-center justify-center"><Loader2 className="h-8 w-8 animate-spin text-muted-foreground" /></div>}>
+              <LandingPage />
+            </Suspense>
+          } />
           <Route path="/accept-invite" element={<AcceptInvite />} />
           <Route path="/reset-password" element={
             <Suspense fallback={<div className="min-h-screen flex items-center justify-center"><Loader2 className="h-8 w-8 animate-spin text-muted-foreground" /></div>}>
