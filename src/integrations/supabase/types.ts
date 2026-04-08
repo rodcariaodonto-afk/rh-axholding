@@ -214,6 +214,45 @@ export type Database = {
           },
         ]
       }
+      b2b_leads: {
+        Row: {
+          cargo: string
+          created_at: string | null
+          email: string
+          empresa: string
+          id: string
+          mensagem: string | null
+          nome: string
+          num_funcionarios: string
+          origem: string | null
+          telefone: string | null
+        }
+        Insert: {
+          cargo: string
+          created_at?: string | null
+          email: string
+          empresa: string
+          id?: string
+          mensagem?: string | null
+          nome: string
+          num_funcionarios: string
+          origem?: string | null
+          telefone?: string | null
+        }
+        Update: {
+          cargo?: string
+          created_at?: string | null
+          email?: string
+          empresa?: string
+          id?: string
+          mensagem?: string | null
+          nome?: string
+          num_funcionarios?: string
+          origem?: string | null
+          telefone?: string | null
+        }
+        Relationships: []
+      }
       banco_horas_registros: {
         Row: {
           banco_horas_acumulado_minutos: number | null
