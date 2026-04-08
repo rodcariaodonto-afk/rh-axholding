@@ -202,7 +202,7 @@ export default function LandingPage() {
             <Link to="/auth" className="block">
               <Button variant="outline" className="w-full border-gray-600 text-gray-300">Entrar</Button>
             </Link>
-            <Button onClick={() => scrollTo("contato")} className="w-full bg-blue-600 text-white">Agendar Demo</Button>
+            <Button onClick={openWhatsApp} className="w-full bg-green-500 text-white"><MessageCircle size={16} className="mr-1.5" /> Falar com Consultor</Button>
           </div>
         )}
       </header>
