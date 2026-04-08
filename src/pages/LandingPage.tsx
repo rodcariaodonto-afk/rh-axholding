@@ -228,8 +228,8 @@ export default function LandingPage() {
               A única plataforma brasileira que combina automação de departamento pessoal, desenvolvimento de talentos e People Analytics com IA preditiva. ROI comprovado desde o primeiro mês.
             </p>
             <div className="flex flex-wrap gap-3">
-              <Button size="lg" onClick={() => scrollTo("contato")} className="bg-blue-600 hover:bg-blue-700 text-white h-12 px-6 text-base">
-                Agendar Demo Gratuita <ArrowRight size={18} className="ml-2" />
+              <Button size="lg" onClick={openWhatsApp} className="bg-green-500 hover:bg-green-600 text-white h-12 px-6 text-base">
+                <MessageCircle size={18} className="mr-2" /> Falar com Consultor
               </Button>
               <Button size="lg" variant="outline" onClick={() => scrollTo("modulos")} className="border-gray-600 text-gray-300 hover:bg-white/10 h-12 px-6 text-base">
                 Conhecer Módulos
