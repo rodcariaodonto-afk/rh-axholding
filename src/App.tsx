@@ -92,6 +92,7 @@ const Absenteeism = lazy(() => import("./pages/Absenteeism"));
 const PaymentSchedule = lazy(() => import("./pages/PaymentSchedule"));
 const SwotAnalysis = lazy(() => import("./pages/SwotAnalysis"));
 const JourneyConfig = lazy(() => import("./pages/JourneyConfig"));
+const LandingPage = lazy(() => import("./pages/LandingPage"));
 
 const queryClient = new QueryClient({
   defaultOptions: {
