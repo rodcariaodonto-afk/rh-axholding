@@ -21,7 +21,7 @@ const ProtectedRoute = ({ children }: ProtectedRouteProps) => {
     // Not logged in -> redirect to auth, preserving return URL
     if (!user) {
       const returnUrl = location.pathname + location.search;
-      const redirectParam = returnUrl !== "/" ? `?redirect=${encodeURIComponent(returnUrl)}` : "";
+      const redirectParam = returnUrl !== "/" && returnUrl !== "/home" ? `?redirect=${encodeURIComponent(returnUrl)}` : "";
       navigate(`/auth${redirectParam}`);
       return;
     }

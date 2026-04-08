@@ -117,12 +117,12 @@ const App = () => (
         <ErrorBoundary>
         <Routes>
           {/* Public routes (no layout) */}
-          <Route path="/auth" element={<Auth />} />
-          <Route path="/landing" element={
+          <Route path="/" element={
             <Suspense fallback={<div className="min-h-screen flex items-center justify-center"><Loader2 className="h-8 w-8 animate-spin text-muted-foreground" /></div>}>
               <LandingPage />
             </Suspense>
           } />
+          <Route path="/auth" element={<Auth />} />
           <Route path="/accept-invite" element={<AcceptInvite />} />
           <Route path="/reset-password" element={
             <Suspense fallback={<div className="min-h-screen flex items-center justify-center"><Loader2 className="h-8 w-8 animate-spin text-muted-foreground" /></div>}>
@@ -189,7 +189,7 @@ const App = () => (
 
           {/* Protected routes with persistent Layout */}
           <Route element={<ProtectedRoute><SetupEnforcementWrapper><LayoutRoute /></SetupEnforcementWrapper></ProtectedRoute>}>
-            <Route path="/" element={<Index />} />
+            <Route path="/home" element={<Index />} />
             <Route path="/dashboard" element={<Dashboard />} />
             <Route path="/employee-onboarding" element={<EmployeeOnboarding />} />
             <Route path="/my-pdis" element={<MyPdis />} />
