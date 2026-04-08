@@ -178,8 +178,8 @@ export default function LandingPage() {
             <Link to="/auth">
               <Button variant="ghost" className="text-gray-300 hover:text-white hover:bg-white/10">Entrar</Button>
             </Link>
-            <Button onClick={() => scrollTo("contato")} className="bg-blue-600 hover:bg-blue-700 text-white">
-              Agendar Demo Gratuita
+            <Button onClick={openWhatsApp} className="bg-green-500 hover:bg-green-600 text-white">
+              <MessageCircle size={16} className="mr-1.5" /> Falar com Consultor
             </Button>
           </div>
 
