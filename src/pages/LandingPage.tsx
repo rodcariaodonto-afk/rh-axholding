@@ -9,7 +9,7 @@ import { useToast } from "@/hooks/use-toast";
 import {
   Users, Brain, BarChart3, DollarSign, Activity,
   CheckCircle2, ArrowRight, Shield, Menu, X,
-  TrendingUp, Clock, Zap, ChevronRight
+  TrendingUp, Clock, Zap, ChevronRight, MessageCircle
 } from "lucide-react";
 import { Link } from "react-router-dom";
 
