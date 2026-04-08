@@ -176,7 +176,7 @@ const ProfilerResultado = () => {
     } else if (applicationId) {
       navigate("/vagas");
     } else {
-      navigate("/");
+      navigate("/home");
     }
   };
 

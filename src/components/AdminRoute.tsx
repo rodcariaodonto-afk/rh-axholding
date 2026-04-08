@@ -19,7 +19,7 @@ const AdminRoute = ({ children }: AdminRouteProps) => {
       if (!user) {
         navigate("/auth");
       } else if (!isAdmin) {
-        navigate("/");
+        navigate("/home");
       }
     }
   }, [user, loading, isLoadingRoles, isAdmin, navigate]);

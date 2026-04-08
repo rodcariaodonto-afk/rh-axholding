@@ -280,7 +280,7 @@ const ImportCSV = () => {
               )}
 
               <Button
-                onClick={() => navigate("/")}
+                onClick={() => navigate("/home")}
                 className="w-full"
               >
                 Voltar para o Inventário
