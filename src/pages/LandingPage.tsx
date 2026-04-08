@@ -404,14 +404,14 @@ export default function LandingPage() {
                   ))}
                 </ul>
                 <Button
-                  onClick={() => scrollTo("contato")}
+                  onClick={openWhatsApp}
                   className={`mt-6 w-full ${
                     p.highlighted
                       ? "bg-white text-blue-700 hover:bg-gray-100"
-                      : "bg-blue-600 text-white hover:bg-blue-700"
+                      : "bg-green-500 text-white hover:bg-green-600"
                   }`}
                 >
-                  {p.name === "ENTERPRISE" ? "Falar com Vendas" : "Começar Agora"} <ChevronRight size={16} className="ml-1" />
+                  <MessageCircle size={16} className="mr-1.5" /> Falar com Consultor
                 </Button>
               </div>
             ))}
