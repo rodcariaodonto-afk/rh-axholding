@@ -533,6 +533,17 @@ export default function LandingPage() {
           </div>
         </div>
       </footer>
+
+      {/* ═══════ WHATSAPP FLOATING BUTTON ═══════ */}
+      <a
+        href="https://wa.me/5511999999999?text=Olá! Gostaria de saber mais sobre o RH Smart IA."
+        target="_blank"
+        rel="noopener noreferrer"
+        className="fixed bottom-6 right-6 z-50 flex items-center gap-2 bg-green-500 hover:bg-green-600 text-white rounded-full px-5 py-3 shadow-lg shadow-green-500/30 transition-all hover:scale-105"
+      >
+        <MessageCircle size={22} />
+        <span className="hidden sm:inline text-sm font-semibold">WhatsApp</span>
+      </a>
     </div>
   );
 }
