@@ -123,6 +123,8 @@ const plans = [
 ];
 
 export default function LandingPage() {
+  const WHATSAPP_URL = "https://wa.me/5511960011555?text=Olá! Gostaria de falar com um consultor sobre o RH Smart IA.";
+
   const { toast } = useToast();
   const [mobileMenu, setMobileMenu] = useState(false);
   const [loading, setLoading] = useState(false);
@@ -132,6 +134,8 @@ export default function LandingPage() {
     document.getElementById(id)?.scrollIntoView({ behavior: "smooth" });
     setMobileMenu(false);
   };
+
+  const openWhatsApp = () => window.open(WHATSAPP_URL, "_blank");
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
