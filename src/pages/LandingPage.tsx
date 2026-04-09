@@ -518,7 +518,7 @@ export default function LandingPage() {
             <div>
               <p className="text-xs font-semibold text-gray-400 uppercase tracking-wider mb-3">Empresa</p>
               <ul className="space-y-2 text-sm text-gray-500">
-                <li><button onClick={() => scrollTo("resultados")} className="hover:text-white transition-colors">Sobre nós</button></li>
+                <li><button onClick={() => scrollTo("precos")} className="hover:text-white transition-colors">Preços</button></li>
                 <li><button onClick={() => scrollTo("precos")} className="hover:text-white transition-colors">Preços</button></li>
                 <li><button onClick={() => scrollTo("contato")} className="hover:text-white transition-colors">Contato</button></li>
               </ul>
@@ -533,7 +533,7 @@ export default function LandingPage() {
             </div>
           </div>
           <div className="border-t border-white/10 pt-6 text-center text-xs text-gray-600">
-            © {new Date().getFullYear()} AX Holding. Todos os direitos reservados. CNPJ: 00.000.000/0001-00
+            © {new Date().getFullYear()} AX Holding. Todos os direitos reservados. CNPJ: 63.862.906/0001-35
           </div>
         </div>
       </footer>
