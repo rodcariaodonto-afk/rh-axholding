@@ -93,6 +93,9 @@ const PaymentSchedule = lazy(() => import("./pages/PaymentSchedule"));
 const SwotAnalysis = lazy(() => import("./pages/SwotAnalysis"));
 const JourneyConfig = lazy(() => import("./pages/JourneyConfig"));
 const LandingPage = lazy(() => import("./pages/LandingPage"));
+const PrivacyPolicy = lazy(() => import("./pages/PrivacyPolicy"));
+const TermsOfUse = lazy(() => import("./pages/TermsOfUse"));
+const LgpdPortal = lazy(() => import("./pages/LgpdPortal"));
 
 const queryClient = new QueryClient({
   defaultOptions: {
@@ -120,6 +123,21 @@ const App = () => (
           <Route path="/" element={
             <Suspense fallback={<div className="min-h-screen flex items-center justify-center"><Loader2 className="h-8 w-8 animate-spin text-muted-foreground" /></div>}>
               <LandingPage />
+            </Suspense>
+          } />
+          <Route path="/privacidade" element={
+            <Suspense fallback={<div className="min-h-screen flex items-center justify-center"><Loader2 className="h-8 w-8 animate-spin text-muted-foreground" /></div>}>
+              <PrivacyPolicy />
+            </Suspense>
+          } />
+          <Route path="/termos" element={
+            <Suspense fallback={<div className="min-h-screen flex items-center justify-center"><Loader2 className="h-8 w-8 animate-spin text-muted-foreground" /></div>}>
+              <TermsOfUse />
+            </Suspense>
+          } />
+          <Route path="/lgpd" element={
+            <Suspense fallback={<div className="min-h-screen flex items-center justify-center"><Loader2 className="h-8 w-8 animate-spin text-muted-foreground" /></div>}>
+              <LgpdPortal />
             </Suspense>
           } />
           <Route path="/auth" element={<Auth />} />
