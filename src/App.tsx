@@ -139,6 +139,7 @@ const App = () => (
             <Suspense fallback={<div className="min-h-screen flex items-center justify-center"><Loader2 className="h-8 w-8 animate-spin text-muted-foreground" /></div>}>
               <LgpdPortal />
             </Suspense>
+          } />
           <Route path="/auth" element={<Auth />} />
           <Route path="/accept-invite" element={<AcceptInvite />} />
           <Route path="/reset-password" element={
