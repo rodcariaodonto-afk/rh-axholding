@@ -526,9 +526,9 @@ export default function LandingPage() {
             <div>
               <p className="text-xs font-semibold text-gray-400 uppercase tracking-wider mb-3">Legal</p>
               <ul className="space-y-2 text-sm text-gray-500">
-                <li><span className="hover:text-white transition-colors cursor-pointer">Política de Privacidade</span></li>
-                <li><span className="hover:text-white transition-colors cursor-pointer">Termos de Uso</span></li>
-                <li><span className="hover:text-white transition-colors cursor-pointer">LGPD</span></li>
+                <li><Link to="/privacidade" className="hover:text-white transition-colors">Política de Privacidade</Link></li>
+                <li><Link to="/termos" className="hover:text-white transition-colors">Termos de Uso</Link></li>
+                <li><Link to="/lgpd" className="hover:text-white transition-colors">LGPD</Link></li>
               </ul>
             </div>
           </div>

@@ -93,6 +93,9 @@ const PaymentSchedule = lazy(() => import("./pages/PaymentSchedule"));
 const SwotAnalysis = lazy(() => import("./pages/SwotAnalysis"));
 const JourneyConfig = lazy(() => import("./pages/JourneyConfig"));
 const LandingPage = lazy(() => import("./pages/LandingPage"));
+const PrivacyPolicy = lazy(() => import("./pages/PrivacyPolicy"));
+const TermsOfUse = lazy(() => import("./pages/TermsOfUse"));
+const LgpdPortal = lazy(() => import("./pages/LgpdPortal"));
 
 const queryClient = new QueryClient({
   defaultOptions: {
