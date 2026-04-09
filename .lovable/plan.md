@@ -1,61 +1,87 @@
 
-# Landing Page Corporativa "RH Smart IA"
+
+# Paginas Legais: Privacidade, Termos de Uso e Portal LGPD
 
 ## Resumo
-Criar uma landing page one-page enterprise em `/landing` (rota publica, sem layout do app) com captacao B2B via Supabase, design azul marinho corporativo, e todas as secoes solicitadas.
+Criar 3 paginas publicas (`/privacidade`, `/termos`, `/lgpd`) com design dark mode consistente com a landing page, e uma migracao para a tabela `lgpd_requests`.
 
 ---
 
-## 1. Migracao — Tabela `b2b_leads`
+## 1. Migracao — Tabela `lgpd_requests`
 
 ```sql
-CREATE TABLE public.b2b_leads (
+CREATE TABLE public.lgpd_requests (
   id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
-  nome TEXT NOT NULL,
-  cargo TEXT NOT NULL,
-  empresa TEXT NOT NULL,
-  num_funcionarios TEXT NOT NULL,
+  name TEXT NOT NULL,
   email TEXT NOT NULL,
-  telefone TEXT,
-  mensagem TEXT,
-  origem TEXT DEFAULT 'landing',
+  request_type TEXT NOT NULL,
+  message TEXT,
   created_at TIMESTAMPTZ DEFAULT NOW()
 );
--- RLS: insert aberto (anon), select apenas admin
-ALTER TABLE public.b2b_leads ENABLE ROW LEVEL SECURITY;
-CREATE POLICY "Anyone can insert leads" ON public.b2b_leads FOR INSERT WITH CHECK (true);
-CREATE POLICY "Admins can read leads" ON public.b2b_leads FOR SELECT USING (false);
+ALTER TABLE public.lgpd_requests ENABLE ROW LEVEL SECURITY;
+CREATE POLICY "Anyone can insert lgpd requests" ON public.lgpd_requests FOR INSERT WITH CHECK (true);
+CREATE POLICY "No public read" ON public.lgpd_requests FOR SELECT USING (false);
 ```
 
-Nao criarei as tabelas `companies`, `employees`, `payroll_records`, `analytics_events` pois o projeto ja possui uma estrutura multi-tenant completa (organizations, employees, etc). A Edge Function de turnover tambem ja existe no contexto do app.
+## 2. Componente compartilhado — `LegalPageLayout.tsx`
 
-## 2. Landing Page — `src/pages/LandingPage.tsx`
+Componente wrapper que inclui:
+- Header identico ao da landing (logo RH Smart IA, menu, botoes Entrar/WhatsApp)
+- Footer identico ao da landing
+- Container centralizado `max-w-4xl` com fundo escuro
+- Botao "Voltar para a pagina inicial" no topo
+- Menu lateral sticky opcional (visivel em `lg+`) com links anchor para as secoes
 
-Pagina unica com ~600 linhas, sem dependencia do layout do app. Componentes inline para simplicidade.
+## 3. Pagina Politica de Privacidade — `PrivacyPolicy.tsx`
 
-### Secoes:
-1. **Header fixo** — Logo "RH Smart IA", menu anchor links (Modulos, Vantagens, Precos, Contato), botoes "Entrar" (link `/auth`) e "Agendar Demo Gratuita" (scroll para formulario)
-2. **Hero** — Headline, subheadline, CTA, mockup de dashboard com graficos preditivos (SVG/ilustracao CSS)
-3. **Modulos (Tabs)** — 5 abas: AX People, AX Talent, AX Analytics, AX Pay, AX Pulse (IA). Cada aba com icone, descricao e lista de features
-4. **Resultados (O Poder da IA)** — 3 metricas animadas (34%, 60h, ROI Imediato) com animacao de contagem
-5. **Precos** — 4 cards (Starter R$197, Growth R$19/colab, Pro R$29/colab destacado, Enterprise sob consulta)
-6. **Formulario B2B** — Nome, Cargo, Empresa, Num Funcionarios (select), Email. Submit para `b2b_leads` via Supabase client
-7. **Footer** — Logo AX Holding, links corporativos, LGPD, contato
+Rota: `/privacidade`
 
-### Design:
-- Paleta: `#0a1628` (azul marinho escuro), `#1e40af` (azul corporativo), `#ffffff`, `#f8fafc`
-- Tipografia: font-sans do Tailwind (Inter, similar a Helvetica Neue/Lato)
-- Gradientes sutis, cards com sombras, secoes alternando fundo claro/escuro
-- Responsivo (mobile-first)
+Secoes com texto juridico completo:
+1. Introducao (RHAxis / AX Holding)
+2. Dados Coletados (Nome, Email, Telefone)
+3. Finalidade (comunicacao e vendas)
+4. Compartilhamento (APIs/integracoes de parceiros)
+5. Retencao (1 ano)
+6. Cookies e Rastreamento (Google Analytics etc.)
+7. Seguranca (SOC 2 Type II, LGPD Compliant)
+8. Contato (privacidade@rhaxis.com.br)
 
-## 3. Rota
+## 4. Pagina Termos de Uso — `TermsOfUse.tsx`
 
-Adicionar em `App.tsx` como rota publica:
-```tsx
-<Route path="/landing" element={<LandingPage />} />
-```
+Rota: `/termos`
 
-## 4. Arquivos criados/alterados
-- `supabase/migrations/` — 1 migracao (tabela b2b_leads)
-- `src/pages/LandingPage.tsx` — pagina completa
-- `src/App.tsx` — adicionar rota `/landing`
+Clausulas numeradas:
+1. Aceitacao dos Termos
+2. Descricao do Servico (SaaS de RH com IA)
+3. Uso Aceitavel
+4. Propriedade Intelectual (AX Holding)
+5. Limitacao de Responsabilidade
+6. Integracoes de Terceiros
+7. Modificacoes dos Termos
+8. Foro (sede AX Holding)
+
+## 5. Pagina Portal LGPD — `LgpdPortal.tsx`
+
+Rota: `/lgpd`
+
+- Badges SOC 2 Type II e LGPD Compliant no topo
+- **Secao 1**: Cards com os 6 direitos do titular (acesso, correcao, eliminacao, anonimizacao, portabilidade, revogacao)
+- **Secao 2**: Formulario funcional conectado a `lgpd_requests`:
+  - Nome Completo, Email, Tipo de Solicitacao (dropdown), Mensagem (textarea)
+  - Checkbox de confirmacao de titularidade
+  - Botao "Enviar Solicitacao"
+
+## 6. Rotas e Links
+
+- Adicionar 3 rotas publicas em `App.tsx`: `/privacidade`, `/termos`, `/lgpd`
+- Atualizar footer da `LandingPage.tsx` para usar `<Link>` nas 3 paginas legais
+
+## Arquivos criados/alterados
+- `supabase/migrations/` — 1 migracao (lgpd_requests)
+- `src/components/LegalPageLayout.tsx` — layout compartilhado
+- `src/pages/PrivacyPolicy.tsx`
+- `src/pages/TermsOfUse.tsx`
+- `src/pages/LgpdPortal.tsx`
+- `src/pages/LandingPage.tsx` — links no footer
+- `src/App.tsx` — 3 rotas novas
+
