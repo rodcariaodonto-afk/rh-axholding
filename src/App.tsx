@@ -125,6 +125,20 @@ const App = () => (
               <LandingPage />
             </Suspense>
           } />
+          <Route path="/privacidade" element={
+            <Suspense fallback={<div className="min-h-screen flex items-center justify-center"><Loader2 className="h-8 w-8 animate-spin text-muted-foreground" /></div>}>
+              <PrivacyPolicy />
+            </Suspense>
+          } />
+          <Route path="/termos" element={
+            <Suspense fallback={<div className="min-h-screen flex items-center justify-center"><Loader2 className="h-8 w-8 animate-spin text-muted-foreground" /></div>}>
+              <TermsOfUse />
+            </Suspense>
+          } />
+          <Route path="/lgpd" element={
+            <Suspense fallback={<div className="min-h-screen flex items-center justify-center"><Loader2 className="h-8 w-8 animate-spin text-muted-foreground" /></div>}>
+              <LgpdPortal />
+            </Suspense>
           <Route path="/auth" element={<Auth />} />
           <Route path="/accept-invite" element={<AcceptInvite />} />
           <Route path="/reset-password" element={
