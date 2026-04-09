@@ -519,7 +519,6 @@ export default function LandingPage() {
               <p className="text-xs font-semibold text-gray-400 uppercase tracking-wider mb-3">Empresa</p>
               <ul className="space-y-2 text-sm text-gray-500">
                 <li><button onClick={() => scrollTo("precos")} className="hover:text-white transition-colors">Preços</button></li>
-                <li><button onClick={() => scrollTo("precos")} className="hover:text-white transition-colors">Preços</button></li>
                 <li><button onClick={() => scrollTo("contato")} className="hover:text-white transition-colors">Contato</button></li>
               </ul>
             </div>
