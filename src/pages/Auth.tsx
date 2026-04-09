@@ -230,7 +230,7 @@ const Auth = () => {
       <Card className="w-full max-w-md border-border/50 shadow-lg">
         <CardHeader className="text-center space-y-4">
           <CardTitle className="text-2xl">
-            {isFirstTimeSetup ? "Configuração Inicial" : "Bem-vindo ao Orb RH"}
+            {isFirstTimeSetup ? "Configuração Inicial" : "Bem-vindo ao RH Smart AI"}
           </CardTitle>
           <CardDescription>
             {isFirstTimeSetup 
