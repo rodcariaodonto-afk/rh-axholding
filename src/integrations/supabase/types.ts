@@ -2967,6 +2967,33 @@ export type Database = {
           },
         ]
       }
+      lgpd_requests: {
+        Row: {
+          created_at: string | null
+          email: string
+          id: string
+          message: string | null
+          name: string
+          request_type: string
+        }
+        Insert: {
+          created_at?: string | null
+          email: string
+          id?: string
+          message?: string | null
+          name: string
+          request_type: string
+        }
+        Update: {
+          created_at?: string | null
+          email?: string
+          id?: string
+          message?: string | null
+          name?: string
+          request_type?: string
+        }
+        Relationships: []
+      }
       notifications: {
         Row: {
           action_url: string | null
