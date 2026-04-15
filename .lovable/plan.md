@@ -1,87 +1,41 @@
 
 
-# Paginas Legais: Privacidade, Termos de Uso e Portal LGPD
+# Correção de Segurança — Headers HTTP
 
-## Resumo
-Criar 3 paginas publicas (`/privacidade`, `/termos`, `/lgpd`) com design dark mode consistente com a landing page, e uma migracao para a tabela `lgpd_requests`.
+## Contexto
 
----
+O scan de segurança (score 71/100) encontrou 5 problemas, todos relacionados a headers HTTP ausentes:
 
-## 1. Migracao — Tabela `lgpd_requests`
+| Severidade | Header | Status |
+|------------|--------|--------|
+| HIGH | Content-Security-Policy | Ausente |
+| MEDIUM | X-Frame-Options | Ausente |
+| LOW | X-XSS-Protection | Ausente |
+| LOW | Permissions-Policy | Ausente |
+| INFO | Server: cloudflare | Informacional |
 
-```sql
-CREATE TABLE public.lgpd_requests (
-  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
-  name TEXT NOT NULL,
-  email TEXT NOT NULL,
-  request_type TEXT NOT NULL,
-  message TEXT,
-  created_at TIMESTAMPTZ DEFAULT NOW()
-);
-ALTER TABLE public.lgpd_requests ENABLE ROW LEVEL SECURITY;
-CREATE POLICY "Anyone can insert lgpd requests" ON public.lgpd_requests FOR INSERT WITH CHECK (true);
-CREATE POLICY "No public read" ON public.lgpd_requests FOR SELECT USING (false);
-```
+## Limitacao importante
 
-## 2. Componente compartilhado — `LegalPageLayout.tsx`
+Este projeto e hospedado na Lovable (Cloudflare). **Nao temos controle sobre headers do servidor HTTP** — eles sao definidos pela infraestrutura de hospedagem, nao pelo codigo do app.
 
-Componente wrapper que inclui:
-- Header identico ao da landing (logo RH Smart IA, menu, botoes Entrar/WhatsApp)
-- Footer identico ao da landing
-- Container centralizado `max-w-4xl` com fundo escuro
-- Botao "Voltar para a pagina inicial" no topo
-- Menu lateral sticky opcional (visivel em `lg+`) com links anchor para as secoes
+## O que podemos fazer
 
-## 3. Pagina Politica de Privacidade — `PrivacyPolicy.tsx`
+Adicionar **meta tags equivalentes** no `index.html` para os headers que possuem equivalencia via `<meta http-equiv>`:
 
-Rota: `/privacidade`
+1. **Content-Security-Policy** — Adicionar `<meta http-equiv="Content-Security-Policy">` com politica adequada (permitindo fontes Google, Supabase, imagens externas)
+2. **X-Frame-Options** — Adicionar `<meta http-equiv="X-Frame-Options" content="DENY">`
+3. **X-XSS-Protection** — Adicionar `<meta http-equiv="X-XSS-Protection" content="1; mode=block">`
 
-Secoes com texto juridico completo:
-1. Introducao (RHAxis / AX Holding)
-2. Dados Coletados (Nome, Email, Telefone)
-3. Finalidade (comunicacao e vendas)
-4. Compartilhamento (APIs/integracoes de parceiros)
-5. Retencao (1 ano)
-6. Cookies e Rastreamento (Google Analytics etc.)
-7. Seguranca (SOC 2 Type II, LGPD Compliant)
-8. Contato (privacidade@rhaxis.com.br)
+## O que NAO podemos corrigir
 
-## 4. Pagina Termos de Uso — `TermsOfUse.tsx`
+- **Permissions-Policy**: nao tem equivalente em meta tag, requer header HTTP real (configuracao do servidor)
+- **Server header (cloudflare)**: controlado pela Cloudflare, nao pelo app — e apenas informacional
 
-Rota: `/termos`
+## Alteracao
 
-Clausulas numeradas:
-1. Aceitacao dos Termos
-2. Descricao do Servico (SaaS de RH com IA)
-3. Uso Aceitavel
-4. Propriedade Intelectual (AX Holding)
-5. Limitacao de Responsabilidade
-6. Integracoes de Terceiros
-7. Modificacoes dos Termos
-8. Foro (sede AX Holding)
+- **Arquivo**: `index.html` — adicionar 3 meta tags no `<head>`
 
-## 5. Pagina Portal LGPD — `LgpdPortal.tsx`
+## Nota
 
-Rota: `/lgpd`
-
-- Badges SOC 2 Type II e LGPD Compliant no topo
-- **Secao 1**: Cards com os 6 direitos do titular (acesso, correcao, eliminacao, anonimizacao, portabilidade, revogacao)
-- **Secao 2**: Formulario funcional conectado a `lgpd_requests`:
-  - Nome Completo, Email, Tipo de Solicitacao (dropdown), Mensagem (textarea)
-  - Checkbox de confirmacao de titularidade
-  - Botao "Enviar Solicitacao"
-
-## 6. Rotas e Links
-
-- Adicionar 3 rotas publicas em `App.tsx`: `/privacidade`, `/termos`, `/lgpd`
-- Atualizar footer da `LandingPage.tsx` para usar `<Link>` nas 3 paginas legais
-
-## Arquivos criados/alterados
-- `supabase/migrations/` — 1 migracao (lgpd_requests)
-- `src/components/LegalPageLayout.tsx` — layout compartilhado
-- `src/pages/PrivacyPolicy.tsx`
-- `src/pages/TermsOfUse.tsx`
-- `src/pages/LgpdPortal.tsx`
-- `src/pages/LandingPage.tsx` — links no footer
-- `src/App.tsx` — 3 rotas novas
+Meta tags `http-equiv` oferecem protecao parcial (funcionam no navegador ao carregar a pagina), mas o ideal seria configurar os headers no servidor. Para protecao completa, seria necessario um dominio proprio com Cloudflare Workers ou outro proxy reverso.
 
