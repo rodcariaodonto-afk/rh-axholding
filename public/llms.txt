@@ -1,0 +1,18 @@
+# RH Smart AI (RHAxis)
+
+> Plataforma brasileira de gestão de RH com IA preditiva, People Analytics, ponto digital, folha, PDI, recrutamento e governança de dados conforme LGPD.
+
+RH Smart AI (RHAxis) é o sistema de gestão de pessoas da AX Holding. Atende empresas que precisam digitalizar todo o ciclo do colaborador — do recrutamento ao desligamento — com conformidade trabalhista (CLT) e LGPD nativa.
+
+## Pages
+
+- [Início](/): Landing page institucional com visão geral da plataforma.
+- [Vagas e Carreiras](/carreiras/:slug): Página pública de carreiras de cada empresa cliente.
+- [Política de Privacidade](/privacidade): Como tratamos dados pessoais.
+- [Termos de Uso](/termos): Termos contratuais de uso da plataforma.
+- [Portal LGPD](/lgpd): Canal para titulares exercerem direitos LGPD.
+- [Login](/auth): Acesso de colaboradores e gestores.
+
+## Optional
+
+- [Aplicar a vaga demo](/vagas/00000000-0000-0000-0000-000000000001/aplicar): Fluxo público de candidatura.
