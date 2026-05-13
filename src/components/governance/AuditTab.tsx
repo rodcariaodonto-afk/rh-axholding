@@ -71,7 +71,7 @@ export function AuditTab() {
                 <TableCell className="text-sm">{l.resource_type}</TableCell>
                 <TableCell className="text-sm font-medium">{l.action}</TableCell>
                 <TableCell className="text-xs text-muted-foreground">{l.user_id?.slice(0, 8) ?? "—"}</TableCell>
-                <TableCell className="text-xs text-muted-foreground">{l.ip_address ?? "—"}</TableCell>
+                <TableCell className="text-xs text-muted-foreground">{(l.ip_address as string | null) ?? "—"}</TableCell>
               </TableRow>
             ))}
             {filtered.length === 0 && (
