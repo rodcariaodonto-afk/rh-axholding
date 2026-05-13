@@ -96,6 +96,7 @@ const LandingPage = lazy(() => import("./pages/LandingPage"));
 const PrivacyPolicy = lazy(() => import("./pages/PrivacyPolicy"));
 const TermsOfUse = lazy(() => import("./pages/TermsOfUse"));
 const LgpdPortal = lazy(() => import("./pages/LgpdPortal"));
+const DataGovernance = lazy(() => import("./pages/DataGovernance"));
 
 const queryClient = new QueryClient({
   defaultOptions: {
@@ -271,6 +272,7 @@ const App = () => (
 
             {/* Admin-only routes */}
             <Route path="/access-management" element={<AdminRoute><AccessManagement /></AdminRoute>} />
+            <Route path="/data-governance" element={<PeopleRoute><DataGovernance /></PeopleRoute>} />
           </Route>
 
           {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
