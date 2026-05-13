@@ -499,6 +499,7 @@ export default function LandingPage() {
           </form>
         </div>
       </section>
+      </main>
 
       {/* ═══════ FOOTER ═══════ */}
       <footer className="bg-[#070e1a] border-t border-white/10 py-12">
