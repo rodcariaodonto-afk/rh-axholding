@@ -113,9 +113,12 @@ export type Database = {
           id: string
           ip_address: unknown
           is_sensitive: boolean
+          new_values: Json | null
           organization_id: string | null
+          previous_values: Json | null
           resource_id: string | null
           resource_type: string
+          severity: string
           user_agent: string | null
           user_id: string | null
         }
@@ -126,9 +129,12 @@ export type Database = {
           id?: string
           ip_address?: unknown
           is_sensitive?: boolean
+          new_values?: Json | null
           organization_id?: string | null
+          previous_values?: Json | null
           resource_id?: string | null
           resource_type: string
+          severity?: string
           user_agent?: string | null
           user_id?: string | null
         }
@@ -139,9 +145,12 @@ export type Database = {
           id?: string
           ip_address?: unknown
           is_sensitive?: boolean
+          new_values?: Json | null
           organization_id?: string | null
+          previous_values?: Json | null
           resource_id?: string | null
           resource_type?: string
+          severity?: string
           user_agent?: string | null
           user_id?: string | null
         }
@@ -886,6 +895,343 @@ export type Database = {
             columns: ["organization_id"]
             isOneToOne: false
             referencedRelation: "organizations_public"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      data_classifications: {
+        Row: {
+          classification: string
+          classified_by: string | null
+          created_at: string
+          id: string
+          notes: string | null
+          organization_id: string
+          resource_id: string
+          resource_type: string
+          retention_until: string | null
+          updated_at: string
+        }
+        Insert: {
+          classification?: string
+          classified_by?: string | null
+          created_at?: string
+          id?: string
+          notes?: string | null
+          organization_id: string
+          resource_id: string
+          resource_type: string
+          retention_until?: string | null
+          updated_at?: string
+        }
+        Update: {
+          classification?: string
+          classified_by?: string | null
+          created_at?: string
+          id?: string
+          notes?: string | null
+          organization_id?: string
+          resource_id?: string
+          resource_type?: string
+          retention_until?: string | null
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "data_classifications_organization_id_fkey"
+            columns: ["organization_id"]
+            isOneToOne: false
+            referencedRelation: "organizations"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "data_classifications_organization_id_fkey"
+            columns: ["organization_id"]
+            isOneToOne: false
+            referencedRelation: "organizations_public"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      data_consents: {
+        Row: {
+          ai_processing_allowed: boolean
+          consent_given_at: string | null
+          consent_revoked_at: string | null
+          consent_source: string | null
+          consent_status: string
+          created_at: string
+          data_origin: string | null
+          id: string
+          legal_basis: string
+          organization_id: string
+          privacy_notes: string | null
+          purpose: string
+          subject_id: string
+          subject_type: string
+          talent_pool_opt_in: boolean
+          updated_at: string
+        }
+        Insert: {
+          ai_processing_allowed?: boolean
+          consent_given_at?: string | null
+          consent_revoked_at?: string | null
+          consent_source?: string | null
+          consent_status?: string
+          created_at?: string
+          data_origin?: string | null
+          id?: string
+          legal_basis?: string
+          organization_id: string
+          privacy_notes?: string | null
+          purpose: string
+          subject_id: string
+          subject_type: string
+          talent_pool_opt_in?: boolean
+          updated_at?: string
+        }
+        Update: {
+          ai_processing_allowed?: boolean
+          consent_given_at?: string | null
+          consent_revoked_at?: string | null
+          consent_source?: string | null
+          consent_status?: string
+          created_at?: string
+          data_origin?: string | null
+          id?: string
+          legal_basis?: string
+          organization_id?: string
+          privacy_notes?: string | null
+          purpose?: string
+          subject_id?: string
+          subject_type?: string
+          talent_pool_opt_in?: boolean
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "data_consents_organization_id_fkey"
+            columns: ["organization_id"]
+            isOneToOne: false
+            referencedRelation: "organizations"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "data_consents_organization_id_fkey"
+            columns: ["organization_id"]
+            isOneToOne: false
+            referencedRelation: "organizations_public"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      data_exports: {
+        Row: {
+          completed_at: string | null
+          created_at: string
+          error_message: string | null
+          expires_at: string | null
+          file_size_bytes: number | null
+          file_url: string | null
+          format: string
+          id: string
+          metadata: Json
+          organization_id: string
+          requested_by: string | null
+          scope: string[]
+          status: string
+          subject_id: string | null
+          subject_type: string | null
+        }
+        Insert: {
+          completed_at?: string | null
+          created_at?: string
+          error_message?: string | null
+          expires_at?: string | null
+          file_size_bytes?: number | null
+          file_url?: string | null
+          format?: string
+          id?: string
+          metadata?: Json
+          organization_id: string
+          requested_by?: string | null
+          scope?: string[]
+          status?: string
+          subject_id?: string | null
+          subject_type?: string | null
+        }
+        Update: {
+          completed_at?: string | null
+          created_at?: string
+          error_message?: string | null
+          expires_at?: string | null
+          file_size_bytes?: number | null
+          file_url?: string | null
+          format?: string
+          id?: string
+          metadata?: Json
+          organization_id?: string
+          requested_by?: string | null
+          scope?: string[]
+          status?: string
+          subject_id?: string | null
+          subject_type?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "data_exports_organization_id_fkey"
+            columns: ["organization_id"]
+            isOneToOne: false
+            referencedRelation: "organizations"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "data_exports_organization_id_fkey"
+            columns: ["organization_id"]
+            isOneToOne: false
+            referencedRelation: "organizations_public"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      data_governance_policies: {
+        Row: {
+          ai_recruitment_policy: string | null
+          candidate_retention_days: number
+          created_at: string
+          data_classification_required: boolean
+          document_access_logging: boolean
+          document_retention_days: number
+          dsr_response_sla_days: number
+          export_link_ttl_days: number
+          organization_id: string
+          sensitive_export_requires_2fa: boolean
+          terminated_employee_retention_days: number
+          updated_at: string
+          updated_by: string | null
+        }
+        Insert: {
+          ai_recruitment_policy?: string | null
+          candidate_retention_days?: number
+          created_at?: string
+          data_classification_required?: boolean
+          document_access_logging?: boolean
+          document_retention_days?: number
+          dsr_response_sla_days?: number
+          export_link_ttl_days?: number
+          organization_id: string
+          sensitive_export_requires_2fa?: boolean
+          terminated_employee_retention_days?: number
+          updated_at?: string
+          updated_by?: string | null
+        }
+        Update: {
+          ai_recruitment_policy?: string | null
+          candidate_retention_days?: number
+          created_at?: string
+          data_classification_required?: boolean
+          document_access_logging?: boolean
+          document_retention_days?: number
+          dsr_response_sla_days?: number
+          export_link_ttl_days?: number
+          organization_id?: string
+          sensitive_export_requires_2fa?: boolean
+          terminated_employee_retention_days?: number
+          updated_at?: string
+          updated_by?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "data_governance_policies_organization_id_fkey"
+            columns: ["organization_id"]
+            isOneToOne: true
+            referencedRelation: "organizations"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "data_governance_policies_organization_id_fkey"
+            columns: ["organization_id"]
+            isOneToOne: true
+            referencedRelation: "organizations_public"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      data_subject_requests: {
+        Row: {
+          assigned_to: string | null
+          created_at: string
+          due_at: string | null
+          history: Json
+          id: string
+          organization_id: string
+          priority: string
+          request_id: string | null
+          request_kind: string
+          resolution_notes: string | null
+          status: string
+          subject_email: string | null
+          subject_id: string | null
+          subject_name: string | null
+          subject_type: string
+          updated_at: string
+        }
+        Insert: {
+          assigned_to?: string | null
+          created_at?: string
+          due_at?: string | null
+          history?: Json
+          id?: string
+          organization_id: string
+          priority?: string
+          request_id?: string | null
+          request_kind: string
+          resolution_notes?: string | null
+          status?: string
+          subject_email?: string | null
+          subject_id?: string | null
+          subject_name?: string | null
+          subject_type: string
+          updated_at?: string
+        }
+        Update: {
+          assigned_to?: string | null
+          created_at?: string
+          due_at?: string | null
+          history?: Json
+          id?: string
+          organization_id?: string
+          priority?: string
+          request_id?: string | null
+          request_kind?: string
+          resolution_notes?: string | null
+          status?: string
+          subject_email?: string | null
+          subject_id?: string | null
+          subject_name?: string | null
+          subject_type?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "data_subject_requests_organization_id_fkey"
+            columns: ["organization_id"]
+            isOneToOne: false
+            referencedRelation: "organizations"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "data_subject_requests_organization_id_fkey"
+            columns: ["organization_id"]
+            isOneToOne: false
+            referencedRelation: "organizations_public"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "data_subject_requests_request_id_fkey"
+            columns: ["request_id"]
+            isOneToOne: false
+            referencedRelation: "lgpd_requests"
             referencedColumns: ["id"]
           },
         ]
@@ -2969,30 +3315,60 @@ export type Database = {
       }
       lgpd_requests: {
         Row: {
+          assigned_to: string | null
           created_at: string | null
+          due_at: string | null
           email: string
           id: string
           message: string | null
           name: string
+          organization_id: string | null
           request_type: string
+          status: string
+          updated_at: string
         }
         Insert: {
+          assigned_to?: string | null
           created_at?: string | null
+          due_at?: string | null
           email: string
           id?: string
           message?: string | null
           name: string
+          organization_id?: string | null
           request_type: string
+          status?: string
+          updated_at?: string
         }
         Update: {
+          assigned_to?: string | null
           created_at?: string | null
+          due_at?: string | null
           email?: string
           id?: string
           message?: string | null
           name?: string
+          organization_id?: string | null
           request_type?: string
+          status?: string
+          updated_at?: string
         }
-        Relationships: []
+        Relationships: [
+          {
+            foreignKeyName: "lgpd_requests_organization_id_fkey"
+            columns: ["organization_id"]
+            isOneToOne: false
+            referencedRelation: "organizations"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "lgpd_requests_organization_id_fkey"
+            columns: ["organization_id"]
+            isOneToOne: false
+            referencedRelation: "organizations_public"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       notifications: {
         Row: {
@@ -4354,6 +4730,63 @@ export type Database = {
           rate_key?: string
         }
         Relationships: []
+      }
+      retention_jobs: {
+        Row: {
+          action: string
+          created_at: string
+          executed_at: string | null
+          executed_by: string | null
+          id: string
+          notes: string | null
+          organization_id: string
+          scheduled_for: string
+          status: string
+          target_id: string
+          target_table: string
+        }
+        Insert: {
+          action: string
+          created_at?: string
+          executed_at?: string | null
+          executed_by?: string | null
+          id?: string
+          notes?: string | null
+          organization_id: string
+          scheduled_for?: string
+          status?: string
+          target_id: string
+          target_table: string
+        }
+        Update: {
+          action?: string
+          created_at?: string
+          executed_at?: string | null
+          executed_by?: string | null
+          id?: string
+          notes?: string | null
+          organization_id?: string
+          scheduled_for?: string
+          status?: string
+          target_id?: string
+          target_table?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "retention_jobs_organization_id_fkey"
+            columns: ["organization_id"]
+            isOneToOne: false
+            referencedRelation: "organizations"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "retention_jobs_organization_id_fkey"
+            columns: ["organization_id"]
+            isOneToOne: false
+            referencedRelation: "organizations_public"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       role_permissions: {
         Row: {
