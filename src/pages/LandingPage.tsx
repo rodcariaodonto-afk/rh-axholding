@@ -207,6 +207,7 @@ export default function LandingPage() {
         )}
       </header>
 
+      <main>
       {/* ═══════ HERO ═══════ */}
       <section className="relative pt-32 pb-20 md:pt-40 md:pb-28 bg-gradient-to-br from-[#0a1628] via-[#0f1f3d] to-[#162a52] overflow-hidden">
         {/* decorative elements */}
@@ -498,6 +499,7 @@ export default function LandingPage() {
           </form>
         </div>
       </section>
+      </main>
 
       {/* ═══════ FOOTER ═══════ */}
       <footer className="bg-[#070e1a] border-t border-white/10 py-12">
