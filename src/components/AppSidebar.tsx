@@ -180,6 +180,7 @@ const menuGroups: MenuGroup[] = [
       { icon: Plug, label: "Integrações", href: "/company-settings/integrations" },
       { icon: Shield, label: "Gestão de Acessos", href: "/access-management" },
       { icon: FileText, label: "Auditoria", href: "/audit" },
+      { icon: Shield, label: "Governança de Dados", href: "/data-governance" },
       { icon: FileStack, label: "Documentos da Empresa", href: "/company-documents" },
       { icon: Package, label: "Inventário", href: "/" },
       { icon: FileText, label: "Documentos de Colaboradores", href: "/documents" },
