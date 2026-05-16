@@ -2617,6 +2617,60 @@ export type Database = {
           },
         ]
       }
+      export_jobs: {
+        Row: {
+          created_at: string
+          error_message: string | null
+          expires_at: string | null
+          finished_at: string | null
+          id: string
+          job_type: Database["public"]["Enums"]["export_job_type"]
+          organization_id: string
+          params: Json
+          requested_by: string
+          result_mime: string | null
+          result_path: string | null
+          result_size_bytes: number | null
+          started_at: string | null
+          status: Database["public"]["Enums"]["export_job_status"]
+          updated_at: string
+        }
+        Insert: {
+          created_at?: string
+          error_message?: string | null
+          expires_at?: string | null
+          finished_at?: string | null
+          id?: string
+          job_type: Database["public"]["Enums"]["export_job_type"]
+          organization_id: string
+          params?: Json
+          requested_by: string
+          result_mime?: string | null
+          result_path?: string | null
+          result_size_bytes?: number | null
+          started_at?: string | null
+          status?: Database["public"]["Enums"]["export_job_status"]
+          updated_at?: string
+        }
+        Update: {
+          created_at?: string
+          error_message?: string | null
+          expires_at?: string | null
+          finished_at?: string | null
+          id?: string
+          job_type?: Database["public"]["Enums"]["export_job_type"]
+          organization_id?: string
+          params?: Json
+          requested_by?: string
+          result_mime?: string | null
+          result_path?: string | null
+          result_size_bytes?: number | null
+          started_at?: string | null
+          status?: Database["public"]["Enums"]["export_job_status"]
+          updated_at?: string
+        }
+        Relationships: []
+      }
       feedbacks: {
         Row: {
           created_at: string
@@ -4102,6 +4156,113 @@ export type Database = {
             columns: ["organization_id"]
             isOneToOne: false
             referencedRelation: "organizations_public"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      payroll_competencies: {
+        Row: {
+          closed_at: string | null
+          closed_by: string | null
+          created_at: string
+          id: string
+          month: number
+          notes: string | null
+          opened_at: string
+          organization_id: string
+          paid_at: string | null
+          reference_label: string | null
+          status: Database["public"]["Enums"]["payroll_competency_status"]
+          updated_at: string
+          year: number
+        }
+        Insert: {
+          closed_at?: string | null
+          closed_by?: string | null
+          created_at?: string
+          id?: string
+          month: number
+          notes?: string | null
+          opened_at?: string
+          organization_id: string
+          paid_at?: string | null
+          reference_label?: string | null
+          status?: Database["public"]["Enums"]["payroll_competency_status"]
+          updated_at?: string
+          year: number
+        }
+        Update: {
+          closed_at?: string | null
+          closed_by?: string | null
+          created_at?: string
+          id?: string
+          month?: number
+          notes?: string | null
+          opened_at?: string
+          organization_id?: string
+          paid_at?: string | null
+          reference_label?: string | null
+          status?: Database["public"]["Enums"]["payroll_competency_status"]
+          updated_at?: string
+          year?: number
+        }
+        Relationships: []
+      }
+      payroll_events: {
+        Row: {
+          amount: number
+          code: string
+          competency_id: string
+          created_at: string
+          created_by: string | null
+          description: string
+          employee_id: string
+          id: string
+          kind: Database["public"]["Enums"]["payroll_event_kind"]
+          metadata: Json | null
+          organization_id: string
+          reference: number | null
+          source: string | null
+          updated_at: string
+        }
+        Insert: {
+          amount?: number
+          code: string
+          competency_id: string
+          created_at?: string
+          created_by?: string | null
+          description: string
+          employee_id: string
+          id?: string
+          kind: Database["public"]["Enums"]["payroll_event_kind"]
+          metadata?: Json | null
+          organization_id: string
+          reference?: number | null
+          source?: string | null
+          updated_at?: string
+        }
+        Update: {
+          amount?: number
+          code?: string
+          competency_id?: string
+          created_at?: string
+          created_by?: string | null
+          description?: string
+          employee_id?: string
+          id?: string
+          kind?: Database["public"]["Enums"]["payroll_event_kind"]
+          metadata?: Json | null
+          organization_id?: string
+          reference?: number | null
+          source?: string | null
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "payroll_events_competency_id_fkey"
+            columns: ["competency_id"]
+            isOneToOne: false
+            referencedRelation: "payroll_competencies"
             referencedColumns: ["id"]
           },
         ]
@@ -7143,6 +7304,21 @@ export type Database = {
         | "asian"
         | "indigenous"
         | "not_declared"
+      export_job_status:
+        | "queued"
+        | "processing"
+        | "completed"
+        | "failed"
+        | "cancelled"
+      export_job_type:
+        | "payroll_csv"
+        | "payroll_pdf"
+        | "time_entries_csv"
+        | "absenteeism_csv"
+        | "inconsistencies_csv"
+        | "employees_csv"
+        | "audit_csv"
+        | "custom"
       feedback_type: "positive" | "neutral" | "negative"
       gender: "male" | "female" | "non_binary" | "prefer_not_to_say"
       inconsistency_severity: "info" | "warning" | "critical"
@@ -7171,6 +7347,13 @@ export type Database = {
         | "widowed"
         | "domestic_partnership"
         | "prefer_not_to_say"
+      payroll_competency_status:
+        | "aberta"
+        | "em_processamento"
+        | "fechada"
+        | "paga"
+        | "cancelada"
+      payroll_event_kind: "provento" | "desconto" | "informativo" | "base"
       pdi_goal_status: "pendente" | "em_andamento" | "concluida"
       pdi_goal_type: "tecnico" | "comportamental" | "lideranca" | "carreira"
       pdi_status:
@@ -7502,6 +7685,23 @@ export const Constants = {
         "indigenous",
         "not_declared",
       ],
+      export_job_status: [
+        "queued",
+        "processing",
+        "completed",
+        "failed",
+        "cancelled",
+      ],
+      export_job_type: [
+        "payroll_csv",
+        "payroll_pdf",
+        "time_entries_csv",
+        "absenteeism_csv",
+        "inconsistencies_csv",
+        "employees_csv",
+        "audit_csv",
+        "custom",
+      ],
       feedback_type: ["positive", "neutral", "negative"],
       gender: ["male", "female", "non_binary", "prefer_not_to_say"],
       inconsistency_severity: ["info", "warning", "critical"],
@@ -7533,6 +7733,14 @@ export const Constants = {
         "domestic_partnership",
         "prefer_not_to_say",
       ],
+      payroll_competency_status: [
+        "aberta",
+        "em_processamento",
+        "fechada",
+        "paga",
+        "cancelada",
+      ],
+      payroll_event_kind: ["provento", "desconto", "informativo", "base"],
       pdi_goal_status: ["pendente", "em_andamento", "concluida"],
       pdi_goal_type: ["tecnico", "comportamental", "lideranca", "carreira"],
       pdi_status: [
