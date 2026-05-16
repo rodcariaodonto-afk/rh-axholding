@@ -10,9 +10,9 @@ export interface CostCenter {
   name: string;
   cnpj: string | null;
   responsible_id: string | null;
-  address: Record<string, unknown> | null;
+  address: unknown;
   active: boolean;
-  metadata: Record<string, unknown> | null;
+  metadata: unknown;
   created_at: string;
   updated_at: string;
 }
