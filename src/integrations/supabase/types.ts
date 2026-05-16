@@ -899,6 +899,63 @@ export type Database = {
           },
         ]
       }
+      cost_centers: {
+        Row: {
+          active: boolean
+          address: Json | null
+          cnpj: string | null
+          code: string
+          created_at: string
+          id: string
+          metadata: Json | null
+          name: string
+          organization_id: string
+          responsible_id: string | null
+          updated_at: string
+        }
+        Insert: {
+          active?: boolean
+          address?: Json | null
+          cnpj?: string | null
+          code: string
+          created_at?: string
+          id?: string
+          metadata?: Json | null
+          name: string
+          organization_id: string
+          responsible_id?: string | null
+          updated_at?: string
+        }
+        Update: {
+          active?: boolean
+          address?: Json | null
+          cnpj?: string | null
+          code?: string
+          created_at?: string
+          id?: string
+          metadata?: Json | null
+          name?: string
+          organization_id?: string
+          responsible_id?: string | null
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "cost_centers_organization_id_fkey"
+            columns: ["organization_id"]
+            isOneToOne: false
+            referencedRelation: "organizations"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "cost_centers_organization_id_fkey"
+            columns: ["organization_id"]
+            isOneToOne: false
+            referencedRelation: "organizations_public"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       data_classifications: {
         Row: {
           classification: string
@@ -3313,6 +3370,69 @@ export type Database = {
           },
         ]
       }
+      legal_entities: {
+        Row: {
+          active: boolean
+          address: Json | null
+          cnae_code: string | null
+          cnpj: string
+          created_at: string
+          id: string
+          legal_name: string
+          metadata: Json | null
+          municipal_registration: string | null
+          organization_id: string
+          state_registration: string | null
+          trade_name: string | null
+          updated_at: string
+        }
+        Insert: {
+          active?: boolean
+          address?: Json | null
+          cnae_code?: string | null
+          cnpj: string
+          created_at?: string
+          id?: string
+          legal_name: string
+          metadata?: Json | null
+          municipal_registration?: string | null
+          organization_id: string
+          state_registration?: string | null
+          trade_name?: string | null
+          updated_at?: string
+        }
+        Update: {
+          active?: boolean
+          address?: Json | null
+          cnae_code?: string | null
+          cnpj?: string
+          created_at?: string
+          id?: string
+          legal_name?: string
+          metadata?: Json | null
+          municipal_registration?: string | null
+          organization_id?: string
+          state_registration?: string | null
+          trade_name?: string | null
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "legal_entities_organization_id_fkey"
+            columns: ["organization_id"]
+            isOneToOne: false
+            referencedRelation: "organizations"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "legal_entities_organization_id_fkey"
+            columns: ["organization_id"]
+            isOneToOne: false
+            referencedRelation: "organizations_public"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       lgpd_requests: {
         Row: {
           assigned_to: string | null
@@ -3559,11 +3679,13 @@ export type Database = {
       organization_locations: {
         Row: {
           address: string | null
+          cost_center_id: string | null
           created_at: string
           created_by: string
           id: string
           is_active: boolean
           latitude: number
+          legal_entity_id: string | null
           longitude: number
           name: string
           organization_id: string
@@ -3572,11 +3694,13 @@ export type Database = {
         }
         Insert: {
           address?: string | null
+          cost_center_id?: string | null
           created_at?: string
           created_by: string
           id?: string
           is_active?: boolean
           latitude: number
+          legal_entity_id?: string | null
           longitude: number
           name: string
           organization_id: string
@@ -3585,11 +3709,13 @@ export type Database = {
         }
         Update: {
           address?: string | null
+          cost_center_id?: string | null
           created_at?: string
           created_by?: string
           id?: string
           is_active?: boolean
           latitude?: number
+          legal_entity_id?: string | null
           longitude?: number
           name?: string
           organization_id?: string
@@ -3597,6 +3723,20 @@ export type Database = {
           updated_at?: string
         }
         Relationships: [
+          {
+            foreignKeyName: "organization_locations_cost_center_id_fkey"
+            columns: ["cost_center_id"]
+            isOneToOne: false
+            referencedRelation: "cost_centers"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "organization_locations_legal_entity_id_fkey"
+            columns: ["legal_entity_id"]
+            isOneToOne: false
+            referencedRelation: "legal_entities"
+            referencedColumns: ["id"]
+          },
           {
             foreignKeyName: "organization_locations_organization_id_fkey"
             columns: ["organization_id"]
@@ -5276,6 +5416,340 @@ export type Database = {
           },
         ]
       }
+      time_clock_device_tokens: {
+        Row: {
+          created_at: string
+          created_by: string | null
+          device_id: string
+          expires_at: string | null
+          id: string
+          organization_id: string
+          revoked_at: string | null
+          scope: string
+          token_hash: string
+        }
+        Insert: {
+          created_at?: string
+          created_by?: string | null
+          device_id: string
+          expires_at?: string | null
+          id?: string
+          organization_id: string
+          revoked_at?: string | null
+          scope?: string
+          token_hash: string
+        }
+        Update: {
+          created_at?: string
+          created_by?: string | null
+          device_id?: string
+          expires_at?: string | null
+          id?: string
+          organization_id?: string
+          revoked_at?: string | null
+          scope?: string
+          token_hash?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "time_clock_device_tokens_device_id_fkey"
+            columns: ["device_id"]
+            isOneToOne: false
+            referencedRelation: "time_clock_devices"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "time_clock_device_tokens_organization_id_fkey"
+            columns: ["organization_id"]
+            isOneToOne: false
+            referencedRelation: "organizations"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "time_clock_device_tokens_organization_id_fkey"
+            columns: ["organization_id"]
+            isOneToOne: false
+            referencedRelation: "organizations_public"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      time_clock_devices: {
+        Row: {
+          cost_center_id: string | null
+          created_at: string
+          device_type: Database["public"]["Enums"]["time_clock_device_type"]
+          firmware_version: string | null
+          id: string
+          integration_mode: Database["public"]["Enums"]["time_clock_integration_mode"]
+          last_event_at: string | null
+          last_sync_at: string | null
+          legal_entity_id: string | null
+          metadata: Json | null
+          model: string | null
+          name: string
+          organization_id: string
+          provider: string | null
+          serial_number: string | null
+          status: Database["public"]["Enums"]["time_clock_device_status"]
+          updated_at: string
+          work_location_id: string | null
+        }
+        Insert: {
+          cost_center_id?: string | null
+          created_at?: string
+          device_type?: Database["public"]["Enums"]["time_clock_device_type"]
+          firmware_version?: string | null
+          id?: string
+          integration_mode?: Database["public"]["Enums"]["time_clock_integration_mode"]
+          last_event_at?: string | null
+          last_sync_at?: string | null
+          legal_entity_id?: string | null
+          metadata?: Json | null
+          model?: string | null
+          name: string
+          organization_id: string
+          provider?: string | null
+          serial_number?: string | null
+          status?: Database["public"]["Enums"]["time_clock_device_status"]
+          updated_at?: string
+          work_location_id?: string | null
+        }
+        Update: {
+          cost_center_id?: string | null
+          created_at?: string
+          device_type?: Database["public"]["Enums"]["time_clock_device_type"]
+          firmware_version?: string | null
+          id?: string
+          integration_mode?: Database["public"]["Enums"]["time_clock_integration_mode"]
+          last_event_at?: string | null
+          last_sync_at?: string | null
+          legal_entity_id?: string | null
+          metadata?: Json | null
+          model?: string | null
+          name?: string
+          organization_id?: string
+          provider?: string | null
+          serial_number?: string | null
+          status?: Database["public"]["Enums"]["time_clock_device_status"]
+          updated_at?: string
+          work_location_id?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "time_clock_devices_cost_center_id_fkey"
+            columns: ["cost_center_id"]
+            isOneToOne: false
+            referencedRelation: "cost_centers"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "time_clock_devices_legal_entity_id_fkey"
+            columns: ["legal_entity_id"]
+            isOneToOne: false
+            referencedRelation: "legal_entities"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "time_clock_devices_organization_id_fkey"
+            columns: ["organization_id"]
+            isOneToOne: false
+            referencedRelation: "organizations"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "time_clock_devices_organization_id_fkey"
+            columns: ["organization_id"]
+            isOneToOne: false
+            referencedRelation: "organizations_public"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "time_clock_devices_work_location_id_fkey"
+            columns: ["work_location_id"]
+            isOneToOne: false
+            referencedRelation: "organization_locations"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      time_clock_raw_events: {
+        Row: {
+          accuracy: number | null
+          biometric_match_status: string | null
+          created_at: string
+          derived_ponto_registro_id: string | null
+          derived_time_entry_id: string | null
+          device_id: string | null
+          direction: Database["public"]["Enums"]["time_clock_direction"]
+          employee_id: string | null
+          event_time: string
+          external_employee_code: string | null
+          hash: string | null
+          id: string
+          latitude: number | null
+          longitude: number | null
+          organization_id: string
+          photo_url: string | null
+          processed_at: string | null
+          processing_status: Database["public"]["Enums"]["time_clock_processing_status"]
+          raw_payload: Json
+          received_at: string
+          source: string
+          source_event_id: string | null
+          sync_log_id: string | null
+        }
+        Insert: {
+          accuracy?: number | null
+          biometric_match_status?: string | null
+          created_at?: string
+          derived_ponto_registro_id?: string | null
+          derived_time_entry_id?: string | null
+          device_id?: string | null
+          direction?: Database["public"]["Enums"]["time_clock_direction"]
+          employee_id?: string | null
+          event_time: string
+          external_employee_code?: string | null
+          hash?: string | null
+          id?: string
+          latitude?: number | null
+          longitude?: number | null
+          organization_id: string
+          photo_url?: string | null
+          processed_at?: string | null
+          processing_status?: Database["public"]["Enums"]["time_clock_processing_status"]
+          raw_payload?: Json
+          received_at?: string
+          source: string
+          source_event_id?: string | null
+          sync_log_id?: string | null
+        }
+        Update: {
+          accuracy?: number | null
+          biometric_match_status?: string | null
+          created_at?: string
+          derived_ponto_registro_id?: string | null
+          derived_time_entry_id?: string | null
+          device_id?: string | null
+          direction?: Database["public"]["Enums"]["time_clock_direction"]
+          employee_id?: string | null
+          event_time?: string
+          external_employee_code?: string | null
+          hash?: string | null
+          id?: string
+          latitude?: number | null
+          longitude?: number | null
+          organization_id?: string
+          photo_url?: string | null
+          processed_at?: string | null
+          processing_status?: Database["public"]["Enums"]["time_clock_processing_status"]
+          raw_payload?: Json
+          received_at?: string
+          source?: string
+          source_event_id?: string | null
+          sync_log_id?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "time_clock_raw_events_device_id_fkey"
+            columns: ["device_id"]
+            isOneToOne: false
+            referencedRelation: "time_clock_devices"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "time_clock_raw_events_organization_id_fkey"
+            columns: ["organization_id"]
+            isOneToOne: false
+            referencedRelation: "organizations"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "time_clock_raw_events_organization_id_fkey"
+            columns: ["organization_id"]
+            isOneToOne: false
+            referencedRelation: "organizations_public"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "time_clock_raw_events_sync_log_id_fkey"
+            columns: ["sync_log_id"]
+            isOneToOne: false
+            referencedRelation: "time_clock_sync_logs"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      time_clock_sync_logs: {
+        Row: {
+          created_at: string
+          device_id: string | null
+          error_details: Json | null
+          events_accepted: number
+          events_duplicated: number
+          events_received: number
+          events_rejected: number
+          id: string
+          metadata: Json | null
+          organization_id: string
+          source_file: string | null
+          sync_status: string
+          triggered_by: string | null
+        }
+        Insert: {
+          created_at?: string
+          device_id?: string | null
+          error_details?: Json | null
+          events_accepted?: number
+          events_duplicated?: number
+          events_received?: number
+          events_rejected?: number
+          id?: string
+          metadata?: Json | null
+          organization_id: string
+          source_file?: string | null
+          sync_status: string
+          triggered_by?: string | null
+        }
+        Update: {
+          created_at?: string
+          device_id?: string | null
+          error_details?: Json | null
+          events_accepted?: number
+          events_duplicated?: number
+          events_received?: number
+          events_rejected?: number
+          id?: string
+          metadata?: Json | null
+          organization_id?: string
+          source_file?: string | null
+          sync_status?: string
+          triggered_by?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "time_clock_sync_logs_device_id_fkey"
+            columns: ["device_id"]
+            isOneToOne: false
+            referencedRelation: "time_clock_devices"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "time_clock_sync_logs_organization_id_fkey"
+            columns: ["organization_id"]
+            isOneToOne: false
+            referencedRelation: "organizations"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "time_clock_sync_logs_organization_id_fkey"
+            columns: ["organization_id"]
+            isOneToOne: false
+            referencedRelation: "organizations_public"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       time_entries: {
         Row: {
           clock_in: string
@@ -5290,12 +5764,14 @@ export type Database = {
           clock_out_within_fence: boolean | null
           created_at: string
           date: string
+          device_id: string | null
           employee_id: string
           id: string
           lunch_out: string | null
           lunch_return: string | null
           notes: string | null
           organization_id: string
+          source_raw_event_id: string | null
           total_minutes: number | null
           updated_at: string
         }
@@ -5312,12 +5788,14 @@ export type Database = {
           clock_out_within_fence?: boolean | null
           created_at?: string
           date?: string
+          device_id?: string | null
           employee_id: string
           id?: string
           lunch_out?: string | null
           lunch_return?: string | null
           notes?: string | null
           organization_id: string
+          source_raw_event_id?: string | null
           total_minutes?: number | null
           updated_at?: string
         }
@@ -5334,16 +5812,25 @@ export type Database = {
           clock_out_within_fence?: boolean | null
           created_at?: string
           date?: string
+          device_id?: string | null
           employee_id?: string
           id?: string
           lunch_out?: string | null
           lunch_return?: string | null
           notes?: string | null
           organization_id?: string
+          source_raw_event_id?: string | null
           total_minutes?: number | null
           updated_at?: string
         }
         Relationships: [
+          {
+            foreignKeyName: "time_entries_device_id_fkey"
+            columns: ["device_id"]
+            isOneToOne: false
+            referencedRelation: "time_clock_devices"
+            referencedColumns: ["id"]
+          },
           {
             foreignKeyName: "time_entries_employee_id_fkey"
             columns: ["employee_id"]
@@ -5363,6 +5850,13 @@ export type Database = {
             columns: ["organization_id"]
             isOneToOne: false
             referencedRelation: "organizations_public"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "time_entries_source_raw_event_id_fkey"
+            columns: ["source_raw_event_id"]
+            isOneToOne: false
+            referencedRelation: "time_clock_raw_events"
             referencedColumns: ["id"]
           },
         ]
@@ -6221,6 +6715,15 @@ export type Database = {
         Returns: string
       }
       is_same_org: { Args: { _org_id: string }; Returns: boolean }
+      tcraw_mark_processed: {
+        Args: {
+          _event_id: string
+          _ponto_registro_id?: string
+          _status: Database["public"]["Enums"]["time_clock_processing_status"]
+          _time_entry_id?: string
+        }
+        Returns: undefined
+      }
       user_belongs_to_org: {
         Args: { _org_id: string; _user_id: string }
         Returns: boolean
@@ -6376,6 +6879,41 @@ export type Database = {
         | "aposentadoria_compulsoria"
         | "falecimento"
         | "forca_maior"
+      time_clock_device_status:
+        | "active"
+        | "inactive"
+        | "offline"
+        | "error"
+        | "pending"
+      time_clock_device_type:
+        | "rep_p"
+        | "rep_a"
+        | "rep_c"
+        | "tablet_kiosk"
+        | "mobile_app"
+        | "web"
+        | "qr_gps"
+        | "biometric"
+        | "manual_upload"
+      time_clock_direction:
+        | "in"
+        | "out"
+        | "break_start"
+        | "break_end"
+        | "unknown"
+      time_clock_integration_mode:
+        | "api"
+        | "webhook"
+        | "afd_file"
+        | "csv_file"
+        | "manual_upload"
+        | "native"
+      time_clock_processing_status:
+        | "pending"
+        | "processed"
+        | "conflict"
+        | "rejected"
+        | "ignored"
       time_off_status: "pending_people" | "approved" | "rejected" | "cancelled"
       training_request_status:
         | "draft"
@@ -6671,6 +7209,46 @@ export const Constants = {
         "aposentadoria_compulsoria",
         "falecimento",
         "forca_maior",
+      ],
+      time_clock_device_status: [
+        "active",
+        "inactive",
+        "offline",
+        "error",
+        "pending",
+      ],
+      time_clock_device_type: [
+        "rep_p",
+        "rep_a",
+        "rep_c",
+        "tablet_kiosk",
+        "mobile_app",
+        "web",
+        "qr_gps",
+        "biometric",
+        "manual_upload",
+      ],
+      time_clock_direction: [
+        "in",
+        "out",
+        "break_start",
+        "break_end",
+        "unknown",
+      ],
+      time_clock_integration_mode: [
+        "api",
+        "webhook",
+        "afd_file",
+        "csv_file",
+        "manual_upload",
+        "native",
+      ],
+      time_clock_processing_status: [
+        "pending",
+        "processed",
+        "conflict",
+        "rejected",
+        "ignored",
       ],
       time_off_status: ["pending_people", "approved", "rejected", "cancelled"],
       training_request_status: [
