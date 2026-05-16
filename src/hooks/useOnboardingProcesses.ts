@@ -1,6 +1,6 @@
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
-import { useOrganization } from "@/contexts/OrganizationContext";
+import { useCurrentOrganization } from "@/hooks/useCurrentOrganization";
 import { toast } from "sonner";
 
 export type OnboardingProcess = {
@@ -36,9 +36,9 @@ export type OnboardingTask = {
 };
 
 export function useOnboardingProcesses() {
-  const { currentOrganization } = useOrganization();
+  const { organizationId } = useCurrentOrganization();
   const qc = useQueryClient();
-  const orgId = currentOrganization?.id;
+  const orgId = organizationId;
 
   const list = useQuery({
     queryKey: ["onboarding_processes", orgId],
