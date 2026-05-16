@@ -3959,6 +3959,154 @@ export type Database = {
           },
         ]
       }
+      medical_exam_events: {
+        Row: {
+          actor_user_id: string | null
+          created_at: string
+          event_type: string
+          exam_id: string | null
+          id: string
+          metadata: Json
+          organization_id: string
+          schedule_id: string | null
+        }
+        Insert: {
+          actor_user_id?: string | null
+          created_at?: string
+          event_type: string
+          exam_id?: string | null
+          id?: string
+          metadata?: Json
+          organization_id: string
+          schedule_id?: string | null
+        }
+        Update: {
+          actor_user_id?: string | null
+          created_at?: string
+          event_type?: string
+          exam_id?: string | null
+          id?: string
+          metadata?: Json
+          organization_id?: string
+          schedule_id?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "medical_exam_events_exam_id_fkey"
+            columns: ["exam_id"]
+            isOneToOne: false
+            referencedRelation: "medical_exams"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "medical_exam_events_organization_id_fkey"
+            columns: ["organization_id"]
+            isOneToOne: false
+            referencedRelation: "organizations"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "medical_exam_events_organization_id_fkey"
+            columns: ["organization_id"]
+            isOneToOne: false
+            referencedRelation: "organizations_public"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "medical_exam_events_schedule_id_fkey"
+            columns: ["schedule_id"]
+            isOneToOne: false
+            referencedRelation: "medical_exam_schedules"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      medical_exam_schedules: {
+        Row: {
+          clinic_address: string | null
+          clinic_name: string | null
+          clinic_phone: string | null
+          created_at: string
+          created_by: string | null
+          doctor_name: string | null
+          employee_id: string
+          exam_id: string | null
+          exam_type: string
+          id: string
+          notes: string | null
+          organization_id: string
+          reminder_sent_at: string | null
+          scheduled_at: string
+          status: string
+          updated_at: string
+        }
+        Insert: {
+          clinic_address?: string | null
+          clinic_name?: string | null
+          clinic_phone?: string | null
+          created_at?: string
+          created_by?: string | null
+          doctor_name?: string | null
+          employee_id: string
+          exam_id?: string | null
+          exam_type: string
+          id?: string
+          notes?: string | null
+          organization_id: string
+          reminder_sent_at?: string | null
+          scheduled_at: string
+          status?: string
+          updated_at?: string
+        }
+        Update: {
+          clinic_address?: string | null
+          clinic_name?: string | null
+          clinic_phone?: string | null
+          created_at?: string
+          created_by?: string | null
+          doctor_name?: string | null
+          employee_id?: string
+          exam_id?: string | null
+          exam_type?: string
+          id?: string
+          notes?: string | null
+          organization_id?: string
+          reminder_sent_at?: string | null
+          scheduled_at?: string
+          status?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "medical_exam_schedules_employee_id_fkey"
+            columns: ["employee_id"]
+            isOneToOne: false
+            referencedRelation: "employees"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "medical_exam_schedules_exam_id_fkey"
+            columns: ["exam_id"]
+            isOneToOne: false
+            referencedRelation: "medical_exams"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "medical_exam_schedules_organization_id_fkey"
+            columns: ["organization_id"]
+            isOneToOne: false
+            referencedRelation: "organizations"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "medical_exam_schedules_organization_id_fkey"
+            columns: ["organization_id"]
+            isOneToOne: false
+            referencedRelation: "organizations_public"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       medical_exams: {
         Row: {
           clinic_name: string | null
@@ -7152,6 +7300,56 @@ export type Database = {
           },
         ]
       }
+      termination_checklist_items: {
+        Row: {
+          created_at: string
+          description: string | null
+          done_at: string | null
+          done_by: string | null
+          id: string
+          process_id: string
+          required: boolean
+          sort_order: number
+          status: string
+          title: string
+          updated_at: string
+        }
+        Insert: {
+          created_at?: string
+          description?: string | null
+          done_at?: string | null
+          done_by?: string | null
+          id?: string
+          process_id: string
+          required?: boolean
+          sort_order?: number
+          status?: string
+          title: string
+          updated_at?: string
+        }
+        Update: {
+          created_at?: string
+          description?: string | null
+          done_at?: string | null
+          done_by?: string | null
+          id?: string
+          process_id?: string
+          required?: boolean
+          sort_order?: number
+          status?: string
+          title?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "termination_checklist_items_process_id_fkey"
+            columns: ["process_id"]
+            isOneToOne: false
+            referencedRelation: "termination_processes"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       termination_details: {
         Row: {
           created_at: string
@@ -7242,6 +7440,169 @@ export type Database = {
             columns: ["organization_id"]
             isOneToOne: false
             referencedRelation: "organizations_public"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      termination_events: {
+        Row: {
+          actor_user_id: string | null
+          created_at: string
+          event_type: string
+          id: string
+          metadata: Json
+          process_id: string
+        }
+        Insert: {
+          actor_user_id?: string | null
+          created_at?: string
+          event_type: string
+          id?: string
+          metadata?: Json
+          process_id: string
+        }
+        Update: {
+          actor_user_id?: string | null
+          created_at?: string
+          event_type?: string
+          id?: string
+          metadata?: Json
+          process_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "termination_events_process_id_fkey"
+            columns: ["process_id"]
+            isOneToOne: false
+            referencedRelation: "termination_processes"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      termination_processes: {
+        Row: {
+          cancelled_at: string | null
+          cancelled_reason: string | null
+          completed_at: string | null
+          created_at: string
+          created_by: string | null
+          employee_id: string
+          exam_id: string | null
+          exam_schedule_id: string | null
+          id: string
+          notes: string | null
+          notice_end_date: string | null
+          notice_start_date: string | null
+          notice_type: string | null
+          organization_id: string
+          responsible_user_id: string | null
+          signature_envelope_id: string | null
+          status: string
+          termination_cause: string | null
+          termination_date: string | null
+          termination_decision: string | null
+          termination_details_id: string | null
+          termination_reason: string | null
+          updated_at: string
+        }
+        Insert: {
+          cancelled_at?: string | null
+          cancelled_reason?: string | null
+          completed_at?: string | null
+          created_at?: string
+          created_by?: string | null
+          employee_id: string
+          exam_id?: string | null
+          exam_schedule_id?: string | null
+          id?: string
+          notes?: string | null
+          notice_end_date?: string | null
+          notice_start_date?: string | null
+          notice_type?: string | null
+          organization_id: string
+          responsible_user_id?: string | null
+          signature_envelope_id?: string | null
+          status?: string
+          termination_cause?: string | null
+          termination_date?: string | null
+          termination_decision?: string | null
+          termination_details_id?: string | null
+          termination_reason?: string | null
+          updated_at?: string
+        }
+        Update: {
+          cancelled_at?: string | null
+          cancelled_reason?: string | null
+          completed_at?: string | null
+          created_at?: string
+          created_by?: string | null
+          employee_id?: string
+          exam_id?: string | null
+          exam_schedule_id?: string | null
+          id?: string
+          notes?: string | null
+          notice_end_date?: string | null
+          notice_start_date?: string | null
+          notice_type?: string | null
+          organization_id?: string
+          responsible_user_id?: string | null
+          signature_envelope_id?: string | null
+          status?: string
+          termination_cause?: string | null
+          termination_date?: string | null
+          termination_decision?: string | null
+          termination_details_id?: string | null
+          termination_reason?: string | null
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "termination_processes_employee_id_fkey"
+            columns: ["employee_id"]
+            isOneToOne: false
+            referencedRelation: "employees"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "termination_processes_exam_id_fkey"
+            columns: ["exam_id"]
+            isOneToOne: false
+            referencedRelation: "medical_exams"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "termination_processes_exam_schedule_id_fkey"
+            columns: ["exam_schedule_id"]
+            isOneToOne: false
+            referencedRelation: "medical_exam_schedules"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "termination_processes_organization_id_fkey"
+            columns: ["organization_id"]
+            isOneToOne: false
+            referencedRelation: "organizations"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "termination_processes_organization_id_fkey"
+            columns: ["organization_id"]
+            isOneToOne: false
+            referencedRelation: "organizations_public"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "termination_processes_signature_envelope_id_fkey"
+            columns: ["signature_envelope_id"]
+            isOneToOne: false
+            referencedRelation: "signature_envelopes"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "termination_processes_termination_details_id_fkey"
+            columns: ["termination_details_id"]
+            isOneToOne: false
+            referencedRelation: "termination_details"
             referencedColumns: ["id"]
           },
         ]
