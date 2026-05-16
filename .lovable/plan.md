@@ -1,115 +1,113 @@
 
-# Governança de Dados — RH AXIS
+# Plano — Evolução RHAXIS (Coalize/Quark/ATA Renata-Frederico)
 
-Pacote completo de Data Governance no padrão IRIS, adaptado à sensibilidade trabalhista (colaboradores, candidatos, folha, ponto, documentos, PDI, avaliações).
+## Princípios
 
-## Estado atual (preservado)
+- **Não recriar nada**. Auditar antes de criar: já existem `time_tracking`, `ponto_registros`, `time_entries`, `auditoria_ponto`, `justificativas_ponto`, `organization_locations`, `EmployeeOnboarding`, `pending_employees`, `documents`, `company-documents`, `payroll`, `payment-schedule`, `culture`, `governance`, `audit`. Tudo isso é evoluído, não duplicado.
+- **Preservar** AppSidebar, identidade visual, rotas e RLS atuais.
+- **RLS obrigatória** em toda tabela nova, sempre por `organization_id` usando `has_org_permission(auth.uid(), organization_id, '<perm>')` (padrão já consolidado no projeto, ex.: governança).
+- **Ações críticas via Edge Functions** com validação JWT, Zod e auditoria.
+- **Eventos brutos imutáveis** (append-only); ajustes em tabelas separadas.
+- Entrega faseada — cada fase é mergeable e funcional isoladamente.
 
-Já existe e será reaproveitado, **sem quebra**:
-- `audit_log` (com `organization_id`, `is_sensitive`, RLS por admin) → será **ampliado**, não substituído
-- `lgpd_requests` (formulário público) → será **ampliado** com campos de fluxo interno
-- `permission_audit_log` → mantido
-- Página `/audit` e `/lgpd` → mantidas, links integrados na nova área
-- RLS multi-tenant via `has_org_role`, `has_org_permission`, `is_same_org`, `get_user_organization` → todas as novas policies seguem o mesmo padrão
-- Buckets `employee-documents`, `resumes`, `pdi-attachments`, `justificativa-anexos` → não alterados
+---
 
-## Nova área: Governança de Dados
+## FASE 1 — Base de frequência multicanal, centros de custo e eventos imutáveis
 
-**Rota**: `/data-governance` (protegida via `AdminRoute` + permissão `governance.access`)
-**Acesso**: Owner, Admin, People Admin, ou role com permissão `governance.access` explicitamente atribuída.
-**Entrada na navegação**: novo item no menu lateral em **Configurações da Organização** → "Governança de Dados".
+**Cadastro estrutural (Cadastro)**
+- `cost_centers` (code, name, cnpj, responsible_id, address, active) — nova página `/cost-centers`.
+- `legal_entities` (CNPJs operacionais) — usado por folha/AFD.
+- Estender `organization_locations` ligando a `cost_center_id` e `legal_entity_id` (não duplicar — já existe).
+- FKs opcionais em `employees`, `departments`, `work_schedules`, `payroll`, dispositivos.
 
-Layout: shadcn `Tabs` no padrão da IRIS, com 8 abas:
+**Dispositivos de ponto (DP > Gestão de Ponto > Dispositivos)**
+- `time_clock_devices` (provider, model, serial, device_type, integration_mode, status, last_sync_at, metadata).
+- `time_clock_device_tokens` (token cifrado, escopo, expiração) — service role only.
+- `time_clock_sync_logs` (sync_status, eventos, erros).
+- Nova aba dentro de `TimeTracking.tsx` (não nova rota).
 
-1. **Visão Geral** — cards de KPIs reais (queries agregadas, sem mocks)
-2. **Exportações** — JSON por escopo + por titular
-3. **Auditoria** — leitor de `audit_log` ampliado com filtros e severidade
-4. **Retenção & Exclusão** — políticas e jobs de retenção
-5. **Conformidade** — relatório consolidado exportável
-6. **Pedidos dos Titulares** — fluxo LGPD ampliado
-7. **Consentimentos** — base legal por colaborador/candidato
-8. **Políticas** — configuração granular por org
+**Ledger imutável**
+- `time_clock_raw_events` append-only: RLS sem UPDATE/DELETE; trigger BEFORE UPDATE/DELETE que lança exceção.
+- Campos: source, source_event_id (unique p/ idempotência), event_time, received_at, direction, raw_payload jsonb, gps, photo_url, biometric_match_status, hash.
 
-## Mudanças de banco (migration única, RLS ativa em todas)
+**Importador AFD/CSV/TXT**
+- Edge Function `time-clock-import` (upload p/ bucket privado `time-clock-imports`, parse AFD/CSV, mapeia matrícula→employee_id, grava raw_events, retorna relatório).
+- UI: aba "Importação AFD" em Dispositivos.
 
-### Novas tabelas
-- `data_exports` — `id, organization_id, requested_by, scope[] (text[]), subject_type, subject_id, status (pending|processing|completed|failed|expired), format (json), file_url, file_size_bytes, expires_at (default now()+7d), created_at, completed_at, error_message, metadata jsonb`
-- `data_subject_requests` — fluxo interno (estende `lgpd_requests`): `id, organization_id, request_id (FK lgpd_requests, nullable), subject_type (employee|candidate|external), subject_id, request_kind (access|rectification|portability|anonymization|deletion|restriction|consent_revocation|review), status (received|in_review|in_progress|awaiting_subject|resolved|rejected), priority (low|med|high|urgent), assigned_to, due_at, resolution_notes, history jsonb[], created_at, updated_at`
-- `data_consents` — `id, organization_id, subject_type (employee|candidate), subject_id, purpose (talent_pool|ai_profiling|marketing|behavioral_test|document_processing|evaluation|...), consent_status (granted|revoked|pending|not_required), legal_basis (consent|contract|legal_obligation|legitimate_interest|...), consent_source, consent_given_at, consent_revoked_at, data_origin, ai_processing_allowed bool, talent_pool_opt_in bool, privacy_notes, created_at, updated_at`
-- `data_governance_policies` — `organization_id (PK), candidate_retention_days (default 730), terminated_employee_retention_days (default 1825 = 5 anos por CLT), document_retention_days, export_link_ttl_days (default 7), document_access_logging bool, ai_recruitment_policy text, dsr_response_sla_days (default 15), data_classification_required bool, sensitive_export_requires_2fa bool, updated_at, updated_by`
-- `data_classifications` — `id, organization_id, resource_type, resource_id, classification (public|internal|confidential|sensitive|legal_obligation), retention_until, classified_by, created_at` (índice por resource_type+resource_id)
-- `retention_jobs` — `id, organization_id, target_table, target_id, action (anonymize|delete|archive), scheduled_for, executed_at, status, executed_by`
+**Apuração derivada**
+- Edge Function `time-clock-process` que transforma `time_clock_raw_events` em `time_entries` (existente) — gera `time_inconsistencies` em conflito, nunca sobrescreve.
+- Marca `time_entries.source_raw_event_id` (nova coluna nullable).
 
-### Ampliação de tabelas existentes
-- `lgpd_requests`: adicionar `organization_id`, `status`, `assigned_to`, `due_at`, `updated_at` (nullable, sem quebrar RLS pública de insert)
-- `audit_log`: adicionar `severity` (info|warn|critical, default info), `previous_values jsonb`, `new_values jsonb` (mantém `changes` para retrocompat)
+## FASE 2 — Inconsistências, calendário e fechamento
 
-### Permissões (linha em `permissions`)
-`governance.access`, `governance.export`, `governance.audit_view`, `governance.policies_manage`, `governance.dsr_manage`, `governance.consent_manage`, `governance.retention_manage` — atribuídas por padrão a `admin` e `people` (via `seed_org_roles` ajustado e backfill para orgs existentes).
+- `operational_calendars`, `operational_calendar_days`, `holiday_exceptions` por `cost_center_id` (feriado conta/não conta). Integra com `journey-config` e `work-schedules` existentes.
+- `time_inconsistencies` (type enum, severity, status, responsible_id, due_date, recommendation, linked_pending_task_id). Página `/time-inconsistencies` em DP.
+- **Reuso** de `useJustificativasPonto` — inconsistência gera justificativa; aprovação atualiza apuração derivada + banco de horas, **sem tocar** raw_event.
+- `pending_tasks` (módulos: time_tracking, vacation, documents, contracts, onboarding, inconsistencies, bank_hours, payroll_notes). Widget no Portal do Colaborador e Portal do Gestor.
 
-### RLS (todas as novas tabelas)
-Padrão: `SELECT` exige `has_org_permission(auth.uid(), organization_id, 'governance.access')`. Mutations exigem permissão específica (`governance.export`, `governance.policies_manage`, etc.). `data_consents` do próprio titular: leitura permitida ao `auth.uid() = subject_id` quando `subject_type='employee'`.
+## FASE 3 — Apontamentos da folha, benefícios, exportações
 
-## Edge Functions (novas, todas com `verify_jwt` validado em código + CORS + Zod)
+- `payroll_periods`, `payroll_events`, `payroll_closing_runs` — agregam faltas/HE/adicional/banco/férias/afastamento/benefícios/ajustes aprovados.
+- Página `/payroll-events` em DP > Apontamentos da Folha (resumo entra em `Payroll.tsx` existente, sem duplicar folha).
+- `benefits_calculation_runs`, `employee_benefit_calculations` (VT/VR) com simulação + ajuste manual auditado.
+- **Central de Exportações** `/exports`: `report_exports` (formato, filtros jsonb, status, file_path, expires_at). Edge Function `report-export-run` para geração assíncrona (AFD/AEJ/AFDT/TXT/CSV/XLSX/PDF). Reusa bucket `governance-exports` ou novo `report-exports`.
 
-- `governance-export` — recebe `{ organization_id, scope[], subject_type?, subject_id?, include_files? (default false) }`. Valida sessão, membership, permissão `governance.export`. Cria `data_exports` (status pending), monta JSON por escopo respeitando RLS via service role + filtro explícito `organization_id`, sobe arquivo no bucket privado `governance-exports` (novo, signed URL com TTL = `export_link_ttl_days`), atualiza status, **grava `audit_log` com severity=critical**.
-- `governance-compliance-report` — gera relatório consolidado (RLS state, contagens, riscos) em JSON; opcionalmente persiste como export.
-- `governance-dsr-resolve` — transição de status do `data_subject_requests` com log de histórico e auditoria.
-- `governance-retention-run` — executa `retention_jobs` agendados (anonymize/delete) respeitando classificações `legal_obligation`. Pode ser chamado manualmente pelo admin.
-- `governance-consent-update` — registra concessão/revogação com base legal, com auditoria.
+## FASE 4 — Espelho, assinatura, admissão, holerite, documentos
 
-Novo bucket privado: **`governance-exports`** (não público, RLS por org via path prefix `<org_id>/...`).
+- `time_sheets` + `time_sheet_signatures` (status draft→signed, hash, IP, user_agent). Edge Function `time-sheet-generate` (PDF) e `time-sheet-sign`.
+- **Assinatura eletrônica transversal**: `document_signature_requests`, `document_signature_events`. Provider plugável via `Administração > Integrações` (DocuSign/ClickSign — apenas wrapper, credenciais via secrets). Usado por contratos, EPIs, espelhos, ASOs.
+- **Admissão digital**: **evoluir** `pending_employees` + `EmployeeOnboarding.tsx`. Adicionar coluna `admission_state` (draft, invited, pending_candidate, pending_hr, validating, signing, completed, cancelled) e `admission_checklist jsonb`. Botão "Iniciar admissão" no funil de seleção quando candidato aprovado.
+- **Holerite em lote**: Edge Function `payslip-batch-upload` (ZIP/PDFs nomeados por CPF/matrícula), valida, grava em `employee_documents` (existente) marcado como `category='payslip'`, status sent/viewed/acknowledged.
+- **Documentos avançado**: estender `employee_documents` com `legal_category`, `retention_until`, `expires_at`, `requires_acknowledgment`, `requires_signature`. Job de alerta de vencimento.
 
-## UI (frontend)
+## FASE 5 — Saúde ocupacional, EPIs, contador, flags, campos custom, comunicação
 
-Estrutura de arquivos:
-```
-src/pages/DataGovernance.tsx                    # shell com Tabs
-src/components/governance/
-  OverviewTab.tsx                                # cards reais via React Query
-  ExportsTab.tsx                                 # form de escopo + lista de exports
-  AuditTab.tsx                                   # tabela filtrável (reaproveita /audit)
-  RetentionTab.tsx                               # políticas + jobs agendados
-  ComplianceTab.tsx                              # relatório + botão exportar
-  DsrTab.tsx                                     # kanban/tabela de pedidos
-  ConsentsTab.tsx                                # consentimentos por titular
-  PoliciesTab.tsx                                # form de policies
-src/hooks/useGovernancePermission.ts
-```
+- `occupational_health_exams` (tipo: admissional/periódico/retorno/mudança/demissional, validade, anexo, ASO).
+- `epi_catalog`, `epi_assignments` (entrega, devolução, validade, assinatura via módulo de assinatura).
+- `module_entitlements` (org × módulo × plano). Hook `useModuleEnabled()` esconde itens no `AppSidebar` sem quebrar rotas (rotas continuam protegidas server-side).
+- **Acesso contador externo**: novo role `accountant` (escopo: relatórios fiscais + holerites + AFD). Convite expirável via `pending_employees` reuso, marcando `role_slug='accountant'`. Auditar todo acesso.
+- `custom_fields` (entity_type, field_type, required, options jsonb) + `custom_field_values`. Validação no front (Zod dinâmico) e exibição em relatórios.
+- Comunicação/avisos: `announcements` + `announcement_reads` (ciência segmentada). FAQ: `faq_articles` (categoria, audiência). Clima: `climate_surveys`, `climate_survey_responses` (anônimo), `climate_action_plans`, eNPS.
 
-- Rota lazy-loaded em `App.tsx` dentro do bloco protegido.
-- Item de menu adicionado em Configurações da Organização (não em rota pública).
-- Padrão visual: tokens semânticos do design system existente, `Tabs`, `Card`, `Badge` por severidade, sem cores hardcoded.
-- Textos UI em PT-BR (regra do projeto).
+---
 
-## Eventos críticos cobertos na auditoria
+## Mudanças no AppSidebar
 
-Hooks/funções server-side e client-side passam a registrar em `audit_log` com `severity`:
-acesso a perfil de colaborador, view/download de documento, download de currículo, alteração salarial, alteração de contrato, alteração de ponto, aprovação de justificativa, aprovação de férias/afastamento, mudança de cargo, admissão, desligamento, criação/edição de avaliação, feedback, alteração de role/permissão, convite, exclusão de colaborador, exclusão de candidato, exportação, alteração de policy.
+Apenas adicionar itens nas categorias existentes (não criar novas categorias):
+- CADASTRO: + Centros de Custo, Locais & CNPJs
+- DEPARTAMENTO PESSOAL: + Inconsistências, Apontamentos da Folha, Espelho de Ponto, Saúde Ocupacional, EPIs
+- RELATÓRIOS & DASHBOARDS: + Central de Exportações
+- ADMINISTRAÇÃO: + Feature Flags & Planos, Campos Personalizados, Acesso Contador, Avisos & Comunicação
+- GESTÃO & DESENVOLVIMENTO: + Clima Organizacional, FAQ
+- PERFIL: + Minhas Pendências, Meus Holerites, Meu Espelho de Ponto
 
-Implementação: helper `logAudit()` no front (chama RPC `insert_audit_log` que já existe) + adições nas Edge Functions críticas (`delete-employee`, `terminate-employee`, `change-user-role`, `invite-employee`, `submit-application`).
+## Permissões novas (`permissions`)
 
-## Visão Geral — fonte real dos cards
+`cost_centers.manage`, `devices.manage`, `time_raw.view`, `time_inconsistency.manage`, `payroll_events.manage`, `benefits.calculate`, `exports.run`, `timesheet.sign`, `signature.manage`, `admission.manage`, `payslip.upload`, `health.view`, `health.manage`, `epi.manage`, `module.toggle`, `accountant.access`, `custom_fields.manage`, `announcements.publish`, `climate.manage`. Atribuir ao role `admin` (todas), `people` (operacionais), `manager/coordinator` (visualização da equipe), `accountant` (apenas exports/holerites/AFD).
 
-Todos via `supabase` queries respeitando RLS:
-- Última exportação: `data_exports order by created_at desc limit 1`
-- LGPD em aberto: `data_subject_requests where status not in ('resolved','rejected')`
-- Exclusões pendentes: `retention_jobs where status='pending' and action='delete'`
-- Eventos críticos 30d: `audit_log where severity='critical' and created_at > now()-30d`
-- Status de retenção: leitura de `data_governance_policies`
-- Colaboradores ativos / candidatos em retenção / docs sensíveis / admins: counts diretos
-- Riscos: derivado do compliance-report (contagem de issues)
+## Detalhes técnicos
 
-## Conformidade — checks gerados
+- **Migrations**: uma migration por fase, idempotentes (`IF NOT EXISTS`), com RLS + policies + triggers de auditoria reusando `insert_audit_log()`.
+- **Edge Functions novas**: `time-clock-import`, `time-clock-process`, `report-export-run`, `time-sheet-generate`, `time-sheet-sign`, `signature-request`, `signature-webhook`, `payslip-batch-upload`, `benefits-calculate`, `accountant-invite`. Todas com CORS, Zod, `auth.getClaims()`, `has_org_permission()`, audit_log.
+- **Storage novos buckets privados**: `time-clock-imports`, `time-sheets`, `payslips`, `signed-documents`, `health-exams`, `epi-evidence`. Policies path-based `<org_id>/...`.
+- **Append-only**: triggers `RAISE EXCEPTION` em UPDATE/DELETE para `time_clock_raw_events`, `time_clock_sync_logs`, `audit_log`, `signature_events`.
+- **Biometria**: armazenar apenas `biometric_template_id` (externo do provedor) + consentimento em `lgpd_requests`. Nunca template bruto.
+- **View-As Collaborator** existente continua válido para QA.
+- **Sem mocks**: dashboards lêem `read_query` real; vazio = empty state.
 
-RLS habilitada em todas as tabelas org-scoped (via `pg_policies`), DSRs em atraso, docs sem classificação, candidatos > retenção, colaboradores desligados em retenção, admins inativos > 90d, exports expirados não removidos, policies não configuradas.
+## Ordem sugerida de entrega
 
-## Fora de escopo (não será feito agora)
+1. Fase 1 (base imutável) — habilita tudo.
+2. Fase 2 (inconsistências + pendências) — fecha o ciclo operacional.
+3. Fase 3 (apontamentos + exportações) — entrega valor p/ DP/Financeiro.
+4. Fase 4 (espelho + assinatura + admissão + holerite).
+5. Fase 5 (saúde, EPI, contador, flags, custom fields, comunicação).
 
-- 2FA real para exports sensíveis (apenas flag na policy; integração 2FA em fase posterior)
-- Cron automático para `retention-run` (execução manual via UI; agendamento pode ser adicionado depois)
-- Anonimização irreversível de tabelas históricas legadas — limitada às tabelas listadas
+Cada fase termina com: build OK, lint OK, linter Supabase OK, smoke test manual nos papéis admin/people/manager/colaborador/contador.
 
-## Entregáveis finais
+## Riscos / decisões a confirmar
 
-Ao concluir: relatório técnico em `docs/governance.md` com tabelas criadas, RLS aplicada, Edge Functions, permissões, eventos de auditoria cobertos e riscos remanescentes (ex.: ausência de 2FA, dependência de execução manual da retenção).
+1. **Provedor de assinatura eletrônica**: ClickSign, DocuSign, D4Sign, ou abstração para qualquer um via integração? (Default: abstração + ClickSign como primeiro adapter, por ser BR.)
+2. **Provedor REP/biometria**: precisa de adapter para algum fabricante específico (Henry, Topdata, Madis)? Ou apenas import AFD genérico nesta primeira leva?
+3. **Holerites**: PDF individual gerado pelo RHAXIS a partir de eventos de folha, ou upload em lote de PDFs prontos vindos do escritório contábil? (Recomendado: ambos.)
+4. Posso prosseguir com as 5 fases sequencialmente, abrindo cada uma para review antes da próxima?
