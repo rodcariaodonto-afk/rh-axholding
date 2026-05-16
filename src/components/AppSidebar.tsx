@@ -100,6 +100,7 @@ const menuGroups: MenuGroup[] = [
       { icon: UserCog, label: "Tipo de Perfil", href: "/profile-type" },
       { icon: Palmtree, label: "Minhas Férias", href: "/time-off", hideFor: ["admin", "people"] },
       { icon: Clock, label: "Meu Ponto", href: "/time-tracking", hideFor: ["admin", "people"] },
+      { icon: FileText, label: "Meus Holerites", href: "/my-payslips" },
     ],
   },
   {
