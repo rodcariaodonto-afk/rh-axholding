@@ -1,11 +1,12 @@
 import { useState } from "react";
+import { useNavigate, Link } from "react-router-dom";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger, DialogFooter } from "@/components/ui/dialog";
-import { Plus, Lock, CheckCircle2, FileDown } from "lucide-react";
+import { Plus, Lock, CheckCircle2, FileDown, ListChecks, Tags } from "lucide-react";
 import {
   usePayrollCompetencies,
   useCreatePayrollCompetency,
