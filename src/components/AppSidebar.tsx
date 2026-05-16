@@ -170,6 +170,8 @@ const menuGroups: MenuGroup[] = [
       { icon: FileText, label: "Recibos (EPI, Vale, Uniforme)", href: "/receipts" },
     ],
   },
+  {
+    label: "RELATÓRIOS & DASHBOARDS",
     showFor: "people",
     items: [
       { icon: LayoutDashboard, label: "Dashboard", href: "/dashboard" },
