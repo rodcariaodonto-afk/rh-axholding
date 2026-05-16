@@ -12,7 +12,8 @@ import { useUserRole } from "@/hooks/useUserRole";
 import { Skeleton } from "@/components/ui/skeleton";
 import { format } from "date-fns";
 import { ptBR } from "date-fns/locale";
-import { Pencil, Trash2, MoreHorizontal, UserMinus, Search } from "lucide-react";
+import { Pencil, Trash2, MoreHorizontal, UserMinus, Search, Workflow } from "lucide-react";
+import { Link } from "react-router-dom";
 import {
   DropdownMenu,
   DropdownMenuContent,
