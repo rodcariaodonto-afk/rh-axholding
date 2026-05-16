@@ -25,6 +25,7 @@ const STATUS_LABEL: Record<string, { label: string; variant: any }> = {
 };
 
 export default function PayrollCompetencies() {
+  const navigate = useNavigate();
   const { data: comps = [], isLoading } = usePayrollCompetencies();
   const create = useCreatePayrollCompetency();
   const updateStatus = useUpdateCompetencyStatus();
