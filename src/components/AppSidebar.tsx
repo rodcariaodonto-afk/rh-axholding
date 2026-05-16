@@ -124,7 +124,10 @@ const menuGroups: MenuGroup[] = [
     showFor: "people",
     items: [
       { icon: Landmark, label: "Dados Trabalhistas", href: "/labor-data" },
+      { icon: Building2, label: "Filiais (CNPJ)", href: "/legal-entities" },
+      { icon: Briefcase, label: "Centros de Custo", href: "/cost-centers" },
       { icon: Clock, label: "Gestão de Ponto", href: "/time-tracking" },
+      { icon: Clock, label: "Dispositivos de Ponto", href: "/time-clock-devices" },
       { icon: Palmtree, label: "Gestão de Férias", href: "/time-off" },
       { icon: CalendarClock, label: "Escalas", href: "/work-schedules" },
       { icon: ClipboardCheck, label: "Parametrização de Jornada", href: "/journey-config" },
