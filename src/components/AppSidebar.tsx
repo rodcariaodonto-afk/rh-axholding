@@ -162,7 +162,14 @@ const menuGroups: MenuGroup[] = [
     ],
   },
   {
-    label: "RELATÓRIOS & DASHBOARDS",
+    label: "ADMISSÃO & SAÚDE OCUPACIONAL",
+    showFor: "people",
+    items: [
+      { icon: UserPlus, label: "Onboarding Digital", href: "/onboarding-processes" },
+      { icon: ClipboardCheck, label: "ASO — Exames Ocupacionais", href: "/medical-exams" },
+      { icon: FileText, label: "Recibos (EPI, Vale, Uniforme)", href: "/receipts" },
+    ],
+  },
     showFor: "people",
     items: [
       { icon: LayoutDashboard, label: "Dashboard", href: "/dashboard" },
