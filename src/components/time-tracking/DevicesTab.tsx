@@ -212,7 +212,7 @@ export function DevicesTab() {
                   <SelectTrigger><SelectValue placeholder="—" /></SelectTrigger>
                   <SelectContent>
                     <SelectItem value="none">—</SelectItem>
-                    {locations.map((loc) => <SelectItem key={loc.id} value={loc.id}>{loc.name}</SelectItem>)}
+                    {locations.map((loc: { id: string; name: string }) => <SelectItem key={loc.id} value={loc.id}>{loc.name}</SelectItem>)}
                   </SelectContent>
                 </Select>
               </div>
