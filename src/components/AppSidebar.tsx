@@ -26,6 +26,7 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { useAuth } from "@/hooks/useAuth";
 import { useUserRole } from "@/hooks/useUserRole";
+import { usePlatformAdmin } from "@/hooks/usePlatformAdmin";
 import { useUserOrganizations } from "@/hooks/useUserOrganizations";
 import {
   Package,
@@ -207,9 +208,20 @@ const menuGroups: MenuGroup[] = [
   },
 ];
 
+const platformAdminGroup: MenuGroup = {
+  label: "AXIS ADMIN",
+  showFor: "all",
+  items: [
+    { icon: Building2, label: "Clientes", href: "/admin/clientes" },
+    { icon: Package, label: "Planos SaaS", href: "/admin/planos" },
+    { icon: FileText, label: "Auditoria Global", href: "/admin/auditoria-global" },
+  ],
+};
+
 export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
   const { user, signOut } = useAuth();
   const { isAdmin, isPeople, realIsAdmin, realIsPeople } = useUserRole(user?.id);
+  const { isPlatformAdmin } = usePlatformAdmin();
   const { isViewingAsCollaborator, toggleViewAsCollaborator } = useViewAs();
   const { data: userOrganizations = [] } = useUserOrganizations(user?.id);
   const location = useLocation();
@@ -382,7 +394,7 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
           )}
         </div>
 
-        {menuGroups.map((group) => {
+        {[...menuGroups, ...(isPlatformAdmin ? [platformAdminGroup] : [])].map((group) => {
           if (!canShowGroup(group)) return null;
           
           const visibleItems = filterItems(group.items.filter(canShowItem));
