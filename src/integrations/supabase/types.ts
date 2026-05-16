@@ -1448,6 +1448,45 @@ export type Database = {
           },
         ]
       }
+      document_templates: {
+        Row: {
+          body_html: string | null
+          created_at: string
+          created_by: string | null
+          id: string
+          is_active: boolean
+          kind: Database["public"]["Enums"]["document_kind"]
+          name: string
+          organization_id: string
+          updated_at: string
+          variables: Json | null
+        }
+        Insert: {
+          body_html?: string | null
+          created_at?: string
+          created_by?: string | null
+          id?: string
+          is_active?: boolean
+          kind: Database["public"]["Enums"]["document_kind"]
+          name: string
+          organization_id: string
+          updated_at?: string
+          variables?: Json | null
+        }
+        Update: {
+          body_html?: string | null
+          created_at?: string
+          created_by?: string | null
+          id?: string
+          is_active?: boolean
+          kind?: Database["public"]["Enums"]["document_kind"]
+          name?: string
+          organization_id?: string
+          updated_at?: string
+          variables?: Json | null
+        }
+        Relationships: []
+      }
       employee_changes: {
         Row: {
           changed_by: string
@@ -2924,6 +2963,91 @@ export type Database = {
           },
         ]
       }
+      hr_documents: {
+        Row: {
+          competency_id: string | null
+          created_at: string
+          created_by: string | null
+          employee_id: string
+          file_mime: string | null
+          file_path: string | null
+          file_size_bytes: number | null
+          id: string
+          kind: Database["public"]["Enums"]["document_kind"]
+          metadata: Json | null
+          organization_id: string
+          requires_signature: boolean
+          signature_envelope_id: string | null
+          signed_at: string | null
+          status: Database["public"]["Enums"]["document_status"]
+          template_id: string | null
+          title: string
+          updated_at: string
+        }
+        Insert: {
+          competency_id?: string | null
+          created_at?: string
+          created_by?: string | null
+          employee_id: string
+          file_mime?: string | null
+          file_path?: string | null
+          file_size_bytes?: number | null
+          id?: string
+          kind: Database["public"]["Enums"]["document_kind"]
+          metadata?: Json | null
+          organization_id: string
+          requires_signature?: boolean
+          signature_envelope_id?: string | null
+          signed_at?: string | null
+          status?: Database["public"]["Enums"]["document_status"]
+          template_id?: string | null
+          title: string
+          updated_at?: string
+        }
+        Update: {
+          competency_id?: string | null
+          created_at?: string
+          created_by?: string | null
+          employee_id?: string
+          file_mime?: string | null
+          file_path?: string | null
+          file_size_bytes?: number | null
+          id?: string
+          kind?: Database["public"]["Enums"]["document_kind"]
+          metadata?: Json | null
+          organization_id?: string
+          requires_signature?: boolean
+          signature_envelope_id?: string | null
+          signed_at?: string | null
+          status?: Database["public"]["Enums"]["document_status"]
+          template_id?: string | null
+          title?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "hr_documents_competency_id_fkey"
+            columns: ["competency_id"]
+            isOneToOne: false
+            referencedRelation: "payroll_competencies"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "hr_documents_signature_envelope_fkey"
+            columns: ["signature_envelope_id"]
+            isOneToOne: false
+            referencedRelation: "signature_envelopes"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "hr_documents_template_id_fkey"
+            columns: ["template_id"]
+            isOneToOne: false
+            referencedRelation: "document_templates"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       import_logs: {
         Row: {
           created_at: string
@@ -4267,6 +4391,81 @@ export type Database = {
           },
         ]
       }
+      payslips: {
+        Row: {
+          ack_status: Database["public"]["Enums"]["payslip_ack_status"]
+          acknowledged_at: string | null
+          competency_id: string | null
+          created_at: string
+          created_by: string | null
+          employee_id: string
+          file_path: string
+          file_size_bytes: number | null
+          gross_amount: number | null
+          id: string
+          net_amount: number | null
+          organization_id: string
+          published_at: string
+          signature_envelope_id: string | null
+          source: Database["public"]["Enums"]["payslip_source"]
+          updated_at: string
+          viewed_at: string | null
+        }
+        Insert: {
+          ack_status?: Database["public"]["Enums"]["payslip_ack_status"]
+          acknowledged_at?: string | null
+          competency_id?: string | null
+          created_at?: string
+          created_by?: string | null
+          employee_id: string
+          file_path: string
+          file_size_bytes?: number | null
+          gross_amount?: number | null
+          id?: string
+          net_amount?: number | null
+          organization_id: string
+          published_at?: string
+          signature_envelope_id?: string | null
+          source?: Database["public"]["Enums"]["payslip_source"]
+          updated_at?: string
+          viewed_at?: string | null
+        }
+        Update: {
+          ack_status?: Database["public"]["Enums"]["payslip_ack_status"]
+          acknowledged_at?: string | null
+          competency_id?: string | null
+          created_at?: string
+          created_by?: string | null
+          employee_id?: string
+          file_path?: string
+          file_size_bytes?: number | null
+          gross_amount?: number | null
+          id?: string
+          net_amount?: number | null
+          organization_id?: string
+          published_at?: string
+          signature_envelope_id?: string | null
+          source?: Database["public"]["Enums"]["payslip_source"]
+          updated_at?: string
+          viewed_at?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "payslips_competency_id_fkey"
+            columns: ["competency_id"]
+            isOneToOne: false
+            referencedRelation: "payroll_competencies"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "payslips_signature_envelope_id_fkey"
+            columns: ["signature_envelope_id"]
+            isOneToOne: false
+            referencedRelation: "signature_envelopes"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       pdi_action_plans: {
         Row: {
           action: string
@@ -5449,6 +5648,130 @@ export type Database = {
             columns: ["position_id"]
             isOneToOne: false
             referencedRelation: "positions"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      signature_envelope_signers: {
+        Row: {
+          created_at: string
+          email: string
+          envelope_id: string
+          full_name: string
+          id: string
+          organization_id: string
+          provider_signer_id: string | null
+          role: string | null
+          signed_at: string | null
+          signing_order: number | null
+          signing_url: string | null
+          status: Database["public"]["Enums"]["signer_status"]
+          updated_at: string
+          user_id: string | null
+        }
+        Insert: {
+          created_at?: string
+          email: string
+          envelope_id: string
+          full_name: string
+          id?: string
+          organization_id: string
+          provider_signer_id?: string | null
+          role?: string | null
+          signed_at?: string | null
+          signing_order?: number | null
+          signing_url?: string | null
+          status?: Database["public"]["Enums"]["signer_status"]
+          updated_at?: string
+          user_id?: string | null
+        }
+        Update: {
+          created_at?: string
+          email?: string
+          envelope_id?: string
+          full_name?: string
+          id?: string
+          organization_id?: string
+          provider_signer_id?: string | null
+          role?: string | null
+          signed_at?: string | null
+          signing_order?: number | null
+          signing_url?: string | null
+          status?: Database["public"]["Enums"]["signer_status"]
+          updated_at?: string
+          user_id?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "signature_envelope_signers_envelope_id_fkey"
+            columns: ["envelope_id"]
+            isOneToOne: false
+            referencedRelation: "signature_envelopes"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      signature_envelopes: {
+        Row: {
+          created_at: string
+          created_by: string | null
+          deadline_at: string | null
+          document_id: string | null
+          finished_at: string | null
+          id: string
+          message: string | null
+          metadata: Json | null
+          organization_id: string
+          provider: Database["public"]["Enums"]["signature_provider"]
+          provider_envelope_id: string | null
+          sent_at: string | null
+          status: Database["public"]["Enums"]["signature_envelope_status"]
+          subject: string | null
+          updated_at: string
+          webhook_payload: Json | null
+        }
+        Insert: {
+          created_at?: string
+          created_by?: string | null
+          deadline_at?: string | null
+          document_id?: string | null
+          finished_at?: string | null
+          id?: string
+          message?: string | null
+          metadata?: Json | null
+          organization_id: string
+          provider?: Database["public"]["Enums"]["signature_provider"]
+          provider_envelope_id?: string | null
+          sent_at?: string | null
+          status?: Database["public"]["Enums"]["signature_envelope_status"]
+          subject?: string | null
+          updated_at?: string
+          webhook_payload?: Json | null
+        }
+        Update: {
+          created_at?: string
+          created_by?: string | null
+          deadline_at?: string | null
+          document_id?: string | null
+          finished_at?: string | null
+          id?: string
+          message?: string | null
+          metadata?: Json | null
+          organization_id?: string
+          provider?: Database["public"]["Enums"]["signature_provider"]
+          provider_envelope_id?: string | null
+          sent_at?: string | null
+          status?: Database["public"]["Enums"]["signature_envelope_status"]
+          subject?: string | null
+          updated_at?: string
+          webhook_payload?: Json | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "signature_envelopes_document_id_fkey"
+            columns: ["document_id"]
+            isOneToOne: false
+            referencedRelation: "hr_documents"
             referencedColumns: ["id"]
           },
         ]
@@ -7278,6 +7601,24 @@ export type Database = {
         | "cable"
         | "charger"
         | "other"
+      document_kind:
+        | "contrato_admissao"
+        | "aditivo"
+        | "distrato"
+        | "recibo"
+        | "ferias"
+        | "advertencia"
+        | "declaracao"
+        | "procuracao"
+        | "politica"
+        | "outro"
+      document_status:
+        | "rascunho"
+        | "aguardando_assinatura"
+        | "assinado"
+        | "recusado"
+        | "arquivado"
+        | "expirado"
       education_level:
         | "elementary"
         | "high_school"
@@ -7354,6 +7695,8 @@ export type Database = {
         | "paga"
         | "cancelada"
       payroll_event_kind: "provento" | "desconto" | "informativo" | "base"
+      payslip_ack_status: "pending" | "viewed" | "acknowledged" | "signed"
+      payslip_source: "internal_generated" | "batch_upload" | "external"
       pdi_goal_status: "pendente" | "em_andamento" | "concluida"
       pdi_goal_type: "tecnico" | "comportamental" | "lideranca" | "carreira"
       pdi_status:
@@ -7389,6 +7732,21 @@ export type Database = {
         | "senior"
         | "especialista"
         | "lider"
+      signature_envelope_status:
+        | "draft"
+        | "sent"
+        | "partially_signed"
+        | "signed"
+        | "refused"
+        | "cancelled"
+        | "expired"
+      signature_provider:
+        | "clicksign"
+        | "d4sign"
+        | "zapsign"
+        | "docusign"
+        | "manual"
+      signer_status: "pending" | "signed" | "refused" | "expired"
       termination_cause:
         | "recebimento_proposta"
         | "baixo_desempenho"
@@ -7656,6 +8014,26 @@ export const Constants = {
         "charger",
         "other",
       ],
+      document_kind: [
+        "contrato_admissao",
+        "aditivo",
+        "distrato",
+        "recibo",
+        "ferias",
+        "advertencia",
+        "declaracao",
+        "procuracao",
+        "politica",
+        "outro",
+      ],
+      document_status: [
+        "rascunho",
+        "aguardando_assinatura",
+        "assinado",
+        "recusado",
+        "arquivado",
+        "expirado",
+      ],
       education_level: [
         "elementary",
         "high_school",
@@ -7741,6 +8119,8 @@ export const Constants = {
         "cancelada",
       ],
       payroll_event_kind: ["provento", "desconto", "informativo", "base"],
+      payslip_ack_status: ["pending", "viewed", "acknowledged", "signed"],
+      payslip_source: ["internal_generated", "batch_upload", "external"],
       pdi_goal_status: ["pendente", "em_andamento", "concluida"],
       pdi_goal_type: ["tecnico", "comportamental", "lideranca", "carreira"],
       pdi_status: [
@@ -7780,6 +8160,23 @@ export const Constants = {
         "especialista",
         "lider",
       ],
+      signature_envelope_status: [
+        "draft",
+        "sent",
+        "partially_signed",
+        "signed",
+        "refused",
+        "cancelled",
+        "expired",
+      ],
+      signature_provider: [
+        "clicksign",
+        "d4sign",
+        "zapsign",
+        "docusign",
+        "manual",
+      ],
+      signer_status: ["pending", "signed", "refused", "expired"],
       termination_cause: [
         "recebimento_proposta",
         "baixo_desempenho",

@@ -5,3 +5,5 @@ project_id = "icggemcoeiwbhtgekkby"
     verify_jwt = false
   [functions.chat]
     verify_jwt = false
+  [functions.signature-webhook]
+    verify_jwt = false

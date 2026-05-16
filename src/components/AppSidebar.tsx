@@ -100,6 +100,7 @@ const menuGroups: MenuGroup[] = [
       { icon: UserCog, label: "Tipo de Perfil", href: "/profile-type" },
       { icon: Palmtree, label: "Minhas Férias", href: "/time-off", hideFor: ["admin", "people"] },
       { icon: Clock, label: "Meu Ponto", href: "/time-tracking", hideFor: ["admin", "people"] },
+      { icon: FileText, label: "Meus Holerites", href: "/my-payslips" },
     ],
   },
   {
@@ -175,6 +176,7 @@ const menuGroups: MenuGroup[] = [
     items: [
       { icon: FileText, label: "Folha de Pagamento", href: "/payroll" },
       { icon: FileText, label: "Competências (Folha)", href: "/payroll-competencies" },
+      { icon: FileText, label: "Holerites", href: "/payslips" },
       { icon: CreditCard, label: "Programação de Pagamento", href: "/payment-schedule" },
       { icon: DollarSign, label: "Custos", href: "/company-costs" },
       { icon: FileStack, label: "Central de Exportações", href: "/exports" },
