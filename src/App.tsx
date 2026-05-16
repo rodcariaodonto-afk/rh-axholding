@@ -105,6 +105,8 @@ const TimeClockDevices = lazy(() => import("./pages/TimeClockDevices"));
 const TimeInconsistencies = lazy(() => import("./pages/TimeInconsistencies"));
 const MyTasks = lazy(() => import("./pages/MyTasks"));
 const PayrollCompetencies = lazy(() => import("./pages/PayrollCompetencies"));
+const PayrollCompetencyDetail = lazy(() => import("./pages/PayrollCompetencyDetail"));
+const PayrollRubrics = lazy(() => import("./pages/PayrollRubrics"));
 const Exports = lazy(() => import("./pages/Exports"));
 const MyPayslips = lazy(() => import("./pages/MyPayslips"));
 const PayslipsManage = lazy(() => import("./pages/PayslipsManage"));
@@ -311,6 +313,8 @@ const App = () => (
             <Route path="/time-inconsistencies" element={<PeopleRoute><TimeInconsistencies /></PeopleRoute>} />
             <Route path="/my-tasks" element={<MyTasks />} />
             <Route path="/payroll-competencies" element={<PeopleRoute><PayrollCompetencies /></PeopleRoute>} />
+            <Route path="/payroll-competencies/:id" element={<PeopleRoute><PayrollCompetencyDetail /></PeopleRoute>} />
+            <Route path="/payroll-rubrics" element={<PeopleRoute><PayrollRubrics /></PeopleRoute>} />
             <Route path="/exports" element={<PeopleRoute><Exports /></PeopleRoute>} />
             <Route path="/my-payslips" element={<MyPayslips />} />
             <Route path="/payslips" element={<PeopleRoute><PayslipsManage /></PeopleRoute>} />
