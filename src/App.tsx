@@ -48,6 +48,9 @@ const TalentBankApplication = lazy(() => import("./pages/TalentBankApplication")
 const Vagas = lazy(() => import("./pages/Vagas"));
 const JobDetailPage = lazy(() => import("./pages/JobDetailPage"));
 const JobFormPage = lazy(() => import("./pages/JobFormPage"));
+const EpiCatalog = lazy(() => import("./pages/EpiCatalog"));
+const EpiDeliveries = lazy(() => import("./pages/EpiDeliveries"));
+const AssetsPage = lazy(() => import("./pages/AssetsPage"));
 const JobApplicationPage = lazy(() => import("./pages/JobApplicationPage"));
 const CareersPage = lazy(() => import("./pages/CareersPage"));
 const Feedbacks = lazy(() => import("./pages/Feedbacks"));
@@ -321,6 +324,9 @@ const App = () => (
             <Route path="/onboarding-processes" element={<PeopleRoute><OnboardingProcesses /></PeopleRoute>} />
             <Route path="/medical-exams" element={<PeopleRoute><MedicalExams /></PeopleRoute>} />
             <Route path="/receipts" element={<PeopleRoute><Receipts /></PeopleRoute>} />
+            <Route path="/epis" element={<PeopleRoute><EpiCatalog /></PeopleRoute>} />
+            <Route path="/epis/entregas" element={<PeopleRoute><EpiDeliveries /></PeopleRoute>} />
+            <Route path="/patrimonio" element={<PeopleRoute><AssetsPage /></PeopleRoute>} />
             <Route path="/admin/clientes" element={<AdminClients />} />
             <Route path="/admin/clientes/novo" element={<AdminNewClient />} />
             <Route path="/admin/clientes/:id" element={<AdminClientDetail />} />
