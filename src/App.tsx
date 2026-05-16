@@ -256,6 +256,8 @@ const App = () => (
             <Route path="/import-csv" element={<ImportCSV />} />
             <Route path="/culture" element={<Culture />} />
             <Route path="/terminations" element={<Terminations />} />
+            <Route path="/terminations/processes" element={<PeopleRoute><TerminationProcesses /></PeopleRoute>} />
+            <Route path="/terminations/processes/:id" element={<PeopleRoute><TerminationProcessDetail /></PeopleRoute>} />
             <Route path="/time-off" element={<TimeOff />} />
             <Route path="/talent-bank" element={<TalentBank />} />
             <Route path="/vagas" element={<Vagas />} />
