@@ -3668,6 +3668,85 @@ export type Database = {
           },
         ]
       }
+      medical_exams: {
+        Row: {
+          clinic_name: string | null
+          created_at: string
+          created_by: string | null
+          doctor_crm: string | null
+          doctor_name: string | null
+          employee_id: string
+          exam_date: string
+          exam_type: string
+          file_path: string | null
+          id: string
+          notes: string | null
+          organization_id: string
+          restrictions: string | null
+          result: string | null
+          updated_at: string
+          valid_until: string | null
+        }
+        Insert: {
+          clinic_name?: string | null
+          created_at?: string
+          created_by?: string | null
+          doctor_crm?: string | null
+          doctor_name?: string | null
+          employee_id: string
+          exam_date: string
+          exam_type: string
+          file_path?: string | null
+          id?: string
+          notes?: string | null
+          organization_id: string
+          restrictions?: string | null
+          result?: string | null
+          updated_at?: string
+          valid_until?: string | null
+        }
+        Update: {
+          clinic_name?: string | null
+          created_at?: string
+          created_by?: string | null
+          doctor_crm?: string | null
+          doctor_name?: string | null
+          employee_id?: string
+          exam_date?: string
+          exam_type?: string
+          file_path?: string | null
+          id?: string
+          notes?: string | null
+          organization_id?: string
+          restrictions?: string | null
+          result?: string | null
+          updated_at?: string
+          valid_until?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "medical_exams_employee_id_fkey"
+            columns: ["employee_id"]
+            isOneToOne: false
+            referencedRelation: "employees"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "medical_exams_organization_id_fkey"
+            columns: ["organization_id"]
+            isOneToOne: false
+            referencedRelation: "organizations"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "medical_exams_organization_id_fkey"
+            columns: ["organization_id"]
+            isOneToOne: false
+            referencedRelation: "organizations_public"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       notifications: {
         Row: {
           action_url: string | null
@@ -3721,6 +3800,317 @@ export type Database = {
             columns: ["organization_id"]
             isOneToOne: false
             referencedRelation: "organizations_public"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      onboarding_processes: {
+        Row: {
+          completed_at: string | null
+          created_at: string
+          created_by: string | null
+          employee_id: string
+          expected_completion_at: string | null
+          id: string
+          notes: string | null
+          organization_id: string
+          responsible_user_id: string | null
+          started_at: string | null
+          status: string
+          template_id: string | null
+          updated_at: string
+        }
+        Insert: {
+          completed_at?: string | null
+          created_at?: string
+          created_by?: string | null
+          employee_id: string
+          expected_completion_at?: string | null
+          id?: string
+          notes?: string | null
+          organization_id: string
+          responsible_user_id?: string | null
+          started_at?: string | null
+          status?: string
+          template_id?: string | null
+          updated_at?: string
+        }
+        Update: {
+          completed_at?: string | null
+          created_at?: string
+          created_by?: string | null
+          employee_id?: string
+          expected_completion_at?: string | null
+          id?: string
+          notes?: string | null
+          organization_id?: string
+          responsible_user_id?: string | null
+          started_at?: string | null
+          status?: string
+          template_id?: string | null
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "onboarding_processes_employee_id_fkey"
+            columns: ["employee_id"]
+            isOneToOne: false
+            referencedRelation: "employees"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "onboarding_processes_organization_id_fkey"
+            columns: ["organization_id"]
+            isOneToOne: false
+            referencedRelation: "organizations"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "onboarding_processes_organization_id_fkey"
+            columns: ["organization_id"]
+            isOneToOne: false
+            referencedRelation: "organizations_public"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "onboarding_processes_template_id_fkey"
+            columns: ["template_id"]
+            isOneToOne: false
+            referencedRelation: "onboarding_templates"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      onboarding_tasks: {
+        Row: {
+          assigned_to: string | null
+          completed_at: string | null
+          completed_by: string | null
+          created_at: string
+          description: string | null
+          document_id: string | null
+          due_date: string | null
+          employee_id: string
+          id: string
+          metadata: Json
+          organization_id: string
+          process_id: string
+          required: boolean
+          responsible_role: string
+          sort_order: number
+          status: string
+          task_type: string
+          title: string
+          updated_at: string
+        }
+        Insert: {
+          assigned_to?: string | null
+          completed_at?: string | null
+          completed_by?: string | null
+          created_at?: string
+          description?: string | null
+          document_id?: string | null
+          due_date?: string | null
+          employee_id: string
+          id?: string
+          metadata?: Json
+          organization_id: string
+          process_id: string
+          required?: boolean
+          responsible_role?: string
+          sort_order?: number
+          status?: string
+          task_type: string
+          title: string
+          updated_at?: string
+        }
+        Update: {
+          assigned_to?: string | null
+          completed_at?: string | null
+          completed_by?: string | null
+          created_at?: string
+          description?: string | null
+          document_id?: string | null
+          due_date?: string | null
+          employee_id?: string
+          id?: string
+          metadata?: Json
+          organization_id?: string
+          process_id?: string
+          required?: boolean
+          responsible_role?: string
+          sort_order?: number
+          status?: string
+          task_type?: string
+          title?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "onboarding_tasks_document_id_fkey"
+            columns: ["document_id"]
+            isOneToOne: false
+            referencedRelation: "hr_documents"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "onboarding_tasks_employee_id_fkey"
+            columns: ["employee_id"]
+            isOneToOne: false
+            referencedRelation: "employees"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "onboarding_tasks_organization_id_fkey"
+            columns: ["organization_id"]
+            isOneToOne: false
+            referencedRelation: "organizations"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "onboarding_tasks_organization_id_fkey"
+            columns: ["organization_id"]
+            isOneToOne: false
+            referencedRelation: "organizations_public"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "onboarding_tasks_process_id_fkey"
+            columns: ["process_id"]
+            isOneToOne: false
+            referencedRelation: "onboarding_processes"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      onboarding_template_tasks: {
+        Row: {
+          created_at: string
+          description: string | null
+          due_offset_days: number
+          id: string
+          organization_id: string
+          required: boolean
+          responsible_role: string
+          sort_order: number
+          task_type: string
+          template_id: string
+          title: string
+        }
+        Insert: {
+          created_at?: string
+          description?: string | null
+          due_offset_days?: number
+          id?: string
+          organization_id: string
+          required?: boolean
+          responsible_role?: string
+          sort_order?: number
+          task_type: string
+          template_id: string
+          title: string
+        }
+        Update: {
+          created_at?: string
+          description?: string | null
+          due_offset_days?: number
+          id?: string
+          organization_id?: string
+          required?: boolean
+          responsible_role?: string
+          sort_order?: number
+          task_type?: string
+          template_id?: string
+          title?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "onboarding_template_tasks_organization_id_fkey"
+            columns: ["organization_id"]
+            isOneToOne: false
+            referencedRelation: "organizations"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "onboarding_template_tasks_organization_id_fkey"
+            columns: ["organization_id"]
+            isOneToOne: false
+            referencedRelation: "organizations_public"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "onboarding_template_tasks_template_id_fkey"
+            columns: ["template_id"]
+            isOneToOne: false
+            referencedRelation: "onboarding_templates"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      onboarding_templates: {
+        Row: {
+          active: boolean
+          created_at: string
+          created_by: string | null
+          description: string | null
+          id: string
+          name: string
+          organization_id: string
+          position_id: string | null
+          unit_id: string | null
+          updated_at: string
+        }
+        Insert: {
+          active?: boolean
+          created_at?: string
+          created_by?: string | null
+          description?: string | null
+          id?: string
+          name: string
+          organization_id: string
+          position_id?: string | null
+          unit_id?: string | null
+          updated_at?: string
+        }
+        Update: {
+          active?: boolean
+          created_at?: string
+          created_by?: string | null
+          description?: string | null
+          id?: string
+          name?: string
+          organization_id?: string
+          position_id?: string | null
+          unit_id?: string | null
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "onboarding_templates_organization_id_fkey"
+            columns: ["organization_id"]
+            isOneToOne: false
+            referencedRelation: "organizations"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "onboarding_templates_organization_id_fkey"
+            columns: ["organization_id"]
+            isOneToOne: false
+            referencedRelation: "organizations_public"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "onboarding_templates_position_id_fkey"
+            columns: ["position_id"]
+            isOneToOne: false
+            referencedRelation: "positions"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "onboarding_templates_unit_id_fkey"
+            columns: ["unit_id"]
+            isOneToOne: false
+            referencedRelation: "units"
             referencedColumns: ["id"]
           },
         ]
@@ -5440,6 +5830,98 @@ export type Database = {
           rate_key?: string
         }
         Relationships: []
+      }
+      receipts: {
+        Row: {
+          acknowledged_at: string | null
+          acknowledged_by: string | null
+          amount: number | null
+          created_at: string
+          created_by: string | null
+          delivered_at: string | null
+          description: string
+          employee_id: string
+          file_path: string | null
+          id: string
+          item_description: string | null
+          organization_id: string
+          quantity: number | null
+          receipt_type: string
+          reference_competency: string | null
+          signature_envelope_id: string | null
+          status: string
+          updated_at: string
+        }
+        Insert: {
+          acknowledged_at?: string | null
+          acknowledged_by?: string | null
+          amount?: number | null
+          created_at?: string
+          created_by?: string | null
+          delivered_at?: string | null
+          description: string
+          employee_id: string
+          file_path?: string | null
+          id?: string
+          item_description?: string | null
+          organization_id: string
+          quantity?: number | null
+          receipt_type: string
+          reference_competency?: string | null
+          signature_envelope_id?: string | null
+          status?: string
+          updated_at?: string
+        }
+        Update: {
+          acknowledged_at?: string | null
+          acknowledged_by?: string | null
+          amount?: number | null
+          created_at?: string
+          created_by?: string | null
+          delivered_at?: string | null
+          description?: string
+          employee_id?: string
+          file_path?: string | null
+          id?: string
+          item_description?: string | null
+          organization_id?: string
+          quantity?: number | null
+          receipt_type?: string
+          reference_competency?: string | null
+          signature_envelope_id?: string | null
+          status?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "receipts_employee_id_fkey"
+            columns: ["employee_id"]
+            isOneToOne: false
+            referencedRelation: "employees"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "receipts_organization_id_fkey"
+            columns: ["organization_id"]
+            isOneToOne: false
+            referencedRelation: "organizations"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "receipts_organization_id_fkey"
+            columns: ["organization_id"]
+            isOneToOne: false
+            referencedRelation: "organizations_public"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "receipts_signature_envelope_id_fkey"
+            columns: ["signature_envelope_id"]
+            isOneToOne: false
+            referencedRelation: "signature_envelopes"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       retention_jobs: {
         Row: {
