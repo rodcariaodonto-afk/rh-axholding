@@ -114,6 +114,8 @@ const Exports = lazy(() => import("./pages/Exports"));
 const MyPayslips = lazy(() => import("./pages/MyPayslips"));
 const PayslipsManage = lazy(() => import("./pages/PayslipsManage"));
 const OnboardingProcesses = lazy(() => import("./pages/OnboardingProcesses"));
+const OnboardingProcessDetail = lazy(() => import("./pages/OnboardingProcessDetail"));
+const OnboardingPortal = lazy(() => import("./pages/OnboardingPortal"));
 const MedicalExams = lazy(() => import("./pages/MedicalExams"));
 const Receipts = lazy(() => import("./pages/Receipts"));
 const AdminClients = lazy(() => import("./pages/AdminClients"));
@@ -215,6 +217,13 @@ const App = () => (
                 <Onboarding />
               </Suspense>
             </ProtectedRoute>
+          } />
+
+          {/* Portal público do colaborador (sem auth, sem layout) */}
+          <Route path="/onboarding/portal/:token" element={
+            <Suspense fallback={<div className="min-h-screen flex items-center justify-center"><Loader2 className="h-8 w-8 animate-spin" /></div>}>
+              <OnboardingPortal />
+            </Suspense>
           } />
 
           {/* Profiler routes (public, with layout) */}
@@ -322,6 +331,7 @@ const App = () => (
             <Route path="/my-payslips" element={<MyPayslips />} />
             <Route path="/payslips" element={<PeopleRoute><PayslipsManage /></PeopleRoute>} />
             <Route path="/onboarding-processes" element={<PeopleRoute><OnboardingProcesses /></PeopleRoute>} />
+            <Route path="/onboarding-processes/:id" element={<PeopleRoute><OnboardingProcessDetail /></PeopleRoute>} />
             <Route path="/medical-exams" element={<PeopleRoute><MedicalExams /></PeopleRoute>} />
             <Route path="/receipts" element={<PeopleRoute><Receipts /></PeopleRoute>} />
             <Route path="/epis" element={<PeopleRoute><EpiCatalog /></PeopleRoute>} />
