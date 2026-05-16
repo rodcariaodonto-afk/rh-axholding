@@ -3547,6 +3547,138 @@ export type Database = {
           },
         ]
       }
+      operational_calendar_days: {
+        Row: {
+          calendar_id: string
+          counts_as_workday: boolean
+          created_at: string
+          day: string
+          day_type: Database["public"]["Enums"]["calendar_day_type"]
+          description: string | null
+          id: string
+          organization_id: string
+          overtime_multiplier: number | null
+        }
+        Insert: {
+          calendar_id: string
+          counts_as_workday?: boolean
+          created_at?: string
+          day: string
+          day_type: Database["public"]["Enums"]["calendar_day_type"]
+          description?: string | null
+          id?: string
+          organization_id: string
+          overtime_multiplier?: number | null
+        }
+        Update: {
+          calendar_id?: string
+          counts_as_workday?: boolean
+          created_at?: string
+          day?: string
+          day_type?: Database["public"]["Enums"]["calendar_day_type"]
+          description?: string | null
+          id?: string
+          organization_id?: string
+          overtime_multiplier?: number | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "operational_calendar_days_calendar_id_fkey"
+            columns: ["calendar_id"]
+            isOneToOne: false
+            referencedRelation: "operational_calendars"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "operational_calendar_days_organization_id_fkey"
+            columns: ["organization_id"]
+            isOneToOne: false
+            referencedRelation: "organizations"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "operational_calendar_days_organization_id_fkey"
+            columns: ["organization_id"]
+            isOneToOne: false
+            referencedRelation: "organizations_public"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      operational_calendars: {
+        Row: {
+          cost_center_id: string | null
+          created_at: string
+          created_by: string | null
+          id: string
+          is_active: boolean
+          legal_entity_id: string | null
+          name: string
+          organization_id: string
+          scope: Database["public"]["Enums"]["calendar_scope"]
+          unit_id: string | null
+          updated_at: string
+          year: number
+        }
+        Insert: {
+          cost_center_id?: string | null
+          created_at?: string
+          created_by?: string | null
+          id?: string
+          is_active?: boolean
+          legal_entity_id?: string | null
+          name: string
+          organization_id: string
+          scope?: Database["public"]["Enums"]["calendar_scope"]
+          unit_id?: string | null
+          updated_at?: string
+          year: number
+        }
+        Update: {
+          cost_center_id?: string | null
+          created_at?: string
+          created_by?: string | null
+          id?: string
+          is_active?: boolean
+          legal_entity_id?: string | null
+          name?: string
+          organization_id?: string
+          scope?: Database["public"]["Enums"]["calendar_scope"]
+          unit_id?: string | null
+          updated_at?: string
+          year?: number
+        }
+        Relationships: [
+          {
+            foreignKeyName: "operational_calendars_cost_center_id_fkey"
+            columns: ["cost_center_id"]
+            isOneToOne: false
+            referencedRelation: "cost_centers"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "operational_calendars_legal_entity_id_fkey"
+            columns: ["legal_entity_id"]
+            isOneToOne: false
+            referencedRelation: "legal_entities"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "operational_calendars_organization_id_fkey"
+            columns: ["organization_id"]
+            isOneToOne: false
+            referencedRelation: "organizations"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "operational_calendars_organization_id_fkey"
+            columns: ["organization_id"]
+            isOneToOne: false
+            referencedRelation: "organizations_public"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       organization_appearance: {
         Row: {
           border_radius: string | null
@@ -4515,6 +4647,84 @@ export type Database = {
             columns: ["unit_id"]
             isOneToOne: false
             referencedRelation: "units"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      pending_tasks: {
+        Row: {
+          action_url: string | null
+          assigned_to: string
+          completed_at: string | null
+          created_at: string
+          created_by: string | null
+          description: string | null
+          due_at: string | null
+          id: string
+          metadata: Json | null
+          module: string
+          organization_id: string
+          priority: Database["public"]["Enums"]["pending_task_priority"]
+          related_resource_id: string | null
+          related_resource_type: string | null
+          status: Database["public"]["Enums"]["pending_task_status"]
+          task_type: string
+          title: string
+          updated_at: string
+        }
+        Insert: {
+          action_url?: string | null
+          assigned_to: string
+          completed_at?: string | null
+          created_at?: string
+          created_by?: string | null
+          description?: string | null
+          due_at?: string | null
+          id?: string
+          metadata?: Json | null
+          module: string
+          organization_id: string
+          priority?: Database["public"]["Enums"]["pending_task_priority"]
+          related_resource_id?: string | null
+          related_resource_type?: string | null
+          status?: Database["public"]["Enums"]["pending_task_status"]
+          task_type: string
+          title: string
+          updated_at?: string
+        }
+        Update: {
+          action_url?: string | null
+          assigned_to?: string
+          completed_at?: string | null
+          created_at?: string
+          created_by?: string | null
+          description?: string | null
+          due_at?: string | null
+          id?: string
+          metadata?: Json | null
+          module?: string
+          organization_id?: string
+          priority?: Database["public"]["Enums"]["pending_task_priority"]
+          related_resource_id?: string | null
+          related_resource_type?: string | null
+          status?: Database["public"]["Enums"]["pending_task_status"]
+          task_type?: string
+          title?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "pending_tasks_organization_id_fkey"
+            columns: ["organization_id"]
+            isOneToOne: false
+            referencedRelation: "organizations"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "pending_tasks_organization_id_fkey"
+            columns: ["organization_id"]
+            isOneToOne: false
+            referencedRelation: "organizations_public"
             referencedColumns: ["id"]
           },
         ]
@@ -5861,6 +6071,115 @@ export type Database = {
           },
         ]
       }
+      time_inconsistencies: {
+        Row: {
+          actual_value: Json | null
+          created_at: string
+          day: string
+          description: string | null
+          employee_id: string
+          expected_value: Json | null
+          id: string
+          justification_id: string | null
+          manager_id: string | null
+          organization_id: string
+          raw_event_id: string | null
+          resolution_notes: string | null
+          resolved_at: string | null
+          resolved_by: string | null
+          severity: Database["public"]["Enums"]["inconsistency_severity"]
+          status: Database["public"]["Enums"]["inconsistency_status"]
+          time_entry_id: string | null
+          type: Database["public"]["Enums"]["inconsistency_type"]
+          updated_at: string
+        }
+        Insert: {
+          actual_value?: Json | null
+          created_at?: string
+          day: string
+          description?: string | null
+          employee_id: string
+          expected_value?: Json | null
+          id?: string
+          justification_id?: string | null
+          manager_id?: string | null
+          organization_id: string
+          raw_event_id?: string | null
+          resolution_notes?: string | null
+          resolved_at?: string | null
+          resolved_by?: string | null
+          severity?: Database["public"]["Enums"]["inconsistency_severity"]
+          status?: Database["public"]["Enums"]["inconsistency_status"]
+          time_entry_id?: string | null
+          type: Database["public"]["Enums"]["inconsistency_type"]
+          updated_at?: string
+        }
+        Update: {
+          actual_value?: Json | null
+          created_at?: string
+          day?: string
+          description?: string | null
+          employee_id?: string
+          expected_value?: Json | null
+          id?: string
+          justification_id?: string | null
+          manager_id?: string | null
+          organization_id?: string
+          raw_event_id?: string | null
+          resolution_notes?: string | null
+          resolved_at?: string | null
+          resolved_by?: string | null
+          severity?: Database["public"]["Enums"]["inconsistency_severity"]
+          status?: Database["public"]["Enums"]["inconsistency_status"]
+          time_entry_id?: string | null
+          type?: Database["public"]["Enums"]["inconsistency_type"]
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "time_inconsistencies_employee_id_fkey"
+            columns: ["employee_id"]
+            isOneToOne: false
+            referencedRelation: "employees"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "time_inconsistencies_justification_id_fkey"
+            columns: ["justification_id"]
+            isOneToOne: false
+            referencedRelation: "justificativas_ponto"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "time_inconsistencies_organization_id_fkey"
+            columns: ["organization_id"]
+            isOneToOne: false
+            referencedRelation: "organizations"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "time_inconsistencies_organization_id_fkey"
+            columns: ["organization_id"]
+            isOneToOne: false
+            referencedRelation: "organizations_public"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "time_inconsistencies_raw_event_id_fkey"
+            columns: ["raw_event_id"]
+            isOneToOne: false
+            referencedRelation: "time_clock_raw_events"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "time_inconsistencies_time_entry_id_fkey"
+            columns: ["time_entry_id"]
+            isOneToOne: false
+            referencedRelation: "time_entries"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       time_off_balances: {
         Row: {
           available_days: number | null
@@ -6750,6 +7069,19 @@ export type Database = {
         | "holiday"
         | "profit_sharing"
         | "other"
+      calendar_day_type:
+        | "feriado_nacional"
+        | "feriado_estadual"
+        | "feriado_municipal"
+        | "ponto_facultativo"
+        | "evento_interno"
+        | "dia_util_extra"
+      calendar_scope:
+        | "default"
+        | "regional"
+        | "unit"
+        | "cost_center"
+        | "legal_entity"
       candidate_stage:
         | "selecao"
         | "fit_cultural"
@@ -6813,6 +7145,24 @@ export type Database = {
         | "not_declared"
       feedback_type: "positive" | "neutral" | "negative"
       gender: "male" | "female" | "non_binary" | "prefer_not_to_say"
+      inconsistency_severity: "info" | "warning" | "critical"
+      inconsistency_status:
+        | "open"
+        | "in_review"
+        | "resolved"
+        | "justified"
+        | "ignored"
+      inconsistency_type:
+        | "falta"
+        | "atraso"
+        | "saida_antecipada"
+        | "marcacao_faltante"
+        | "marcacao_excedente"
+        | "jornada_nao_cumprida"
+        | "fora_da_cerca"
+        | "intervalo_insuficiente"
+        | "duplicado"
+        | "horas_extras_nao_autorizadas"
       job_status: "active" | "closed" | "draft" | "on_hold"
       marital_status:
         | "single"
@@ -6829,6 +7179,8 @@ export type Database = {
         | "entregue"
         | "concluido"
         | "cancelado"
+      pending_task_priority: "low" | "medium" | "high" | "urgent"
+      pending_task_status: "open" | "in_progress" | "done" | "dismissed"
       position_level:
         | "junior"
         | "mid"
@@ -7068,6 +7420,21 @@ export const Constants = {
         "profit_sharing",
         "other",
       ],
+      calendar_day_type: [
+        "feriado_nacional",
+        "feriado_estadual",
+        "feriado_municipal",
+        "ponto_facultativo",
+        "evento_interno",
+        "dia_util_extra",
+      ],
+      calendar_scope: [
+        "default",
+        "regional",
+        "unit",
+        "cost_center",
+        "legal_entity",
+      ],
       candidate_stage: [
         "selecao",
         "fit_cultural",
@@ -7137,6 +7504,26 @@ export const Constants = {
       ],
       feedback_type: ["positive", "neutral", "negative"],
       gender: ["male", "female", "non_binary", "prefer_not_to_say"],
+      inconsistency_severity: ["info", "warning", "critical"],
+      inconsistency_status: [
+        "open",
+        "in_review",
+        "resolved",
+        "justified",
+        "ignored",
+      ],
+      inconsistency_type: [
+        "falta",
+        "atraso",
+        "saida_antecipada",
+        "marcacao_faltante",
+        "marcacao_excedente",
+        "jornada_nao_cumprida",
+        "fora_da_cerca",
+        "intervalo_insuficiente",
+        "duplicado",
+        "horas_extras_nao_autorizadas",
+      ],
       job_status: ["active", "closed", "draft", "on_hold"],
       marital_status: [
         "single",
@@ -7155,6 +7542,8 @@ export const Constants = {
         "concluido",
         "cancelado",
       ],
+      pending_task_priority: ["low", "medium", "high", "urgent"],
+      pending_task_status: ["open", "in_progress", "done", "dismissed"],
       position_level: [
         "junior",
         "mid",
