@@ -1,101 +1,126 @@
-## Objetivo
+# Fase 2 — Assinatura Eletrônica por Tenant (Clicksign)
 
-Adicionar ao RHAXIS a camada **Super Admin AXIS** (gestão de clientes/tenants pela AXHolding), planos/módulos contratados, ações administrativas e integração modular de **assinatura eletrônica por empresa cliente** começando pela **Clicksign** — reaproveitando `organizations`, `organization_members`, `roles`, `permissions`, `audit_log` e `has_org_role` já existentes.
+Objetivo: permitir que cada cliente (organização) configure suas próprias credenciais Clicksign e envie documentos para assinatura — sem expor segredos no PostgREST e sem misturar credenciais entre tenants.
 
----
+## 1. Banco de dados (migration única)
 
-## Fase 1 — Super Admin AXIS (fundação)
+### `organization_integrations`
+Tabela genérica para integrações por organização (começa com Clicksign, extensível).
 
-### Banco (migration)
-- Adicionar em `organizations`: `is_internal BOOLEAN DEFAULT false`, `plan_id UUID`, `status TEXT` (`trial|active|suspended|cancelled|pending_deletion|deleted`), `trial_ends_at`, `suspended_at`, `scheduled_deletion_at`, `responsible_name`, `responsible_email`, `responsible_phone`, `internal_notes`, `last_access_at`.
-- Nova tabela `plans` (`id`, `slug`, `name`, `description`, `price_cents`, `features jsonb`, `is_active`). Seed: Starter, Professional, Enterprise.
-- Nova tabela `plan_modules` (`plan_id`, `module_key`) e `organization_modules` (`organization_id`, `module_key`, `enabled`, `enabled_by`, `enabled_at`) para módulos habilitados por tenant.
-- Nova tabela `super_admin_audit_log` (espelho global, append-only) — ou usar `audit_log` existente com flag `is_platform = true`.
-- Função `is_platform_admin(_user_id uuid) RETURNS boolean` (SECURITY DEFINER): retorna `true` se o usuário é member ativo da org `is_internal = true` com role `admin` ou `is_owner = true`.
-- Seed: org interna **AXHolding Internal** (`is_internal=true`, slug `axholding-internal`); cria automaticamente membership owner/admin para o usuário com email `rodcaria.odonto@gmail.com` quando ele aparecer em `auth.users` (trigger one-shot).
-- RLS: políticas adicionais em todas as tabelas-chave permitindo `is_platform_admin(auth.uid())` para leitura/escrita global controlada (auditada).
+Colunas principais:
+- `organization_id` (FK organizations)
+- `provider` (enum: `clicksign`)
+- `environment` (enum: `sandbox` | `production`)
+- `is_active` (boolean)
+- `encrypted_credentials` (bytea) — `pgp_sym_encrypt` com `INTEGRATION_ENCRYPTION_KEY`
+- `webhook_secret` (text, gerado server-side) — usado para validar HMAC do Clicksign
+- `webhook_url_token` (text único) — URL pública do webhook por org
+- `capabilities` (jsonb) — ex.: `{ whatsapp: true, email: true }`
+- `last_tested_at`, `last_test_status`, `last_test_error`
+- `created_by`, `updated_by`
 
-### Edge Functions
-- `super-admin-create-client`: cria org cliente vazia + role admin local + convida owner via `invite-employee`. Valida `is_platform_admin`.
-- `super-admin-client-action`: ações `suspend`, `reactivate`, `cancel`, `schedule_deletion`, `cancel_deletion`, `resend_invite`, `transfer_owner`.
-- `super-admin-update-plan`: troca plano e sincroniza `organization_modules`.
-- `super-admin-impersonate`: gera sessão de suporte com TTL curto (registra em audit_log + banner no frontend).
-- Todas validam JWT + `is_platform_admin` server-side, sanitizam input (Zod) e gravam auditoria.
+Constraint: `UNIQUE (organization_id, provider)`.
 
-### Frontend
-- `src/hooks/usePlatformAdmin.ts` — checa `is_platform_admin` via RPC.
-- `src/components/PlatformAdminRoute.tsx` — guard de rota.
-- Novo bloco no `AppSidebar.tsx` **"AXIS Admin"** (visível só para platform admin), com:
-  - `/admin/clientes` — lista de clientes (status, plano, owner, último acesso, ações)
-  - `/admin/clientes/novo` — wizard de criação
-  - `/admin/clientes/:id` — detalhe + ações (suspender, plano, módulos, impersonar)
-  - `/admin/planos` — CRUD de planos e módulos
-  - `/admin/usuarios-globais` — lista cross-tenant
-  - `/admin/auditoria-global` — log de plataforma
-  - `/admin/suporte` — sessões de impersonation ativas
-- Banner global vermelho quando em modo impersonation.
+RLS:
+- SELECT: membros da org via `user_belongs_to_org` — **porém `encrypted_credentials` e `webhook_secret` ficam fora**: criamos uma VIEW `organization_integrations_safe` sem esses campos e revogamos SELECT da tabela base para `authenticated`. Apenas service role lê os blobs.
+- INSERT/UPDATE/DELETE: somente via Edge Function (service role).
 
----
+### `signature_events` (append-only)
+Toda mudança de status vinda do Clicksign:
+- `organization_id`, `envelope_id`, `provider`, `event_type`, `payload` (jsonb), `received_at`, `webhook_id`
 
-## Fase 2 — Assinatura Eletrônica por Tenant (Clicksign)
+Trigger `block_modify_append_only` para UPDATE/DELETE.
 
-### Banco
-- Nova tabela `organization_integrations` (se não existir; caso exista, adicionar campos):
-  - `id`, `organization_id`, `provider` (`clicksign|d4sign|zapsign|manual`), `category` (`signature`), `status` (`disconnected|configured|active|error`), `environment` (`sandbox|production`), `encrypted_credentials BYTEA` (pgcrypto AES com chave em secret `INTEGRATION_ENCRYPTION_KEY`), `settings_json`, `last_tested_at`, `last_error`, `created_by`, `updated_by`.
-- Reutilizar/expandir `signature_envelopes`, `signature_envelope_signers` (já criados na Fase 4 anterior). Adicionar:
-  - `signature_events` (append-only: timestamp, tipo, payload sanitizado, hash).
-  - `signature_provider_webhooks` (idempotência: provider_event_id único).
-- Funções `pgp_sym_encrypt`/`pgp_sym_decrypt` via pgcrypto, com chave injetada apenas em Edge Functions.
-- RLS: leitura/escrita apenas para `can_manage_org_integrations(uid, org_id)`. Credenciais decriptadas **nunca** retornadas via PostgREST — apenas via Edge Function.
+### `signature_provider_webhooks` (idempotência)
+- `provider`, `external_event_id`, `organization_id`, `received_at`
+- `UNIQUE (provider, external_event_id)`
 
-### Edge Functions
-- `signature-config-test` — recebe credenciais, testa contra API Clicksign, salva criptografado, marca `last_tested_at`.
-- `signature-config-get` — retorna apenas metadados (provider, status, environment, masked).
-- `signature-create-envelope`, `signature-send-document` — refatorar `signature-send` existente para usar credenciais da org (não global).
-- `signature-webhook-clicksign` — endpoint público com validação HMAC + token secreto na URL + idempotência por `provider_event_id`.
-- `signature-sync-status`, `signature-cancel-envelope`.
-- Adapter modular já existe em `_shared/signature-provider.ts` — estender para receber `credentials` por chamada em vez de ler `Deno.env`.
+### Extensões em `signature_envelopes` (Fase 4)
+- `provider_envelope_id` (text)
+- `provider` (default `clicksign`)
+- `organization_id` (NOT NULL, FK)
+- índice `(organization_id, status)`
 
-### Frontend
-- `/integrations/signature` (já existe `IntegrationsSettings.tsx` — adicionar aba **Assinatura Eletrônica**):
-  - Card por provider (Clicksign ativo; D4Sign/ZapSign "em breve").
-  - Form: API token, ambiente (sandbox/prod), webhook secret.
-  - Botão **Testar conexão** → chama `signature-config-test`.
-  - Status visual e `last_tested_at`. Token nunca é retornado.
-- Em **Documentos**, **Holerites**, **Admissão**, **EPI/Recibos**: ação **"Enviar para assinatura"** já parcialmente existente — garantir uso do provider configurado da org ativa, com seleção de tipo (simples / avançada / ICP-Brasil) com validação de capability do plano.
-- Sub-página **Documentos > Assinaturas** (acompanhamento de envelopes).
+### Funções
+- `get_org_integration_credentials(_org_id, _provider)` — SECURITY DEFINER, retorna jsonb decifrado. Só executável pelo role service.
+- `set_org_integration_credentials(_org_id, _provider, _creds jsonb, _env, _caps)` — cifra e upserta.
+- Permissões adicionadas: `integrations.signature.manage`, `signatures.send`, `signatures.view_all`.
 
----
+### Secret
+`INTEGRATION_ENCRYPTION_KEY` (32+ bytes) — pedir via `add_secret` antes de rodar migration que dependa dela em runtime (a função apenas usa quando chamada).
 
-## Fase 3 — Permissões, Auditoria e Hardening
+## 2. Edge Functions
 
-- Adicionar permissions: `platform.admin.*`, `clients.manage`, `integrations.signature.manage`, `signatures.send`, `signatures.view_all`.
-- Auditar todas as ações Super Admin e de integração (quem testou credencial, enviou, cancelou, webhook recebido, doc baixado).
-- Rodar `supabase--linter`; corrigir policies permissivas.
-- Checklist final: nenhum secret no frontend, RLS em todas as novas tabelas, idempotência de webhook, isolamento multi-tenant validado.
+Todas validam JWT via `getClaims`, checam `has_org_permission(user, org, 'integrations.signature.manage')` para configuração e `signatures.send` para envio, e gravam em `platform_audit_log` quando relevante.
 
----
+1. **`signature-config-upsert`** — POST `{ organization_id, environment, api_token, capabilities }` → cifra e grava. Gera `webhook_secret` e `webhook_url_token` no primeiro upsert.
+2. **`signature-config-get`** — GET `?organization_id=` → retorna metadados (sem token), webhook URL pública pronta para colar no painel Clicksign.
+3. **`signature-config-test`** — chama endpoint leve do Clicksign com as credenciais decifradas e grava `last_test_*`.
+4. **`signature-create-envelope`** — cria envelope no Clicksign para um documento (payslip / hr_document / admissão / EPI), persiste em `signature_envelopes` com `provider_envelope_id`.
+5. **`signature-send-document`** — adiciona signatários + dispara envio (email/WhatsApp conforme `capabilities`).
+6. **`signature-cancel-envelope`** — cancela no Clicksign + atualiza local.
+7. **`signature-sync-status`** — fallback poll (caso webhook falhe).
+8. **`signature-webhook-clicksign`** — público (`verify_jwt = false`), URL inclui `webhook_url_token`. Valida HMAC com `webhook_secret`, faz idempotência via `signature_provider_webhooks`, grava em `signature_events`, atualiza `signature_envelopes` e `signature_envelope_signers`.
 
-## Detalhes técnicos
+### Adapter
+Estender `supabase/functions/_shared/signature-provider.ts`:
+- Interface `SignatureProvider` recebe `credentials` por chamada (nada de `Deno.env` no provider).
+- Implementação `ClicksignProvider` com `createEnvelope`, `addSigner`, `send`, `cancel`, `getStatus`, `verifyWebhook(rawBody, signature, secret)`.
 
-**Stack**: usa `has_org_role`, `has_org_permission`, `organization_members`, `roles` (locais por org) já existentes. Cliente novo nasce vazio (sem seed de demo).
+## 3. Frontend
 
-**Criptografia**: pgcrypto symmetric (`pgp_sym_encrypt`). Chave única `INTEGRATION_ENCRYPTION_KEY` injetada apenas em Edge Functions via Supabase secrets — não armazenada em DB.
+### Configuração (somente admin/owner)
+- Nova aba **"Assinatura Eletrônica"** em `IntegrationsSettings.tsx`:
+  - Form: ambiente (sandbox/prod), token, toggles de canais (email/WhatsApp).
+  - Botão **Testar conexão** → `signature-config-test`.
+  - Bloco **Webhook**: exibe URL única `https://…/functions/v1/signature-webhook-clicksign?t=<token>` com botão copiar + instruções.
+  - Status: último teste, ambiente ativo, badge "Configurado".
 
-**Impersonation**: Edge Function gera link de magic-link de curta duração + grava `super_admin_sessions` (user_id, target_org_id, expires_at, ip). Frontend lê esse estado e exibe banner "Visualizando como cliente — sair".
+### Hooks
+- `useOrgSignatureConfig.ts` — get/upsert/test via edge functions.
+- Ampliar `useSignatureEnvelopes.ts` (já existe da Fase 4) para usar provider per-tenant.
 
-**Adapter signature**: assinatura `createEnvelope(input, credentials)` — credentials injetadas pelo caller (edge function que decripta), nunca lidas de `Deno.env` dentro do adapter.
+### Ações nas telas existentes
+Adicionar botão **"Enviar para assinatura"** com guard `signatures.send` + verificação `is_active` em:
+- `PayslipsManage.tsx` (holerites)
+- `MyPayslips.tsx` (re-envio se permitido)
+- `HrDocuments` (já tem assinatura — passa a usar provider per-tenant)
+- `OnboardingProcesses.tsx` (admissão)
+- `Receipts.tsx` (EPI/recibos)
 
-**Migrações**: 3 migrations separadas (Fase 1 schema, Fase 2 signature/integrations, Fase 3 permissions/audit).
+Modal único `SendForSignatureDialog.tsx` reutilizável: lista signatários sugeridos, canal (email/whatsapp), confirma envio.
 
-**Arquivos a criar/editar (estimativa)**:
-- 3 migrations SQL
-- ~6 Edge Functions novas + refatorar 2 existentes
-- ~8 páginas novas (`/admin/*`) + 1 aba em IntegrationsSettings
-- ~5 hooks (`usePlatformAdmin`, `useClients`, `usePlans`, `useSignatureIntegration`, `useImpersonation`)
-- `PlatformAdminRoute.tsx`, atualizar `AppSidebar.tsx`, `App.tsx`
+### Painel de envelopes
+Página `/assinaturas` (já existente como `SignatureEnvelopes`?) — se não, criar listando envelopes da org com status, ações (sync, cancelar, reenviar).
 
----
+## 4. Segurança e Hardening
 
-## Entrega por fase
-Cada fase termina com checkpoint para sua validação antes de seguir. Começarei pela **Fase 1** (fundação Super Admin + sua promoção a platform admin).
+- `encrypted_credentials` nunca sai do banco via PostgREST (view + revoke).
+- Webhook usa token na URL **e** HMAC do payload — ambos obrigatórios.
+- Rate limit no `signature-webhook-clicksign` via `check_rate_limit` por IP.
+- Auditoria: cada `config-upsert`, `test`, `create-envelope`, `send`, `cancel` grava em `platform_audit_log` com `target_organization_id`.
+- Rodar `supabase--linter` ao fim e corrigir warnings da migration.
+
+## 5. Arquivos previstos
+
+**Migration**: 1 (`fase_2_signature_per_tenant.sql`)
+
+**Edge functions** (novas/editadas):
+- `signature-config-upsert`, `signature-config-get`, `signature-config-test`
+- `signature-create-envelope`, `signature-send-document`, `signature-cancel-envelope`, `signature-sync-status`
+- `signature-webhook-clicksign`
+- `_shared/signature-provider.ts` (refatorar)
+- `supabase/config.toml` (apenas webhook `verify_jwt = false`)
+
+**Frontend**:
+- `src/hooks/useOrgSignatureConfig.ts`
+- `src/components/integrations/SignatureProviderTab.tsx`
+- `src/components/signature/SendForSignatureDialog.tsx`
+- Edições em `IntegrationsSettings.tsx`, `PayslipsManage.tsx`, `MyPayslips.tsx`, `HrDocuments*`, `OnboardingProcesses.tsx`, `Receipts.tsx`
+- `src/App.tsx` (rota `/assinaturas` se faltar)
+
+## 6. Secret a pedir antes de começar
+
+- `INTEGRATION_ENCRYPTION_KEY` (gerar string aleatória de 64 chars hex — eu mostro como)
+
+Após sua aprovação eu peço esse secret e já rodo a migration.
