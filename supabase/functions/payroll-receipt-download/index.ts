@@ -53,7 +53,7 @@ Deno.serve(async (req) => {
       download_count: receipt.download_count + 1,
       last_downloaded_at: new Date().toISOString(),
     };
-    if (acknowledge && isOwner && !receipt.published === false) {
+    if (acknowledge && isOwner) {
       update.acknowledged_at = new Date().toISOString();
       update.acknowledged_ip = ip;
       update.acknowledged_user_agent = ua;

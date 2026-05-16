@@ -151,14 +151,14 @@ Deno.serve(async (req) => {
         employee_id, match_status: employee_id ? "matched" : "unmatched",
       }).eq("id", receipt_id);
 
-      // ajustar contadores
-      if (previousStatus !== "matched" && employee_id) {
-        await supabaseAdmin.rpc as unknown; // não temos RPC; faremos via SQL inline:
+      // ajustar contadores se houve mudança no match
+      if (previousStatus !== (employee_id ? "matched" : "unmatched")) {
+        const { count: matchedCount } = await supabaseAdmin.from("payroll_receipts").select("id", { count: "exact", head: true })
+          .eq("batch_id", receipt.batch_id).eq("match_status", "matched");
+        const { count: unmatchedCount } = await supabaseAdmin.from("payroll_receipts").select("id", { count: "exact", head: true })
+          .eq("batch_id", receipt.batch_id).eq("match_status", "unmatched");
         await supabaseAdmin.from("payroll_receipt_batches").update({
-          matched_count: ((await supabaseAdmin.from("payroll_receipts").select("id", { count: "exact", head: true })
-            .eq("batch_id", receipt.batch_id).eq("match_status", "matched")).count || 0),
-          unmatched_count: ((await supabaseAdmin.from("payroll_receipts").select("id", { count: "exact", head: true })
-            .eq("batch_id", receipt.batch_id).eq("match_status", "unmatched")).count || 0),
+          matched_count: matchedCount || 0, unmatched_count: unmatchedCount || 0,
         }).eq("id", receipt.batch_id);
       }
 
