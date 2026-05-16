@@ -1,126 +1,128 @@
-# Fase 2 — Assinatura Eletrônica por Tenant (Clicksign)
 
-Objetivo: permitir que cada cliente (organização) configure suas próprias credenciais Clicksign e envie documentos para assinatura — sem expor segredos no PostgREST e sem misturar credenciais entre tenants.
+## Escopo desta entrega
 
-## 1. Banco de dados (migration única)
+Você marcou 4 módulos prioritários. Implementar os 4 de ponta-a-ponta (banco + RLS + Edge Functions + telas + integrações) numa única rodada é inviável sem comprometer qualidade. Proponho dividir assim:
 
-### `organization_integrations`
-Tabela genérica para integrações por organização (começa com Clicksign, extensível).
+- **Esta entrega (Fase 3):** Bloco 1 do documento (sidebar) + **Admissão Digital** + **Recibos/Holerites em lote**.
+- **Próxima entrega (Fase 4):** **Saúde Ocupacional (ASO)** + **Rescisão Contratual**.
+- **Fases futuras:** Folha de Pagamento + Apontamentos, EPIs, Treinamentos, Super Admin completo.
 
-Colunas principais:
-- `organization_id` (FK organizations)
-- `provider` (enum: `clicksign`)
-- `environment` (enum: `sandbox` | `production`)
-- `is_active` (boolean)
-- `encrypted_credentials` (bytea) — `pgp_sym_encrypt` com `INTEGRATION_ENCRYPTION_KEY`
-- `webhook_secret` (text, gerado server-side) — usado para validar HMAC do Clicksign
-- `webhook_url_token` (text único) — URL pública do webhook por org
-- `capabilities` (jsonb) — ex.: `{ whatsapp: true, email: true }`
-- `last_tested_at`, `last_test_status`, `last_test_error`
-- `created_by`, `updated_by`
+Se preferir trocar a ordem ou priorizar outro módulo agora, me diga antes de aprovar.
 
-Constraint: `UNIQUE (organization_id, provider)`.
+---
+
+## Bloco 1 — Sidebar com grupos colapsáveis
+
+Refatorar `src/components/AppSidebar.tsx` mantendo 100% das rotas, permissões, ViewAs, busca, multi-org e responsividade atuais.
+
+- Cada `SidebarGroupLabel` vira um `button` acessível (`aria-expanded`, `aria-controls`, foco por teclado) com `ChevronRight` fechado / `ChevronDown` aberto.
+- Estado de expansão por grupo persistido em `localStorage` (chave por `userId:orgId`).
+- Comportamento padrão: todos recolhidos exceto o grupo que contém a rota ativa.
+- Busca abre automaticamente os grupos com resultados; ao limpar a busca, restaura o estado salvo.
+- Mensagem "Nenhum item encontrado" quando a busca não retorna nada, com botão para limpar.
+- Transição suave usando `Collapsible` do shadcn (já disponível no projeto) ou classes Tailwind.
+- Sem renomear rotas, sem remover itens, sem quebrar offcanvas mobile.
+
+---
+
+## Bloco 2 — Admissão Digital (4.1 do documento)
+
+Fluxo real: candidato aprovado → processo admissional → colaborador ativo.
+
+### Banco (migration única)
+
+Tabelas novas (todas com `organization_id`, RLS, timestamps, `created_by`):
+
+- `admission_processes` — `candidate_id?`, `employee_id?`, `position_id`, `department_id`, `manager_id`, `cost_center_id`, `unit_id`, `contract_type`, `expected_start_date`, `status` (`draft|invited|in_progress|review|signed|completed|cancelled`), `responsible_user_id`, `invite_token` (único, expirável), `invite_expires_at`, `completed_at`.
+- `admission_checklist_items` — `process_id`, `title`, `description`, `required`, `status` (`pending|done|skipped`), `done_at`, `done_by`, `order`.
+- `admission_documents` — `process_id`, `doc_type` (RG, CPF, CTPS, comprovante, foto, diploma, dependentes, dados bancários, outros), `file_path` (bucket `employee-documents`), `status` (`pending|submitted|approved|rejected`), `review_notes`, `reviewed_by`, `reviewed_at`.
+- `admission_form_data` — `process_id`, payload `jsonb` (dados pessoais, endereço, bancários, dependentes), `submitted_at`.
+- `admission_events` — append-only: `process_id`, `event_type`, `actor_user_id`, `metadata jsonb`, `created_at`.
 
 RLS:
-- SELECT: membros da org via `user_belongs_to_org` — **porém `encrypted_credentials` e `webhook_secret` ficam fora**: criamos uma VIEW `organization_integrations_safe` sem esses campos e revogamos SELECT da tabela base para `authenticated`. Apenas service role lê os blobs.
-- INSERT/UPDATE/DELETE: somente via Edge Function (service role).
+- RH/DP/Admin da org: full CRUD por `organization_id`.
+- Candidato acessa via token público (link seguro) — sem auth Supabase, validado em Edge Function.
+- Colaborador criado vê apenas o próprio processo após login.
 
-### `signature_events` (append-only)
-Toda mudança de status vinda do Clicksign:
-- `organization_id`, `envelope_id`, `provider`, `event_type`, `payload` (jsonb), `received_at`, `webhook_id`
+Trigger: ao mudar `status` para `completed`, criar/atualizar `employees`, `employees_contracts`, `employees_contact`, `employees_legal_docs`, `employee_documents` (cópia dos anexos), gerar `audit_log`.
 
-Trigger `block_modify_append_only` para UPDATE/DELETE.
+### Edge Functions
 
-### `signature_provider_webhooks` (idempotência)
-- `provider`, `external_event_id`, `organization_id`, `received_at`
-- `UNIQUE (provider, external_event_id)`
+- `admission-create` — RH cria processo (a partir de candidato ou do zero), gera `invite_token`.
+- `admission-invite-send` — envia e-mail com link seguro ao candidato (Resend já configurado).
+- `admission-public-get` — público, valida token, retorna formulário e documentos pendentes.
+- `admission-public-submit` — público, valida token + rate limit, salva form data e arquivos.
+- `admission-review-document` — RH aprova/rejeita documento individual.
+- `admission-complete` — RH valida tudo, opcionalmente envia contrato para Clicksign (reutiliza `signature-send`), converte em colaborador.
+- `admission-cancel` — cancela e registra auditoria.
 
-### Extensões em `signature_envelopes` (Fase 4)
-- `provider_envelope_id` (text)
-- `provider` (default `clicksign`)
-- `organization_id` (NOT NULL, FK)
-- índice `(organization_id, status)`
+### Frontend
 
-### Funções
-- `get_org_integration_credentials(_org_id, _provider)` — SECURITY DEFINER, retorna jsonb decifrado. Só executável pelo role service.
-- `set_org_integration_credentials(_org_id, _provider, _creds jsonb, _env, _caps)` — cifra e upserta.
-- Permissões adicionadas: `integrations.signature.manage`, `signatures.send`, `signatures.view_all`.
+- `/admissoes` — listagem (cards de resumo: em andamento / pendentes / concluídos / cancelados), filtros por status/cargo/responsável, busca.
+- `/admissoes/nova` — wizard 3 passos (vínculo com candidato → dados do cargo/contrato → checklist personalizado).
+- `/admissoes/:id` — detalhe com abas (Visão Geral, Checklist, Documentos, Formulário, Eventos), botão de reenviar convite, ações de aprovar/rejeitar doc, botão "Enviar contrato p/ assinatura", botão "Concluir admissão".
+- `/admissao-publica/:token` — página pública para o candidato preencher dados e anexar documentos (sem login).
+- Hook `useAdmissions`, `useAdmissionProcess(id)`, `useAdmissionPublic(token)`.
+- Componente `AdmissionStatusBadge` reutilizando o padrão visual existente.
+- Integração com o card de candidato no Funil: botão "Iniciar admissão" pré-preenche o wizard.
 
-### Secret
-`INTEGRATION_ENCRYPTION_KEY` (32+ bytes) — pedir via `add_secret` antes de rodar migration que dependa dela em runtime (a função apenas usa quando chamada).
+---
 
-## 2. Edge Functions
+## Bloco 3 — Recibos / Holerites em lote (4.3 do documento)
 
-Todas validam JWT via `getClaims`, checam `has_org_permission(user, org, 'integrations.signature.manage')` para configuração e `signatures.send` para envio, e gravam em `platform_audit_log` quando relevante.
+Upload em lote de PDFs, associação automática por CPF/matrícula, publicação com ciência.
 
-1. **`signature-config-upsert`** — POST `{ organization_id, environment, api_token, capabilities }` → cifra e grava. Gera `webhook_secret` e `webhook_url_token` no primeiro upsert.
-2. **`signature-config-get`** — GET `?organization_id=` → retorna metadados (sem token), webhook URL pública pronta para colar no painel Clicksign.
-3. **`signature-config-test`** — chama endpoint leve do Clicksign com as credenciais decifradas e grava `last_test_*`.
-4. **`signature-create-envelope`** — cria envelope no Clicksign para um documento (payslip / hr_document / admissão / EPI), persiste em `signature_envelopes` com `provider_envelope_id`.
-5. **`signature-send-document`** — adiciona signatários + dispara envio (email/WhatsApp conforme `capabilities`).
-6. **`signature-cancel-envelope`** — cancela no Clicksign + atualiza local.
-7. **`signature-sync-status`** — fallback poll (caso webhook falhe).
-8. **`signature-webhook-clicksign`** — público (`verify_jwt = false`), URL inclui `webhook_url_token`. Valida HMAC com `webhook_secret`, faz idempotência via `signature_provider_webhooks`, grava em `signature_events`, atualiza `signature_envelopes` e `signature_envelope_signers`.
+### Banco (migration única — estende o que já existe)
 
-### Adapter
-Estender `supabase/functions/_shared/signature-provider.ts`:
-- Interface `SignatureProvider` recebe `credentials` por chamada (nada de `Deno.env` no provider).
-- Implementação `ClicksignProvider` com `createEnvelope`, `addSigner`, `send`, `cancel`, `getStatus`, `verifyWebhook(rawBody, signature, secret)`.
+- `payroll_receipt_batches` — `organization_id`, `competency` (YYYY-MM), `type` (`holerite|recibo|13o|ferias|rescisao`), `status` (`draft|matching|ready|published|cancelled`), `total_files`, `matched_count`, `unmatched_count`, `published_at`, `published_by`.
+- `payroll_receipts` — `batch_id`, `employee_id?` (null se não casou), `cpf_lookup`, `matricula_lookup`, `file_path`, `file_name`, `match_status` (`matched|ambiguous|unmatched`), `published`, `acknowledged_at`, `acknowledged_ip`.
+- `document_acknowledgements` — `receipt_id`, `employee_id`, `acknowledged_at`, `ip_address`, `user_agent` (para auditoria forte).
 
-## 3. Frontend
+RLS: RH/DP/Admin da org gerenciam tudo; colaborador lê apenas `payroll_receipts WHERE employee_id = auth.uid() AND published = true`.
 
-### Configuração (somente admin/owner)
-- Nova aba **"Assinatura Eletrônica"** em `IntegrationsSettings.tsx`:
-  - Form: ambiente (sandbox/prod), token, toggles de canais (email/WhatsApp).
-  - Botão **Testar conexão** → `signature-config-test`.
-  - Bloco **Webhook**: exibe URL única `https://…/functions/v1/signature-webhook-clicksign?t=<token>` com botão copiar + instruções.
-  - Status: último teste, ambiente ativo, badge "Configurado".
+Bucket: reusar `payroll-exports` ou criar `payroll-receipts` (privado), policies por org.
 
-### Hooks
-- `useOrgSignatureConfig.ts` — get/upsert/test via edge functions.
-- Ampliar `useSignatureEnvelopes.ts` (já existe da Fase 4) para usar provider per-tenant.
+### Edge Functions
 
-### Ações nas telas existentes
-Adicionar botão **"Enviar para assinatura"** com guard `signatures.send` + verificação `is_active` em:
-- `PayslipsManage.tsx` (holerites)
-- `MyPayslips.tsx` (re-envio se permitido)
-- `HrDocuments` (já tem assinatura — passa a usar provider per-tenant)
-- `OnboardingProcesses.tsx` (admissão)
-- `Receipts.tsx` (EPI/recibos)
+- `payroll-receipts-upload` — recebe lote de PDFs, extrai CPF/matrícula do nome do arquivo (padrão configurável) ou de metadado, cria registros com `match_status`.
+- `payroll-receipts-rematch` — RH corrige manualmente associações ambíguas/sem match.
+- `payroll-receipts-publish` — valida que não há `unmatched`/`ambiguous`, marca `published=true`, dispara notificação (in-app) aos colaboradores, registra auditoria.
+- `payroll-receipts-acknowledge` — colaborador dá ciência (grava IP/UA).
+- `payroll-receipts-download` — gera signed URL temporária + audita download.
 
-Modal único `SendForSignatureDialog.tsx` reutilizável: lista signatários sugeridos, canal (email/whatsapp), confirma envio.
+### Frontend
 
-### Painel de envelopes
-Página `/assinaturas` (já existente como `SignatureEnvelopes`?) — se não, criar listando envelopes da org com status, ações (sync, cancelar, reenviar).
+- `/holerites` (RH) — listagem de lotes com cards (este mês / publicados / pendentes), filtros por competência/tipo.
+- `/holerites/novo` — wizard: escolher competência+tipo → upload múltiplo → tela de revisão de matches com cores (verde/amarelo/vermelho) e correção manual → confirmar publicação.
+- `/holerites/:batchId` — detalhe do lote, lista de recibos, status de ciência por colaborador, exportar relatório.
+- `/meus-holerites` (colaborador, já existe `MyPayslips.tsx`) — completar: card por competência, botão "Dar ciência" obrigatório antes de baixar, badge "Novo", download via signed URL.
+- Integração com Floating Chat: notificação quando novo holerite for publicado.
 
-## 4. Segurança e Hardening
+---
 
-- `encrypted_credentials` nunca sai do banco via PostgREST (view + revoke).
-- Webhook usa token na URL **e** HMAC do payload — ambos obrigatórios.
-- Rate limit no `signature-webhook-clicksign` via `check_rate_limit` por IP.
-- Auditoria: cada `config-upsert`, `test`, `create-envelope`, `send`, `cancel` grava em `platform_audit_log` com `target_organization_id`.
-- Rodar `supabase--linter` ao fim e corrigir warnings da migration.
+## Detalhes técnicos transversais
 
-## 5. Arquivos previstos
+- **Padrão UX:** todas as páginas seguem o padrão existente (header com título + descrição + breadcrumb + CTA primário, cards de resumo, tabela responsiva, empty state com CTA, skeletons em loading, toasts via `sonner`, `AlertDialog` para ações destrutivas).
+- **Segurança:** zero secret no frontend; toda criação/mudança de status passa por Edge Function que valida JWT + `has_org_permission`; rate-limit em endpoints públicos (token de admissão).
+- **Auditoria:** registrar em `audit_log` (já existe) e nas tabelas `*_events` para timelines no detalhe.
+- **Integração com Clicksign:** já está disponível por tenant (Fase 2). Os botões "Enviar contrato para assinatura" / "Enviar holerite para assinatura" só aparecem quando o tenant tem credencial configurada — caso contrário mostram tooltip explicativo.
+- **Realtime:** subscrever mudanças de `admission_processes` e `payroll_receipt_batches` para refletir progresso ao vivo.
+- **Tipos:** `src/integrations/supabase/types.ts` é regenerado automaticamente após a migration.
 
-**Migration**: 1 (`fase_2_signature_per_tenant.sql`)
+---
 
-**Edge functions** (novas/editadas):
-- `signature-config-upsert`, `signature-config-get`, `signature-config-test`
-- `signature-create-envelope`, `signature-send-document`, `signature-cancel-envelope`, `signature-sync-status`
-- `signature-webhook-clicksign`
-- `_shared/signature-provider.ts` (refatorar)
-- `supabase/config.toml` (apenas webhook `verify_jwt = false`)
+## Ordem de execução
 
-**Frontend**:
-- `src/hooks/useOrgSignatureConfig.ts`
-- `src/components/integrations/SignatureProviderTab.tsx`
-- `src/components/signature/SendForSignatureDialog.tsx`
-- Edições em `IntegrationsSettings.tsx`, `PayslipsManage.tsx`, `MyPayslips.tsx`, `HrDocuments*`, `OnboardingProcesses.tsx`, `Receipts.tsx`
-- `src/App.tsx` (rota `/assinaturas` se faltar)
+1. Migration única consolidada (sidebar não precisa; Admissão + Holerites em uma só migration).
+2. Edge Functions (Admissão e Holerites em paralelo).
+3. Refator do `AppSidebar`.
+4. Páginas e hooks de Admissão.
+5. Páginas e hooks de Holerites em lote + completar `MyPayslips`.
+6. Rotas no `App.tsx` + entradas no menu (já existem para holerites; criar para admissão).
+7. Smoke test manual: criar admissão, simular fluxo do candidato, concluir; subir 3 PDFs de holerite, matchear, publicar, dar ciência.
 
-## 6. Secret a pedir antes de começar
+## Fora de escopo desta entrega (vão para Fase 4+)
 
-- `INTEGRATION_ENCRYPTION_KEY` (gerar string aleatória de 64 chars hex — eu mostro como)
-
-Após sua aprovação eu peço esse secret e já rodo a migration.
+- Saúde Ocupacional (ASO) e Rescisão Contratual — próxima fase.
+- Folha de Pagamento completa, EPIs, Treinamentos, Super Admin avançado — fases seguintes.
+- Auditoria detalhada de cada um dos 9 módulos existentes (faria nesta fase só se você trocar para a opção "Bloco 1 + auditoria").
