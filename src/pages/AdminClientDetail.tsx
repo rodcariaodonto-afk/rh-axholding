@@ -29,8 +29,8 @@ const ALL_MODULES = [
 function ClientDetailInner() {
   const { id } = useParams();
   const { data: client, isLoading } = useClient(id);
-  const { data: plans = [] } = usePlans();
-  const { data: orgModules = [] } = useOrgModules(id);
+  const { data: plans } = usePlans();
+  const { data: orgModules } = useOrgModules(id);
   const action = useClientAction();
   const updatePlan = useUpdateClientPlan();
 
@@ -38,20 +38,25 @@ function ClientDetailInner() {
   const [modules, setModules] = useState<string[]>([]);
 
   useEffect(() => {
-    if (client && plans.length) {
+    if (client && plans && plans.length) {
       const current = plans.find((p) => p.id === client.plan_id)?.slug ?? "starter";
-      setPlanSlug(current);
+      setPlanSlug((prev) => (prev === current ? prev : current));
     }
   }, [client, plans]);
 
   useEffect(() => {
-    const enabled = orgModules.filter((m: any) => m.enabled).map((m: any) => m.module_key);
-    setModules(enabled);
+    if (!orgModules) return;
+    const enabled = orgModules.filter((m: any) => m.enabled).map((m: any) => m.module_key).sort();
+    setModules((prev) => {
+      const same = prev.length === enabled.length && prev.every((v, i) => v === enabled[i]);
+      return same ? prev : enabled;
+    });
   }, [orgModules]);
 
   if (isLoading || !client) return <div className="p-8"><Skeleton className="h-96 w-full" /></div>;
 
   const toggle = (k: string) => setModules((p) => (p.includes(k) ? p.filter((x) => x !== k) : [...p, k]));
+
 
   return (
     <div className="container mx-auto p-6 space-y-6 max-w-5xl">
