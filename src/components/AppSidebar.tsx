@@ -160,6 +160,7 @@ const menuGroups: MenuGroup[] = [
       { icon: UserPlus, label: "Candidatos", href: "/candidates" },
       { icon: Filter, label: "Funil de Seleção", href: "/selection-funnel" },
       { icon: Archive, label: "Banco de Talentos", href: "/talent-bank" },
+      { icon: UserPlus, label: "Admissão Digital", href: "/admissoes" },
     ],
   },
   {
