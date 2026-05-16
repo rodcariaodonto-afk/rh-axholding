@@ -40,6 +40,8 @@ const CompanyCosts = lazy(() => import("./pages/CompanyCosts"));
 const CompanySettings = lazy(() => import("./pages/CompanySettings"));
 const Culture = lazy(() => import("./pages/Culture"));
 const Terminations = lazy(() => import("./pages/Terminations"));
+const TerminationProcesses = lazy(() => import("./pages/TerminationProcesses"));
+const TerminationProcessDetail = lazy(() => import("./pages/TerminationProcessDetail"));
 const TimeOff = lazy(() => import("./pages/TimeOff"));
 const TalentBank = lazy(() => import("./pages/TalentBank"));
 const TalentBankApplication = lazy(() => import("./pages/TalentBankApplication"));
