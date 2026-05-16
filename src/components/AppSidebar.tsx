@@ -171,6 +171,9 @@ const menuGroups: MenuGroup[] = [
       { icon: UserPlus, label: "Onboarding Digital", href: "/onboarding-processes" },
       { icon: ClipboardCheck, label: "ASO — Exames Ocupacionais", href: "/medical-exams" },
       { icon: FileText, label: "Recibos (EPI, Vale, Uniforme)", href: "/receipts" },
+      { icon: Package, label: "EPIs — Catálogo & Estoque", href: "/epis" },
+      { icon: ClipboardList, label: "EPIs — Entregas", href: "/epis/entregas" },
+      { icon: Archive, label: "Patrimônio", href: "/patrimonio" },
     ],
   },
   {

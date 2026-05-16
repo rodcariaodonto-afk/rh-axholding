@@ -396,6 +396,160 @@ export type Database = {
           },
         ]
       }
+      asset_assignments: {
+        Row: {
+          asset_id: string
+          assigned_at: string
+          assigned_by: string | null
+          created_at: string
+          employee_id: string
+          expected_return_at: string | null
+          id: string
+          notes: string | null
+          organization_id: string
+          return_condition: string | null
+          returned_at: string | null
+          signature_data: string | null
+          signed_at: string | null
+          status: Database["public"]["Enums"]["asset_assignment_status"]
+          updated_at: string
+        }
+        Insert: {
+          asset_id: string
+          assigned_at?: string
+          assigned_by?: string | null
+          created_at?: string
+          employee_id: string
+          expected_return_at?: string | null
+          id?: string
+          notes?: string | null
+          organization_id: string
+          return_condition?: string | null
+          returned_at?: string | null
+          signature_data?: string | null
+          signed_at?: string | null
+          status?: Database["public"]["Enums"]["asset_assignment_status"]
+          updated_at?: string
+        }
+        Update: {
+          asset_id?: string
+          assigned_at?: string
+          assigned_by?: string | null
+          created_at?: string
+          employee_id?: string
+          expected_return_at?: string | null
+          id?: string
+          notes?: string | null
+          organization_id?: string
+          return_condition?: string | null
+          returned_at?: string | null
+          signature_data?: string | null
+          signed_at?: string | null
+          status?: Database["public"]["Enums"]["asset_assignment_status"]
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "asset_assignments_asset_id_fkey"
+            columns: ["asset_id"]
+            isOneToOne: false
+            referencedRelation: "assets"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "asset_assignments_organization_id_fkey"
+            columns: ["organization_id"]
+            isOneToOne: false
+            referencedRelation: "organizations"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "asset_assignments_organization_id_fkey"
+            columns: ["organization_id"]
+            isOneToOne: false
+            referencedRelation: "organizations_public"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      assets: {
+        Row: {
+          acquired_at: string | null
+          acquired_value: number | null
+          brand: string | null
+          category: string
+          created_at: string
+          current_assignee_id: string | null
+          description: string | null
+          id: string
+          invoice_number: string | null
+          location: string | null
+          model: string | null
+          notes: string | null
+          organization_id: string
+          serial_number: string | null
+          status: Database["public"]["Enums"]["asset_status"]
+          tag: string
+          updated_at: string
+          warranty_until: string | null
+        }
+        Insert: {
+          acquired_at?: string | null
+          acquired_value?: number | null
+          brand?: string | null
+          category: string
+          created_at?: string
+          current_assignee_id?: string | null
+          description?: string | null
+          id?: string
+          invoice_number?: string | null
+          location?: string | null
+          model?: string | null
+          notes?: string | null
+          organization_id: string
+          serial_number?: string | null
+          status?: Database["public"]["Enums"]["asset_status"]
+          tag: string
+          updated_at?: string
+          warranty_until?: string | null
+        }
+        Update: {
+          acquired_at?: string | null
+          acquired_value?: number | null
+          brand?: string | null
+          category?: string
+          created_at?: string
+          current_assignee_id?: string | null
+          description?: string | null
+          id?: string
+          invoice_number?: string | null
+          location?: string | null
+          model?: string | null
+          notes?: string | null
+          organization_id?: string
+          serial_number?: string | null
+          status?: Database["public"]["Enums"]["asset_status"]
+          tag?: string
+          updated_at?: string
+          warranty_until?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "assets_organization_id_fkey"
+            columns: ["organization_id"]
+            isOneToOne: false
+            referencedRelation: "organizations"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "assets_organization_id_fkey"
+            columns: ["organization_id"]
+            isOneToOne: false
+            referencedRelation: "organizations_public"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       audit_log: {
         Row: {
           action: string
@@ -2627,6 +2781,227 @@ export type Database = {
           user_id?: string
         }
         Relationships: []
+      }
+      epi_catalog: {
+        Row: {
+          ca_expires_at: string | null
+          ca_number: string | null
+          category: string | null
+          code: string
+          created_at: string
+          description: string | null
+          durability_days: number | null
+          id: string
+          is_active: boolean
+          manufacturer: string | null
+          min_stock_qty: number
+          name: string
+          organization_id: string
+          stock_qty: number
+          unit: string
+          updated_at: string
+        }
+        Insert: {
+          ca_expires_at?: string | null
+          ca_number?: string | null
+          category?: string | null
+          code: string
+          created_at?: string
+          description?: string | null
+          durability_days?: number | null
+          id?: string
+          is_active?: boolean
+          manufacturer?: string | null
+          min_stock_qty?: number
+          name: string
+          organization_id: string
+          stock_qty?: number
+          unit?: string
+          updated_at?: string
+        }
+        Update: {
+          ca_expires_at?: string | null
+          ca_number?: string | null
+          category?: string | null
+          code?: string
+          created_at?: string
+          description?: string | null
+          durability_days?: number | null
+          id?: string
+          is_active?: boolean
+          manufacturer?: string | null
+          min_stock_qty?: number
+          name?: string
+          organization_id?: string
+          stock_qty?: number
+          unit?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "epi_catalog_organization_id_fkey"
+            columns: ["organization_id"]
+            isOneToOne: false
+            referencedRelation: "organizations"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "epi_catalog_organization_id_fkey"
+            columns: ["organization_id"]
+            isOneToOne: false
+            referencedRelation: "organizations_public"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      epi_deliveries: {
+        Row: {
+          ca_at_delivery: string | null
+          created_at: string
+          delivered_at: string
+          delivered_by: string | null
+          employee_id: string
+          epi_id: string
+          expected_return_at: string | null
+          id: string
+          notes: string | null
+          organization_id: string
+          quantity: number
+          receipt_id: string | null
+          return_condition: string | null
+          returned_at: string | null
+          returned_qty: number | null
+          signature_data: string | null
+          signed_at: string | null
+          status: Database["public"]["Enums"]["epi_delivery_status"]
+          updated_at: string
+        }
+        Insert: {
+          ca_at_delivery?: string | null
+          created_at?: string
+          delivered_at?: string
+          delivered_by?: string | null
+          employee_id: string
+          epi_id: string
+          expected_return_at?: string | null
+          id?: string
+          notes?: string | null
+          organization_id: string
+          quantity: number
+          receipt_id?: string | null
+          return_condition?: string | null
+          returned_at?: string | null
+          returned_qty?: number | null
+          signature_data?: string | null
+          signed_at?: string | null
+          status?: Database["public"]["Enums"]["epi_delivery_status"]
+          updated_at?: string
+        }
+        Update: {
+          ca_at_delivery?: string | null
+          created_at?: string
+          delivered_at?: string
+          delivered_by?: string | null
+          employee_id?: string
+          epi_id?: string
+          expected_return_at?: string | null
+          id?: string
+          notes?: string | null
+          organization_id?: string
+          quantity?: number
+          receipt_id?: string | null
+          return_condition?: string | null
+          returned_at?: string | null
+          returned_qty?: number | null
+          signature_data?: string | null
+          signed_at?: string | null
+          status?: Database["public"]["Enums"]["epi_delivery_status"]
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "epi_deliveries_epi_id_fkey"
+            columns: ["epi_id"]
+            isOneToOne: false
+            referencedRelation: "epi_catalog"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "epi_deliveries_organization_id_fkey"
+            columns: ["organization_id"]
+            isOneToOne: false
+            referencedRelation: "organizations"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "epi_deliveries_organization_id_fkey"
+            columns: ["organization_id"]
+            isOneToOne: false
+            referencedRelation: "organizations_public"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      epi_stock_movements: {
+        Row: {
+          created_at: string
+          delivery_id: string | null
+          epi_id: string
+          id: string
+          kind: Database["public"]["Enums"]["epi_movement_kind"]
+          organization_id: string
+          performed_by: string | null
+          quantity: number
+          reason: string | null
+          unit_cost: number | null
+        }
+        Insert: {
+          created_at?: string
+          delivery_id?: string | null
+          epi_id: string
+          id?: string
+          kind: Database["public"]["Enums"]["epi_movement_kind"]
+          organization_id: string
+          performed_by?: string | null
+          quantity: number
+          reason?: string | null
+          unit_cost?: number | null
+        }
+        Update: {
+          created_at?: string
+          delivery_id?: string | null
+          epi_id?: string
+          id?: string
+          kind?: Database["public"]["Enums"]["epi_movement_kind"]
+          organization_id?: string
+          performed_by?: string | null
+          quantity?: number
+          reason?: string | null
+          unit_cost?: number | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "epi_stock_movements_epi_id_fkey"
+            columns: ["epi_id"]
+            isOneToOne: false
+            referencedRelation: "epi_catalog"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "epi_stock_movements_organization_id_fkey"
+            columns: ["organization_id"]
+            isOneToOne: false
+            referencedRelation: "organizations"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "epi_stock_movements_organization_id_fkey"
+            columns: ["organization_id"]
+            isOneToOne: false
+            referencedRelation: "organizations_public"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       equity: {
         Row: {
@@ -9181,6 +9556,18 @@ export type Database = {
         | "processing"
         | "completed"
         | "error"
+      asset_assignment_status:
+        | "ativa"
+        | "aguardando_assinatura"
+        | "devolvida"
+        | "cancelada"
+      asset_status:
+        | "disponivel"
+        | "em_uso"
+        | "manutencao"
+        | "devolvido"
+        | "baixado"
+        | "perdido"
       bonus_status: "pending" | "approved" | "paid" | "cancelled"
       bonus_type:
         | "performance"
@@ -9268,6 +9655,18 @@ export type Database = {
         | "postdoc"
       employee_status: "pending" | "active" | "on_leave" | "terminated"
       employment_type: "full_time" | "part_time" | "contractor" | "intern"
+      epi_delivery_status:
+        | "entregue"
+        | "aguardando_assinatura"
+        | "assinado"
+        | "devolvido"
+        | "cancelado"
+      epi_movement_kind:
+        | "entrada"
+        | "saida"
+        | "ajuste"
+        | "devolucao"
+        | "descarte"
       equity_status:
         | "granted"
         | "vesting"
@@ -9612,6 +10011,20 @@ export const Constants = {
         "completed",
         "error",
       ],
+      asset_assignment_status: [
+        "ativa",
+        "aguardando_assinatura",
+        "devolvida",
+        "cancelada",
+      ],
+      asset_status: [
+        "disponivel",
+        "em_uso",
+        "manutencao",
+        "devolvido",
+        "baixado",
+        "perdido",
+      ],
       bonus_status: ["pending", "approved", "paid", "cancelled"],
       bonus_type: [
         "performance",
@@ -9708,6 +10121,20 @@ export const Constants = {
       ],
       employee_status: ["pending", "active", "on_leave", "terminated"],
       employment_type: ["full_time", "part_time", "contractor", "intern"],
+      epi_delivery_status: [
+        "entregue",
+        "aguardando_assinatura",
+        "assinado",
+        "devolvido",
+        "cancelado",
+      ],
+      epi_movement_kind: [
+        "entrada",
+        "saida",
+        "ajuste",
+        "devolucao",
+        "descarte",
+      ],
       equity_status: [
         "granted",
         "vesting",
