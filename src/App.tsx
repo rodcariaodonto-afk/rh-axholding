@@ -114,6 +114,8 @@ const Exports = lazy(() => import("./pages/Exports"));
 const MyPayslips = lazy(() => import("./pages/MyPayslips"));
 const PayslipsManage = lazy(() => import("./pages/PayslipsManage"));
 const OnboardingProcesses = lazy(() => import("./pages/OnboardingProcesses"));
+const OnboardingProcessDetail = lazy(() => import("./pages/OnboardingProcessDetail"));
+const OnboardingPortal = lazy(() => import("./pages/OnboardingPortal"));
 const MedicalExams = lazy(() => import("./pages/MedicalExams"));
 const Receipts = lazy(() => import("./pages/Receipts"));
 const AdminClients = lazy(() => import("./pages/AdminClients"));
