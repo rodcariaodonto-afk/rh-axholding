@@ -175,6 +175,7 @@ const menuGroups: MenuGroup[] = [
     items: [
       { icon: FileText, label: "Folha de Pagamento", href: "/payroll" },
       { icon: FileText, label: "Competências (Folha)", href: "/payroll-competencies" },
+      { icon: FileText, label: "Holerites", href: "/payslips" },
       { icon: CreditCard, label: "Programação de Pagamento", href: "/payment-schedule" },
       { icon: DollarSign, label: "Custos", href: "/company-costs" },
       { icon: FileStack, label: "Central de Exportações", href: "/exports" },

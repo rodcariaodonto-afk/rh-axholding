@@ -104,6 +104,8 @@ const TimeInconsistencies = lazy(() => import("./pages/TimeInconsistencies"));
 const MyTasks = lazy(() => import("./pages/MyTasks"));
 const PayrollCompetencies = lazy(() => import("./pages/PayrollCompetencies"));
 const Exports = lazy(() => import("./pages/Exports"));
+const MyPayslips = lazy(() => import("./pages/MyPayslips"));
+const PayslipsManage = lazy(() => import("./pages/PayslipsManage"));
 
 const queryClient = new QueryClient({
   defaultOptions: {
@@ -287,6 +289,8 @@ const App = () => (
             <Route path="/my-tasks" element={<MyTasks />} />
             <Route path="/payroll-competencies" element={<PeopleRoute><PayrollCompetencies /></PeopleRoute>} />
             <Route path="/exports" element={<PeopleRoute><Exports /></PeopleRoute>} />
+            <Route path="/my-payslips" element={<MyPayslips />} />
+            <Route path="/payslips" element={<PeopleRoute><PayslipsManage /></PeopleRoute>} />
           </Route>
 
           {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
