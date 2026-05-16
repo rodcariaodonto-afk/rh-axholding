@@ -9,7 +9,7 @@ import {
 import { IntegrationCard } from "@/components/IntegrationCard";
 import { ResendEmailConfig } from "@/components/ResendEmailConfig";
 import { Button } from "@/components/ui/button";
-import { RefreshCw, Plug, Shield, Bot, Mail } from "lucide-react";
+import { RefreshCw, Plug, Shield, Bot, Mail, FileSignature } from "lucide-react";
 import { Skeleton } from "@/components/ui/skeleton";
 
 // Provider configuration
@@ -22,6 +22,15 @@ const PROVIDERS = [
     icon: <Mail className="h-5 w-5 text-primary" />,
     helpUrl: "https://resend.com/api-keys",
     helpText: "Obter API key",
+  },
+  {
+    id: "clicksign",
+    name: "Clicksign — Assinatura Eletrônica",
+    description: "Envie holerites, admissões, EPI e documentos para assinatura digital com validade jurídica",
+    placeholder: "Cole seu Access Token do Clicksign",
+    icon: <FileSignature className="h-5 w-5 text-primary" />,
+    helpUrl: "https://app.clicksign.com/users/edit#api",
+    helpText: "Obter Access Token",
   },
   {
     id: "anthropic",
