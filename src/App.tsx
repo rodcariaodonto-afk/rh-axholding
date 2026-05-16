@@ -320,6 +320,9 @@ const App = () => (
             <Route path="/admin/auditoria-global" element={<AdminAudit />} />
             <Route path="/admissoes" element={<PeopleRoute><Admissoes /></PeopleRoute>} />
             <Route path="/admissoes/:id" element={<PeopleRoute><AdmissaoDetail /></PeopleRoute>} />
+            <Route path="/holerites" element={<PeopleRoute><Holerites /></PeopleRoute>} />
+            <Route path="/holerites/novo" element={<PeopleRoute><HoleriteNovo /></PeopleRoute>} />
+            <Route path="/holerites/:id" element={<PeopleRoute><HoleriteDetail /></PeopleRoute>} />
           </Route>
 
           {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}

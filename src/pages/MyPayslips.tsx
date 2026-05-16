@@ -90,7 +90,7 @@ export default function MyPayslips() {
                     </TableRow>
                   </TableHeader>
                   <TableBody>
-                    {legacy.map((p: { id: string; payroll_competencies?: { reference_label?: string }; net_amount?: number; ack_status: string; file_path: string }) => (
+                    {legacy.map((p: any) => (
                       <TableRow key={p.id}>
                         <TableCell className="font-medium">{p.payroll_competencies?.reference_label ?? "—"}</TableCell>
                         <TableCell>{p.net_amount ? `R$ ${Number(p.net_amount).toFixed(2)}` : "—"}</TableCell>
