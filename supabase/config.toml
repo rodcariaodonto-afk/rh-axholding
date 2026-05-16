@@ -7,3 +7,5 @@ project_id = "icggemcoeiwbhtgekkby"
     verify_jwt = false
   [functions.signature-webhook]
     verify_jwt = false
+  [functions.admission-public]
+    verify_jwt = false

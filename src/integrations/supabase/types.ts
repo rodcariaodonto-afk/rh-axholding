@@ -105,6 +105,297 @@ export type Database = {
           },
         ]
       }
+      admission_checklist_items: {
+        Row: {
+          created_at: string
+          description: string | null
+          display_order: number
+          done_at: string | null
+          done_by: string | null
+          id: string
+          process_id: string
+          required: boolean
+          status: Database["public"]["Enums"]["admission_checklist_status"]
+          title: string
+          updated_at: string
+        }
+        Insert: {
+          created_at?: string
+          description?: string | null
+          display_order?: number
+          done_at?: string | null
+          done_by?: string | null
+          id?: string
+          process_id: string
+          required?: boolean
+          status?: Database["public"]["Enums"]["admission_checklist_status"]
+          title: string
+          updated_at?: string
+        }
+        Update: {
+          created_at?: string
+          description?: string | null
+          display_order?: number
+          done_at?: string | null
+          done_by?: string | null
+          id?: string
+          process_id?: string
+          required?: boolean
+          status?: Database["public"]["Enums"]["admission_checklist_status"]
+          title?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "admission_checklist_items_process_id_fkey"
+            columns: ["process_id"]
+            isOneToOne: false
+            referencedRelation: "admission_processes"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      admission_documents: {
+        Row: {
+          created_at: string
+          doc_label: string
+          doc_type: string
+          file_name: string | null
+          file_path: string | null
+          file_size: number | null
+          id: string
+          process_id: string
+          required: boolean
+          review_notes: string | null
+          reviewed_at: string | null
+          reviewed_by: string | null
+          status: Database["public"]["Enums"]["admission_doc_status"]
+          submitted_at: string | null
+          updated_at: string
+        }
+        Insert: {
+          created_at?: string
+          doc_label: string
+          doc_type: string
+          file_name?: string | null
+          file_path?: string | null
+          file_size?: number | null
+          id?: string
+          process_id: string
+          required?: boolean
+          review_notes?: string | null
+          reviewed_at?: string | null
+          reviewed_by?: string | null
+          status?: Database["public"]["Enums"]["admission_doc_status"]
+          submitted_at?: string | null
+          updated_at?: string
+        }
+        Update: {
+          created_at?: string
+          doc_label?: string
+          doc_type?: string
+          file_name?: string | null
+          file_path?: string | null
+          file_size?: number | null
+          id?: string
+          process_id?: string
+          required?: boolean
+          review_notes?: string | null
+          reviewed_at?: string | null
+          reviewed_by?: string | null
+          status?: Database["public"]["Enums"]["admission_doc_status"]
+          submitted_at?: string | null
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "admission_documents_process_id_fkey"
+            columns: ["process_id"]
+            isOneToOne: false
+            referencedRelation: "admission_processes"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      admission_events: {
+        Row: {
+          actor_user_id: string | null
+          created_at: string
+          description: string | null
+          event_type: string
+          id: string
+          metadata: Json
+          process_id: string
+        }
+        Insert: {
+          actor_user_id?: string | null
+          created_at?: string
+          description?: string | null
+          event_type: string
+          id?: string
+          metadata?: Json
+          process_id: string
+        }
+        Update: {
+          actor_user_id?: string | null
+          created_at?: string
+          description?: string | null
+          event_type?: string
+          id?: string
+          metadata?: Json
+          process_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "admission_events_process_id_fkey"
+            columns: ["process_id"]
+            isOneToOne: false
+            referencedRelation: "admission_processes"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      admission_form_data: {
+        Row: {
+          created_at: string
+          id: string
+          payload: Json
+          process_id: string
+          submitted_at: string | null
+          updated_at: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          payload?: Json
+          process_id: string
+          submitted_at?: string | null
+          updated_at?: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          payload?: Json
+          process_id?: string
+          submitted_at?: string | null
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "admission_form_data_process_id_fkey"
+            columns: ["process_id"]
+            isOneToOne: true
+            referencedRelation: "admission_processes"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      admission_processes: {
+        Row: {
+          base_position_id: string | null
+          cancellation_reason: string | null
+          cancelled_at: string | null
+          candidate_email: string
+          candidate_id: string | null
+          candidate_name: string
+          candidate_phone: string | null
+          completed_at: string | null
+          contract_type: string | null
+          created_at: string
+          created_by: string | null
+          department_id: string | null
+          employee_id: string | null
+          expected_start_date: string | null
+          id: string
+          invite_expires_at: string | null
+          invite_sent_at: string | null
+          invite_token: string | null
+          manager_id: string | null
+          notes: string | null
+          organization_id: string
+          responsible_user_id: string | null
+          status: Database["public"]["Enums"]["admission_status"]
+          unit_id: string | null
+          updated_at: string
+        }
+        Insert: {
+          base_position_id?: string | null
+          cancellation_reason?: string | null
+          cancelled_at?: string | null
+          candidate_email: string
+          candidate_id?: string | null
+          candidate_name: string
+          candidate_phone?: string | null
+          completed_at?: string | null
+          contract_type?: string | null
+          created_at?: string
+          created_by?: string | null
+          department_id?: string | null
+          employee_id?: string | null
+          expected_start_date?: string | null
+          id?: string
+          invite_expires_at?: string | null
+          invite_sent_at?: string | null
+          invite_token?: string | null
+          manager_id?: string | null
+          notes?: string | null
+          organization_id: string
+          responsible_user_id?: string | null
+          status?: Database["public"]["Enums"]["admission_status"]
+          unit_id?: string | null
+          updated_at?: string
+        }
+        Update: {
+          base_position_id?: string | null
+          cancellation_reason?: string | null
+          cancelled_at?: string | null
+          candidate_email?: string
+          candidate_id?: string | null
+          candidate_name?: string
+          candidate_phone?: string | null
+          completed_at?: string | null
+          contract_type?: string | null
+          created_at?: string
+          created_by?: string | null
+          department_id?: string | null
+          employee_id?: string | null
+          expected_start_date?: string | null
+          id?: string
+          invite_expires_at?: string | null
+          invite_sent_at?: string | null
+          invite_token?: string | null
+          manager_id?: string | null
+          notes?: string | null
+          organization_id?: string
+          responsible_user_id?: string | null
+          status?: Database["public"]["Enums"]["admission_status"]
+          unit_id?: string | null
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "admission_processes_candidate_id_fkey"
+            columns: ["candidate_id"]
+            isOneToOne: false
+            referencedRelation: "candidates"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "admission_processes_organization_id_fkey"
+            columns: ["organization_id"]
+            isOneToOne: false
+            referencedRelation: "organizations"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "admission_processes_organization_id_fkey"
+            columns: ["organization_id"]
+            isOneToOne: false
+            referencedRelation: "organizations_public"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       audit_log: {
         Row: {
           action: string
@@ -4864,6 +5155,218 @@ export type Database = {
           },
         ]
       }
+      payroll_receipt_batches: {
+        Row: {
+          ambiguous_count: number
+          competency: string
+          created_at: string
+          created_by: string | null
+          description: string | null
+          id: string
+          matched_count: number
+          organization_id: string
+          published_at: string | null
+          published_by: string | null
+          receipt_type: Database["public"]["Enums"]["payroll_receipt_type"]
+          status: Database["public"]["Enums"]["payroll_batch_status"]
+          total_files: number
+          unmatched_count: number
+          updated_at: string
+        }
+        Insert: {
+          ambiguous_count?: number
+          competency: string
+          created_at?: string
+          created_by?: string | null
+          description?: string | null
+          id?: string
+          matched_count?: number
+          organization_id: string
+          published_at?: string | null
+          published_by?: string | null
+          receipt_type: Database["public"]["Enums"]["payroll_receipt_type"]
+          status?: Database["public"]["Enums"]["payroll_batch_status"]
+          total_files?: number
+          unmatched_count?: number
+          updated_at?: string
+        }
+        Update: {
+          ambiguous_count?: number
+          competency?: string
+          created_at?: string
+          created_by?: string | null
+          description?: string | null
+          id?: string
+          matched_count?: number
+          organization_id?: string
+          published_at?: string | null
+          published_by?: string | null
+          receipt_type?: Database["public"]["Enums"]["payroll_receipt_type"]
+          status?: Database["public"]["Enums"]["payroll_batch_status"]
+          total_files?: number
+          unmatched_count?: number
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "payroll_receipt_batches_organization_id_fkey"
+            columns: ["organization_id"]
+            isOneToOne: false
+            referencedRelation: "organizations"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "payroll_receipt_batches_organization_id_fkey"
+            columns: ["organization_id"]
+            isOneToOne: false
+            referencedRelation: "organizations_public"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      payroll_receipt_events: {
+        Row: {
+          actor_user_id: string | null
+          batch_id: string | null
+          created_at: string
+          event_type: string
+          id: string
+          metadata: Json
+          organization_id: string
+          receipt_id: string | null
+        }
+        Insert: {
+          actor_user_id?: string | null
+          batch_id?: string | null
+          created_at?: string
+          event_type: string
+          id?: string
+          metadata?: Json
+          organization_id: string
+          receipt_id?: string | null
+        }
+        Update: {
+          actor_user_id?: string | null
+          batch_id?: string | null
+          created_at?: string
+          event_type?: string
+          id?: string
+          metadata?: Json
+          organization_id?: string
+          receipt_id?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "payroll_receipt_events_batch_id_fkey"
+            columns: ["batch_id"]
+            isOneToOne: false
+            referencedRelation: "payroll_receipt_batches"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "payroll_receipt_events_receipt_id_fkey"
+            columns: ["receipt_id"]
+            isOneToOne: false
+            referencedRelation: "payroll_receipts"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      payroll_receipts: {
+        Row: {
+          acknowledged_at: string | null
+          acknowledged_ip: unknown
+          acknowledged_user_agent: string | null
+          batch_id: string
+          cpf_lookup: string | null
+          created_at: string
+          download_count: number
+          employee_id: string | null
+          file_name: string
+          file_path: string
+          file_size: number | null
+          id: string
+          last_downloaded_at: string | null
+          match_candidates: Json | null
+          match_status: Database["public"]["Enums"]["payroll_match_status"]
+          matricula_lookup: string | null
+          organization_id: string
+          published: boolean
+          updated_at: string
+        }
+        Insert: {
+          acknowledged_at?: string | null
+          acknowledged_ip?: unknown
+          acknowledged_user_agent?: string | null
+          batch_id: string
+          cpf_lookup?: string | null
+          created_at?: string
+          download_count?: number
+          employee_id?: string | null
+          file_name: string
+          file_path: string
+          file_size?: number | null
+          id?: string
+          last_downloaded_at?: string | null
+          match_candidates?: Json | null
+          match_status?: Database["public"]["Enums"]["payroll_match_status"]
+          matricula_lookup?: string | null
+          organization_id: string
+          published?: boolean
+          updated_at?: string
+        }
+        Update: {
+          acknowledged_at?: string | null
+          acknowledged_ip?: unknown
+          acknowledged_user_agent?: string | null
+          batch_id?: string
+          cpf_lookup?: string | null
+          created_at?: string
+          download_count?: number
+          employee_id?: string | null
+          file_name?: string
+          file_path?: string
+          file_size?: number | null
+          id?: string
+          last_downloaded_at?: string | null
+          match_candidates?: Json | null
+          match_status?: Database["public"]["Enums"]["payroll_match_status"]
+          matricula_lookup?: string | null
+          organization_id?: string
+          published?: boolean
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "payroll_receipts_batch_id_fkey"
+            columns: ["batch_id"]
+            isOneToOne: false
+            referencedRelation: "payroll_receipt_batches"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "payroll_receipts_employee_id_fkey"
+            columns: ["employee_id"]
+            isOneToOne: false
+            referencedRelation: "employees"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "payroll_receipts_organization_id_fkey"
+            columns: ["organization_id"]
+            isOneToOne: false
+            referencedRelation: "organizations"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "payroll_receipts_organization_id_fkey"
+            columns: ["organization_id"]
+            isOneToOne: false
+            referencedRelation: "organizations_public"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       payslips: {
         Row: {
           ack_status: Database["public"]["Enums"]["payslip_ack_status"]
@@ -8241,6 +8744,16 @@ export type Database = {
       }
     }
     Enums: {
+      admission_checklist_status: "pending" | "done" | "skipped"
+      admission_doc_status: "pending" | "submitted" | "approved" | "rejected"
+      admission_status:
+        | "draft"
+        | "invited"
+        | "in_progress"
+        | "review"
+        | "signed"
+        | "completed"
+        | "cancelled"
       ai_analysis_status:
         | "not_requested"
         | "pending"
@@ -8392,6 +8905,12 @@ export type Database = {
         | "widowed"
         | "domestic_partnership"
         | "prefer_not_to_say"
+      payroll_batch_status:
+        | "draft"
+        | "matching"
+        | "ready"
+        | "published"
+        | "cancelled"
       payroll_competency_status:
         | "aberta"
         | "em_processamento"
@@ -8399,6 +8918,13 @@ export type Database = {
         | "paga"
         | "cancelada"
       payroll_event_kind: "provento" | "desconto" | "informativo" | "base"
+      payroll_match_status: "matched" | "ambiguous" | "unmatched"
+      payroll_receipt_type:
+        | "holerite"
+        | "recibo"
+        | "decimo_terceiro"
+        | "ferias"
+        | "rescisao"
       payslip_ack_status: "pending" | "viewed" | "acknowledged" | "signed"
       payslip_source: "internal_generated" | "batch_upload" | "external"
       pdi_goal_status: "pendente" | "em_andamento" | "concluida"
@@ -8647,6 +9173,17 @@ export type CompositeTypes<
 export const Constants = {
   public: {
     Enums: {
+      admission_checklist_status: ["pending", "done", "skipped"],
+      admission_doc_status: ["pending", "submitted", "approved", "rejected"],
+      admission_status: [
+        "draft",
+        "invited",
+        "in_progress",
+        "review",
+        "signed",
+        "completed",
+        "cancelled",
+      ],
       ai_analysis_status: [
         "not_requested",
         "pending",
@@ -8815,6 +9352,13 @@ export const Constants = {
         "domestic_partnership",
         "prefer_not_to_say",
       ],
+      payroll_batch_status: [
+        "draft",
+        "matching",
+        "ready",
+        "published",
+        "cancelled",
+      ],
       payroll_competency_status: [
         "aberta",
         "em_processamento",
@@ -8823,6 +9367,14 @@ export const Constants = {
         "cancelada",
       ],
       payroll_event_kind: ["provento", "desconto", "informativo", "base"],
+      payroll_match_status: ["matched", "ambiguous", "unmatched"],
+      payroll_receipt_type: [
+        "holerite",
+        "recibo",
+        "decimo_terceiro",
+        "ferias",
+        "rescisao",
+      ],
       payslip_ack_status: ["pending", "viewed", "acknowledged", "signed"],
       payslip_source: ["internal_generated", "batch_upload", "external"],
       pdi_goal_status: ["pendente", "em_andamento", "concluida"],
