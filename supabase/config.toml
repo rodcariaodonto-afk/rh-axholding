@@ -9,3 +9,5 @@ project_id = "icggemcoeiwbhtgekkby"
     verify_jwt = false
   [functions.admission-public]
     verify_jwt = false
+  [functions.onboarding-portal]
+    verify_jwt = false
