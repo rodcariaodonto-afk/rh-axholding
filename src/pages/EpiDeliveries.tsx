@@ -94,7 +94,7 @@ export default function EpiDeliveries() {
           <NewDeliveryForm
             catalog={catalog.data ?? []}
             employees={employees ?? []}
-            onSubmit={async (i) => { await deliver.mutateAsync(i); setOpenNew(false); }}
+            onSubmit={async (i: any) => { await deliver.mutateAsync(i); setOpenNew(false); }}
           />
         </DialogContent>
       </Dialog>
@@ -103,7 +103,7 @@ export default function EpiDeliveries() {
       <Dialog open={!!returnFor} onOpenChange={(o) => !o && setReturnFor(null)}>
         <DialogContent>
           <DialogHeader><DialogTitle>Registrar devolução</DialogTitle></DialogHeader>
-          <ReturnForm onSubmit={async (qty, cond) => {
+          <ReturnForm onSubmit={async (qty: number | undefined, cond: string) => {
             await returnEpi.mutateAsync({ delivery_id: returnFor!, returned_qty: qty, return_condition: cond });
             setReturnFor(null);
           }} />

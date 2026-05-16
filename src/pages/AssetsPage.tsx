@@ -181,7 +181,7 @@ export default function AssetsPage() {
       <Dialog open={!!assignFor} onOpenChange={(o) => !o && setAssignFor(null)}>
         <DialogContent>
           <DialogHeader><DialogTitle>Atribuir {assignFor?.tag}</DialogTitle></DialogHeader>
-          <AssignForm employees={employees ?? []} onSubmit={async (i) => {
+          <AssignForm employees={employees ?? []} onSubmit={async (i: any) => {
             await assign.mutateAsync({ asset_id: assignFor!.id, ...i });
             setAssignFor(null);
           }} />
@@ -192,7 +192,7 @@ export default function AssetsPage() {
       <Dialog open={!!returnFor} onOpenChange={(o) => !o && setReturnFor(null)}>
         <DialogContent>
           <DialogHeader><DialogTitle>Devolução</DialogTitle></DialogHeader>
-          <ReturnAssetForm onSubmit={async (cond) => {
+          <ReturnAssetForm onSubmit={async (cond: string) => {
             await returnAsset.mutateAsync({ assignment_id: returnFor!.assignmentId, asset_id: returnFor!.assetId, return_condition: cond });
             setReturnFor(null);
           }} />
