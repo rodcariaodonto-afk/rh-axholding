@@ -82,7 +82,8 @@ export default function PayrollCompetencies() {
               </Button>
             </DialogFooter>
           </DialogContent>
-        </Dialog>
+          </Dialog>
+        </div>
       </div>
 
       <Card>
