@@ -394,7 +394,7 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
           )}
         </div>
 
-        {menuGroups.map((group) => {
+        {[...menuGroups, ...(isPlatformAdmin ? [platformAdminGroup] : [])].map((group) => {
           if (!canShowGroup(group)) return null;
           
           const visibleItems = filterItems(group.items.filter(canShowItem));
