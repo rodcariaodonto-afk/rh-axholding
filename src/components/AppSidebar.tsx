@@ -426,48 +426,84 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
           )}
         </div>
 
-        {[...menuGroups, ...(isPlatformAdmin ? [platformAdminGroup] : [])].map((group) => {
-          if (!canShowGroup(group)) return null;
-          
-          const visibleItems = filterItems(group.items.filter(canShowItem));
-          
-          // Hide group if no items match search
-          if (visibleItems.length === 0) return null;
-          
-          return (
-            <SidebarGroup key={group.label} className="p-0">
-              <SidebarGroupLabel className="px-0 text-[10px] font-semibold tracking-wider text-muted-foreground">
-                {group.label}
-              </SidebarGroupLabel>
-              <SidebarGroupContent>
-                <SidebarMenu>
-                  {visibleItems.map((item) => (
-                    <SidebarMenuItem key={item.label}>
-                      <SidebarMenuButton
-                        asChild
-                        isActive={isActive(item.href)}
-                        className="h-[38px]"
-                      >
-                        <Link to={item.href}>
-                          <item.icon className="size-5" />
-                          <span className="flex-1">{item.label}</span>
-                          {item.badge && (
-                            <span className="bg-destructive text-destructive-foreground text-[10px] font-semibold px-1.5 py-0.5 rounded-full">
-                              {item.badge}
-                            </span>
-                          )}
-                          {isActive(item.href) && (
-                            <ChevronRight className="size-4 text-muted-foreground opacity-60" />
-                          )}
-                        </Link>
-                      </SidebarMenuButton>
-                    </SidebarMenuItem>
-                  ))}
-                </SidebarMenu>
-              </SidebarGroupContent>
-            </SidebarGroup>
-          );
-        })}
+        {(() => {
+          const allGroups = [...menuGroups, ...(isPlatformAdmin ? [platformAdminGroup] : [])];
+          const isSearching = searchTerm.trim().length > 0;
+          const visibleGroups = allGroups
+            .filter(canShowGroup)
+            .map((group) => ({
+              group,
+              items: filterItems(group.items.filter(canShowItem)),
+            }))
+            .filter(({ items }) => items.length > 0);
+
+          if (isSearching && visibleGroups.length === 0) {
+            return (
+              <div className="px-2 py-6 text-center text-sm text-muted-foreground">
+                Nenhum item encontrado
+                <button
+                  onClick={() => setSearchTerm("")}
+                  className="block mx-auto mt-2 text-xs text-primary hover:underline"
+                >
+                  Limpar busca
+                </button>
+              </div>
+            );
+          }
+
+          return visibleGroups.map(({ group, items }) => {
+            const hasActive = items.some((it) => isActive(it.href));
+            const isOpen = isSearching || hasActive || openGroups[group.label] === true;
+            const contentId = `sidebar-group-${group.label.replace(/\s+/g, "-")}`;
+
+            return (
+              <SidebarGroup key={group.label} className="p-0">
+                <button
+                  type="button"
+                  onClick={() => !isSearching && toggleGroup(group.label)}
+                  aria-expanded={isOpen}
+                  aria-controls={contentId}
+                  className="flex items-center gap-1 w-full px-0 py-1.5 text-[10px] font-semibold tracking-wider text-muted-foreground hover:text-foreground transition-colors text-left"
+                >
+                  {isOpen ? (
+                    <ChevronDown className="size-3 shrink-0" />
+                  ) : (
+                    <ChevronRight className="size-3 shrink-0" />
+                  )}
+                  <span className="flex-1">{group.label}</span>
+                </button>
+                {isOpen && (
+                  <SidebarGroupContent id={contentId}>
+                    <SidebarMenu>
+                      {items.map((item) => (
+                        <SidebarMenuItem key={item.label}>
+                          <SidebarMenuButton
+                            asChild
+                            isActive={isActive(item.href)}
+                            className="h-[38px]"
+                          >
+                            <Link to={item.href}>
+                              <item.icon className="size-5" />
+                              <span className="flex-1">{item.label}</span>
+                              {item.badge && (
+                                <span className="bg-destructive text-destructive-foreground text-[10px] font-semibold px-1.5 py-0.5 rounded-full">
+                                  {item.badge}
+                                </span>
+                              )}
+                              {isActive(item.href) && (
+                                <ChevronRight className="size-4 text-muted-foreground opacity-60" />
+                              )}
+                            </Link>
+                          </SidebarMenuButton>
+                        </SidebarMenuItem>
+                      ))}
+                    </SidebarMenu>
+                  </SidebarGroupContent>
+                )}
+              </SidebarGroup>
+            );
+          });
+        })()}
       </SidebarContent>
 
       <SidebarFooter className="px-5 pb-5 space-y-2">
