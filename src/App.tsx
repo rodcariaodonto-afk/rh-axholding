@@ -114,6 +114,9 @@ const AdminNewClient = lazy(() => import("./pages/AdminNewClient"));
 const AdminClientDetail = lazy(() => import("./pages/AdminClientDetail"));
 const AdminPlans = lazy(() => import("./pages/AdminPlans"));
 const AdminAudit = lazy(() => import("./pages/AdminAudit"));
+const Admissoes = lazy(() => import("./pages/Admissoes"));
+const AdmissaoDetail = lazy(() => import("./pages/AdmissaoDetail"));
+const AdmissaoPublica = lazy(() => import("./pages/AdmissaoPublica"));
 
 const queryClient = new QueryClient({
   defaultOptions: {
@@ -178,6 +181,11 @@ const App = () => (
           <Route path="/carreiras/:slug" element={
             <Suspense fallback={<div className="container mx-auto px-4 py-8 space-y-4"><Skeleton className="h-12 w-64" /><Skeleton className="h-64 w-full" /></div>}>
               <CareersPage />
+            </Suspense>
+          } />
+          <Route path="/admissoes-publica/:token" element={
+            <Suspense fallback={<div className="min-h-screen flex items-center justify-center"><Loader2 className="h-8 w-8 animate-spin text-muted-foreground" /></div>}>
+              <AdmissaoPublica />
             </Suspense>
           } />
 
@@ -307,6 +315,8 @@ const App = () => (
             <Route path="/admin/clientes/:id" element={<AdminClientDetail />} />
             <Route path="/admin/planos" element={<AdminPlans />} />
             <Route path="/admin/auditoria-global" element={<AdminAudit />} />
+            <Route path="/admissoes" element={<PeopleRoute><Admissoes /></PeopleRoute>} />
+            <Route path="/admissoes/:id" element={<PeopleRoute><AdmissaoDetail /></PeopleRoute>} />
           </Route>
 
           {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
