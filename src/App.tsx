@@ -324,6 +324,7 @@ const App = () => (
             <Route path="/my-payslips" element={<MyPayslips />} />
             <Route path="/payslips" element={<PeopleRoute><PayslipsManage /></PeopleRoute>} />
             <Route path="/onboarding-processes" element={<PeopleRoute><OnboardingProcesses /></PeopleRoute>} />
+            <Route path="/onboarding-processes/:id" element={<PeopleRoute><OnboardingProcessDetail /></PeopleRoute>} />
             <Route path="/medical-exams" element={<PeopleRoute><MedicalExams /></PeopleRoute>} />
             <Route path="/receipts" element={<PeopleRoute><Receipts /></PeopleRoute>} />
             <Route path="/epis" element={<PeopleRoute><EpiCatalog /></PeopleRoute>} />
