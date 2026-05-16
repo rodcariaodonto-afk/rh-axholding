@@ -5515,6 +5515,66 @@ export type Database = {
           },
         ]
       }
+      payroll_rubrics: {
+        Row: {
+          code: string
+          created_at: string
+          default_formula: string | null
+          default_reference: number | null
+          description: string
+          id: string
+          is_active: boolean
+          is_system: boolean
+          kind: Database["public"]["Enums"]["payroll_event_kind"]
+          organization_id: string
+          sort_order: number
+          updated_at: string
+        }
+        Insert: {
+          code: string
+          created_at?: string
+          default_formula?: string | null
+          default_reference?: number | null
+          description: string
+          id?: string
+          is_active?: boolean
+          is_system?: boolean
+          kind: Database["public"]["Enums"]["payroll_event_kind"]
+          organization_id: string
+          sort_order?: number
+          updated_at?: string
+        }
+        Update: {
+          code?: string
+          created_at?: string
+          default_formula?: string | null
+          default_reference?: number | null
+          description?: string
+          id?: string
+          is_active?: boolean
+          is_system?: boolean
+          kind?: Database["public"]["Enums"]["payroll_event_kind"]
+          organization_id?: string
+          sort_order?: number
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "payroll_rubrics_organization_id_fkey"
+            columns: ["organization_id"]
+            isOneToOne: false
+            referencedRelation: "organizations"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "payroll_rubrics_organization_id_fkey"
+            columns: ["organization_id"]
+            isOneToOne: false
+            referencedRelation: "organizations_public"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       payslips: {
         Row: {
           ack_status: Database["public"]["Enums"]["payslip_ack_status"]
