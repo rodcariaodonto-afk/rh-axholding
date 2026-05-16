@@ -108,12 +108,15 @@ export default function PayrollCompetencies() {
                 {comps.map((c: any) => {
                   const st = STATUS_LABEL[c.status] ?? { label: c.status, variant: "secondary" };
                   return (
-                    <TableRow key={c.id}>
+                    <TableRow key={c.id} className="cursor-pointer" onClick={() => navigate(`/payroll-competencies/${c.id}`)}>
                       <TableCell className="font-medium">{c.reference_label}</TableCell>
                       <TableCell><Badge variant={st.variant}>{st.label}</Badge></TableCell>
                       <TableCell className="text-sm">{c.opened_at ? new Date(c.opened_at).toLocaleDateString("pt-BR") : "—"}</TableCell>
                       <TableCell className="text-sm">{c.closed_at ? new Date(c.closed_at).toLocaleDateString("pt-BR") : "—"}</TableCell>
-                      <TableCell className="text-right space-x-1">
+                      <TableCell className="text-right space-x-1" onClick={(e) => e.stopPropagation()}>
+                        <Button size="sm" variant="ghost" onClick={() => navigate(`/payroll-competencies/${c.id}`)}>
+                          <ListChecks className="size-3.5 mr-1" />Abrir
+                        </Button>
                         <Button
                           size="sm" variant="outline"
                           onClick={() => createExport.mutate({ job_type: "payroll_csv", params: { competency_id: c.id } })}
