@@ -28,7 +28,8 @@ export default function OnboardingProcessDetail() {
     return <div className="p-6"><p className="text-muted-foreground">Carregando...</p></div>;
   }
   const p = process.data;
-  const portalUrl = p.public_token ? `${window.location.origin}/onboarding/portal/${p.public_token}` : null;
+  const PUBLIC_BASE_URL = "https://www.rhaxis.com.br";
+  const portalUrl = p.public_token ? `${PUBLIC_BASE_URL}/onboarding/portal/${p.public_token}` : null;
 
   const copyLink = () => {
     if (!portalUrl) return;
