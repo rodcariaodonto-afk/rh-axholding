@@ -1,5 +1,5 @@
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2.45.0";
-import { getSignatureProvider } from "../_shared/signature-provider.ts";
+import { getSignatureProviderForOrg } from "../_shared/signature-provider.ts";
 
 const corsHeaders = {
   "Access-Control-Allow-Origin": "*",
@@ -41,7 +41,7 @@ Deno.serve(async (req) => {
     const { data: signed, error: sErr } = await admin.storage.from("employee-files").createSignedUrl(doc.file_path, 3600);
     if (sErr) throw sErr;
 
-    const adapter = getSignatureProvider(provider);
+    const adapter = await getSignatureProviderForOrg(admin, doc.organization_id, provider ?? "clicksign", "signature-send");
     const envelope = await adapter.createEnvelope({
       organization_id: doc.organization_id,
       document_id: doc.id,

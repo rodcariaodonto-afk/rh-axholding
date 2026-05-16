@@ -133,12 +133,35 @@ class ManualProvider implements SignatureProvider {
 // ============================================================
 // Factory
 // ============================================================
-export function getSignatureProvider(name?: SignatureProviderName): SignatureProvider {
+export function getSignatureProvider(name?: SignatureProviderName, token?: string): SignatureProvider {
   const provider = name ?? (Deno.env.get("SIGNATURE_PROVIDER") as SignatureProviderName) ?? "clicksign";
   if (provider === "clicksign") {
-    const token = Deno.env.get("CLICKSIGN_API_TOKEN");
-    if (!token) return new ManualProvider();
-    return new ClicksignProvider(token);
+    const resolved = token ?? Deno.env.get("CLICKSIGN_API_TOKEN");
+    if (!resolved) return new ManualProvider();
+    return new ClicksignProvider(resolved);
   }
   return new ManualProvider();
+}
+
+/**
+ * Resolve o provider de assinatura usando a credencial criptografada
+ * da organização (tabela organization_integrations). Cai para manual se
+ * o tenant ainda não configurou.
+ */
+export async function getSignatureProviderForOrg(
+  admin: any,
+  organizationId: string,
+  preferred: SignatureProviderName = "clicksign",
+  callerFunction = "signature",
+): Promise<SignatureProvider> {
+  if (preferred === "clicksign") {
+    const { getIntegrationSecret } = await import("./get-integration-secret.ts");
+    const token = await getIntegrationSecret(admin, organizationId, "clicksign", {
+      updateLastUsed: true,
+      logDecryption: true,
+      callerFunction,
+    });
+    if (token) return new ClicksignProvider(token);
+  }
+  return getSignatureProvider(preferred);
 }

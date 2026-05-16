@@ -27,6 +27,7 @@ export const IntegrationProviderSchema = z.enum([
   'openai',
   'github',
   'resend',
+  'clicksign',
 ]);
 
 export const IntegrationSensitivitySchema = z.enum([
