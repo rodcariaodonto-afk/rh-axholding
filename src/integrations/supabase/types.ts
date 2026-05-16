@@ -4618,6 +4618,92 @@ export type Database = {
           },
         ]
       }
+      onboarding_documents: {
+        Row: {
+          created_at: string
+          doc_label: string
+          doc_type: string
+          employee_id: string
+          file_name: string | null
+          file_path: string | null
+          id: string
+          organization_id: string
+          process_id: string
+          required: boolean
+          review_notes: string | null
+          reviewed_at: string | null
+          reviewed_by: string | null
+          status: string
+          updated_at: string
+          uploaded_at: string | null
+        }
+        Insert: {
+          created_at?: string
+          doc_label: string
+          doc_type: string
+          employee_id: string
+          file_name?: string | null
+          file_path?: string | null
+          id?: string
+          organization_id: string
+          process_id: string
+          required?: boolean
+          review_notes?: string | null
+          reviewed_at?: string | null
+          reviewed_by?: string | null
+          status?: string
+          updated_at?: string
+          uploaded_at?: string | null
+        }
+        Update: {
+          created_at?: string
+          doc_label?: string
+          doc_type?: string
+          employee_id?: string
+          file_name?: string | null
+          file_path?: string | null
+          id?: string
+          organization_id?: string
+          process_id?: string
+          required?: boolean
+          review_notes?: string | null
+          reviewed_at?: string | null
+          reviewed_by?: string | null
+          status?: string
+          updated_at?: string
+          uploaded_at?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "onboarding_documents_employee_id_fkey"
+            columns: ["employee_id"]
+            isOneToOne: false
+            referencedRelation: "employees"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "onboarding_documents_organization_id_fkey"
+            columns: ["organization_id"]
+            isOneToOne: false
+            referencedRelation: "organizations"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "onboarding_documents_organization_id_fkey"
+            columns: ["organization_id"]
+            isOneToOne: false
+            referencedRelation: "organizations_public"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "onboarding_documents_process_id_fkey"
+            columns: ["process_id"]
+            isOneToOne: false
+            referencedRelation: "onboarding_processes"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       onboarding_processes: {
         Row: {
           completed_at: string | null
@@ -4628,6 +4714,10 @@ export type Database = {
           id: string
           notes: string | null
           organization_id: string
+          portal_data: Json
+          portal_started_at: string | null
+          portal_submitted_at: string | null
+          public_token: string | null
           responsible_user_id: string | null
           started_at: string | null
           status: string
@@ -4643,6 +4733,10 @@ export type Database = {
           id?: string
           notes?: string | null
           organization_id: string
+          portal_data?: Json
+          portal_started_at?: string | null
+          portal_submitted_at?: string | null
+          public_token?: string | null
           responsible_user_id?: string | null
           started_at?: string | null
           status?: string
@@ -4658,6 +4752,10 @@ export type Database = {
           id?: string
           notes?: string | null
           organization_id?: string
+          portal_data?: Json
+          portal_started_at?: string | null
+          portal_submitted_at?: string | null
+          public_token?: string | null
           responsible_user_id?: string | null
           started_at?: string | null
           status?: string
@@ -9454,6 +9552,7 @@ export type Database = {
         Returns: string
       }
       ensure_invite_org_member: { Args: never; Returns: Json }
+      get_onboarding_by_token: { Args: { _token: string }; Returns: Json }
       get_org_user_permissions: {
         Args: { _org_id: string; _user_id: string }
         Returns: {
