@@ -46,7 +46,7 @@ export function useUpsertCostCenter() {
   return useMutation({
     mutationFn: async (input: Partial<CostCenter> & { code: string; name: string }) => {
       if (!organization?.id) throw new Error("Organização não encontrada");
-      const payload = { ...input, organization_id: organization.id };
+      const payload = { ...input, organization_id: organization.id } as never;
       if (input.id) {
         const { data, error } = await supabase
           .from("cost_centers")
