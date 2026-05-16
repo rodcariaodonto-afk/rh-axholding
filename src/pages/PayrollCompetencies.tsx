@@ -42,10 +42,12 @@ export default function PayrollCompetencies() {
           <h1 className="text-2xl font-bold tracking-tight">Folha de Pagamento — Competências</h1>
           <p className="text-muted-foreground">Gestão de competências mensais e fechamento</p>
         </div>
-        <Dialog open={open} onOpenChange={setOpen}>
-          <DialogTrigger asChild>
-            <Button><Plus className="size-4 mr-1.5" />Nova competência</Button>
-          </DialogTrigger>
+        <div className="flex gap-2">
+          <Button asChild variant="outline"><Link to="/payroll-rubrics"><Tags className="size-4 mr-1.5" />Rubricas</Link></Button>
+          <Dialog open={open} onOpenChange={setOpen}>
+            <DialogTrigger asChild>
+              <Button><Plus className="size-4 mr-1.5" />Nova competência</Button>
+            </DialogTrigger>
           <DialogContent>
             <DialogHeader><DialogTitle>Abrir competência</DialogTitle></DialogHeader>
             <div className="grid grid-cols-2 gap-3 py-2">
