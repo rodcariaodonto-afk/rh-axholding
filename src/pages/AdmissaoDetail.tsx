@@ -137,7 +137,7 @@ export default function AdmissaoDetail() {
                 </div>
                 <Badge variant={docStatusVariant[doc.status] || "outline"}>{doc.status}</Badge>
                 {doc.file_path && (
-                  <Button size="sm" variant="outline" onClick={() => downloadDoc(doc.file_path, doc.file_name || "doc")}>Baixar</Button>
+                  <Button size="sm" variant="outline" onClick={() => downloadDoc(doc.file_path as string, doc.file_name || "doc")}>Baixar</Button>
                 )}
                 {doc.status === "submitted" && (
                   <Dialog open={reviewing === doc.id} onOpenChange={(o) => !o && setReviewing(null)}>
