@@ -5,6 +5,7 @@ export const validators: Record<string, (key: string) => boolean> = {
   openai: (key) => key.startsWith('sk-') && key.length > 20,
   github: (key) => key.startsWith('ghp_') || key.startsWith('github_pat_') || key.length >= 40,
   resend: (key) => key.startsWith('re_') && key.length > 10,
+  clicksign: (key) => key.length >= 20,
 };
 
 // Expected formats for better error messages
@@ -14,6 +15,7 @@ export const expectedFormats: Record<string, string> = {
   openai: 'Deve começar com "sk-" (ex: sk-proj-...)',
   github: 'Deve começar com "ghp_" ou "github_pat_" (ou ter 40+ caracteres)',
   resend: 'Deve começar com "re_" (ex: re_123abc...)',
+  clicksign: 'Access Token do Clicksign (mínimo 20 caracteres) — obtido em Configurações da Conta > API',
 };
 
 // Optional connection testers (only called if test_connection = true)
@@ -73,6 +75,17 @@ export const testers: Record<string, (key: string) => Promise<boolean>> = {
       return false;
     }
   },
+  clicksign: async (key) => {
+    // GET /accounts não gera custo e valida o token
+    try {
+      const res = await fetch(`https://app.clicksign.com/api/v1/accounts?access_token=${encodeURIComponent(key)}`, {
+        headers: { 'Accept': 'application/json' },
+      });
+      return res.status === 200;
+    } catch {
+      return false;
+    }
+  },
 };
 
 // Provider metadata for UI
@@ -101,5 +114,10 @@ export const providerMeta: Record<string, { name: string; description: string; p
     name: 'Resend',
     description: 'Envio de emails transacionais (convites)',
     placeholder: 're_...',
+  },
+  clicksign: {
+    name: 'Clicksign',
+    description: 'Assinatura eletrônica de holerites, admissões e documentos de RH',
+    placeholder: 'Cole seu Access Token do Clicksign',
   },
 };
