@@ -114,6 +114,9 @@ const AdminNewClient = lazy(() => import("./pages/AdminNewClient"));
 const AdminClientDetail = lazy(() => import("./pages/AdminClientDetail"));
 const AdminPlans = lazy(() => import("./pages/AdminPlans"));
 const AdminAudit = lazy(() => import("./pages/AdminAudit"));
+const Admissoes = lazy(() => import("./pages/Admissoes"));
+const AdmissaoDetail = lazy(() => import("./pages/AdmissaoDetail"));
+const AdmissaoPublica = lazy(() => import("./pages/AdmissaoPublica"));
 
 const queryClient = new QueryClient({
   defaultOptions: {
