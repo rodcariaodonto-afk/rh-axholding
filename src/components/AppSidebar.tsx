@@ -26,6 +26,7 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { useAuth } from "@/hooks/useAuth";
 import { useUserRole } from "@/hooks/useUserRole";
+import { usePlatformAdmin } from "@/hooks/usePlatformAdmin";
 import { useUserOrganizations } from "@/hooks/useUserOrganizations";
 import {
   Package,
