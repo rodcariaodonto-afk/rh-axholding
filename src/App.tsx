@@ -100,6 +100,8 @@ const DataGovernance = lazy(() => import("./pages/DataGovernance"));
 const CostCenters = lazy(() => import("./pages/CostCenters"));
 const LegalEntities = lazy(() => import("./pages/LegalEntities"));
 const TimeClockDevices = lazy(() => import("./pages/TimeClockDevices"));
+const TimeInconsistencies = lazy(() => import("./pages/TimeInconsistencies"));
+const MyTasks = lazy(() => import("./pages/MyTasks"));
 
 const queryClient = new QueryClient({
   defaultOptions: {
@@ -279,6 +281,8 @@ const App = () => (
             <Route path="/cost-centers" element={<PeopleRoute><CostCenters /></PeopleRoute>} />
             <Route path="/legal-entities" element={<PeopleRoute><LegalEntities /></PeopleRoute>} />
             <Route path="/time-clock-devices" element={<PeopleRoute><TimeClockDevices /></PeopleRoute>} />
+            <Route path="/time-inconsistencies" element={<PeopleRoute><TimeInconsistencies /></PeopleRoute>} />
+            <Route path="/my-tasks" element={<MyTasks />} />
           </Route>
 
           {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}

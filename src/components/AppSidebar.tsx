@@ -70,6 +70,7 @@ import {
   AlertTriangle,
   CreditCard,
   Compass,
+  Inbox,
 } from "lucide-react";
 
 interface MenuItem {
@@ -91,6 +92,7 @@ const menuGroups: MenuGroup[] = [
     label: "PERFIL",
     showFor: "all",
     items: [
+      { icon: Inbox, label: "Minhas Tarefas", href: "/my-tasks" },
       { icon: User, label: "Meu Perfil", href: "/profile" },
       { icon: Brain, label: "Profiler", href: "/profiler-intro" },
       { icon: TrendingUp, label: "Meu PDI", href: "/my-pdis" },
@@ -131,6 +133,7 @@ const menuGroups: MenuGroup[] = [
       { icon: Palmtree, label: "Gestão de Férias", href: "/time-off" },
       { icon: CalendarClock, label: "Escalas", href: "/work-schedules" },
       { icon: ClipboardCheck, label: "Parametrização de Jornada", href: "/journey-config" },
+      { icon: AlertTriangle, label: "Inconsistências de Ponto", href: "/time-inconsistencies" },
       { icon: AlertTriangle, label: "Absenteísmo", href: "/absenteeism" },
       { icon: UserMinus, label: "Rescisão Contratual", href: "/terminations" },
     ],
