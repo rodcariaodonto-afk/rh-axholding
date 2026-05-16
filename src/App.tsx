@@ -109,6 +109,11 @@ const PayslipsManage = lazy(() => import("./pages/PayslipsManage"));
 const OnboardingProcesses = lazy(() => import("./pages/OnboardingProcesses"));
 const MedicalExams = lazy(() => import("./pages/MedicalExams"));
 const Receipts = lazy(() => import("./pages/Receipts"));
+const AdminClients = lazy(() => import("./pages/AdminClients"));
+const AdminNewClient = lazy(() => import("./pages/AdminNewClient"));
+const AdminClientDetail = lazy(() => import("./pages/AdminClientDetail"));
+const AdminPlans = lazy(() => import("./pages/AdminPlans"));
+const AdminAudit = lazy(() => import("./pages/AdminAudit"));
 
 const queryClient = new QueryClient({
   defaultOptions: {
@@ -297,6 +302,11 @@ const App = () => (
             <Route path="/onboarding-processes" element={<PeopleRoute><OnboardingProcesses /></PeopleRoute>} />
             <Route path="/medical-exams" element={<PeopleRoute><MedicalExams /></PeopleRoute>} />
             <Route path="/receipts" element={<PeopleRoute><Receipts /></PeopleRoute>} />
+            <Route path="/admin/clientes" element={<AdminClients />} />
+            <Route path="/admin/clientes/novo" element={<AdminNewClient />} />
+            <Route path="/admin/clientes/:id" element={<AdminClientDetail />} />
+            <Route path="/admin/planos" element={<AdminPlans />} />
+            <Route path="/admin/auditoria-global" element={<AdminAudit />} />
           </Route>
 
           {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
