@@ -60,7 +60,7 @@ export function DevicesTab() {
   const { data: devices = [], isLoading } = useTimeClockDevices();
   const { data: costCenters = [] } = useCostCenters({ activeOnly: true });
   const { data: legalEntities = [] } = useLegalEntities({ activeOnly: true });
-  const { data: locations = [] } = useOrganizationLocations();
+  const { locations = [] } = useOrganizationLocations();
   const upsert = useUpsertDevice();
   const del = useDeleteDevice();
   const [editing, setEditing] = useState<Partial<TimeClockDevice> | null>(null);
