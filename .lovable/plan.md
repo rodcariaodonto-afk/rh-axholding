@@ -121,8 +121,12 @@ Bucket: reusar `payroll-exports` ou criar `payroll-receipts` (privado), policies
 6. Rotas no `App.tsx` + entradas no menu (já existem para holerites; criar para admissão).
 7. Smoke test manual: criar admissão, simular fluxo do candidato, concluir; subir 3 PDFs de holerite, matchear, publicar, dar ciência.
 
-## Fora de escopo desta entrega (vão para Fase 4+)
+## Fase 4 — Concluída
 
-- Saúde Ocupacional (ASO) e Rescisão Contratual — próxima fase.
-- Folha de Pagamento completa, EPIs, Treinamentos, Super Admin avançado — fases seguintes.
-- Auditoria detalhada de cada um dos 9 módulos existentes (faria nesta fase só se você trocar para a opção "Bloco 1 + auditoria").
+- **Saúde Ocupacional (ASO):** agendamentos (`medical_exam_schedules`), eventos, bucket privado `medical-exams`, upload por signed URL, dialogs de Agendar/Registrar exame. Página `/medical-exams` agora com tabs Exames + Agendamentos.
+- **Rescisão Contratual:** workflow `termination_processes` + checklist + eventos, edge function `termination-process` com ações create/advance_status/checklist/save_details/complete/cancel. Páginas `/terminations/processes` (lista) e `/terminations/processes/:id` (detalhe com stepper, checklist, cálculos).
+
+## Fora de escopo (fases seguintes)
+
+- Folha de Pagamento completa, EPIs, Treinamentos, Super Admin avançado.
+- Geração automática de TRCT em PDF e integração nativa com Clicksign no fluxo de rescisão.

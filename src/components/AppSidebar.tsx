@@ -138,6 +138,7 @@ const menuGroups: MenuGroup[] = [
       { icon: AlertTriangle, label: "Inconsistências de Ponto", href: "/time-inconsistencies" },
       { icon: AlertTriangle, label: "Absenteísmo", href: "/absenteeism" },
       { icon: UserMinus, label: "Rescisão Contratual", href: "/terminations" },
+      { icon: UserMinus, label: "Processos de Rescisão", href: "/terminations/processes" },
     ],
   },
   {

@@ -12,7 +12,8 @@ import { useUserRole } from "@/hooks/useUserRole";
 import { Skeleton } from "@/components/ui/skeleton";
 import { format } from "date-fns";
 import { ptBR } from "date-fns/locale";
-import { Pencil, Trash2, MoreHorizontal, UserMinus, Search } from "lucide-react";
+import { Pencil, Trash2, MoreHorizontal, UserMinus, Search, Workflow } from "lucide-react";
+import { Link } from "react-router-dom";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -134,10 +135,15 @@ const Terminations = () => {
       <div className="space-y-6">
         <div className="flex items-center justify-between">
           <h1 className="text-3xl font-bold tracking-tight">Desligamentos</h1>
-          <Button onClick={() => setShowSelectEmployee(true)}>
-            <UserMinus className="size-4 mr-2" />
-            Novo Desligamento
-          </Button>
+          <div className="flex gap-2">
+            <Button asChild variant="outline">
+              <Link to="/terminations/processes"><Workflow className="size-4 mr-2" />Processos de rescisão</Link>
+            </Button>
+            <Button onClick={() => setShowSelectEmployee(true)}>
+              <UserMinus className="size-4 mr-2" />
+              Novo Desligamento
+            </Button>
+          </div>
         </div>
 
         <Card>

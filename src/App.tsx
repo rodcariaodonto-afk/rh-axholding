@@ -40,6 +40,8 @@ const CompanyCosts = lazy(() => import("./pages/CompanyCosts"));
 const CompanySettings = lazy(() => import("./pages/CompanySettings"));
 const Culture = lazy(() => import("./pages/Culture"));
 const Terminations = lazy(() => import("./pages/Terminations"));
+const TerminationProcesses = lazy(() => import("./pages/TerminationProcesses"));
+const TerminationProcessDetail = lazy(() => import("./pages/TerminationProcessDetail"));
 const TimeOff = lazy(() => import("./pages/TimeOff"));
 const TalentBank = lazy(() => import("./pages/TalentBank"));
 const TalentBankApplication = lazy(() => import("./pages/TalentBankApplication"));
@@ -254,6 +256,8 @@ const App = () => (
             <Route path="/import-csv" element={<ImportCSV />} />
             <Route path="/culture" element={<Culture />} />
             <Route path="/terminations" element={<Terminations />} />
+            <Route path="/terminations/processes" element={<PeopleRoute><TerminationProcesses /></PeopleRoute>} />
+            <Route path="/terminations/processes/:id" element={<PeopleRoute><TerminationProcessDetail /></PeopleRoute>} />
             <Route path="/time-off" element={<TimeOff />} />
             <Route path="/talent-bank" element={<TalentBank />} />
             <Route path="/vagas" element={<Vagas />} />
