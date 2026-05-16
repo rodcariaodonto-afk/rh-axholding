@@ -24,7 +24,7 @@ const statusLabel: Record<string, string> = {
 
 export default function OnboardingProcesses() {
   const { list, create } = useOnboardingProcesses();
-  const { employees } = useEmployees();
+  const employees = useEmployees();
   const navigate = useNavigate();
   const [open, setOpen] = useState(false);
   const [employeeId, setEmployeeId] = useState("");
