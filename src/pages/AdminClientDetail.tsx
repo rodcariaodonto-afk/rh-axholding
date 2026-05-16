@@ -129,7 +129,7 @@ function ClientDetailInner() {
             <Select value={planSlug} onValueChange={setPlanSlug}>
               <SelectTrigger className="max-w-md"><SelectValue /></SelectTrigger>
               <SelectContent>
-                {plans.map((p) => <SelectItem key={p.slug} value={p.slug}>{p.name}</SelectItem>)}
+                {(plans ?? []).map((p) => <SelectItem key={p.slug} value={p.slug}>{p.name}</SelectItem>)}
               </SelectContent>
             </Select>
           </div>
