@@ -14,6 +14,10 @@ export type OnboardingProcess = {
   completed_at: string | null;
   responsible_user_id: string | null;
   notes: string | null;
+  public_token: string | null;
+  portal_started_at: string | null;
+  portal_submitted_at: string | null;
+  portal_data: Record<string, any>;
   created_at: string;
   updated_at: string;
   employee?: { full_name: string; email: string } | null;
@@ -35,6 +39,29 @@ export type OnboardingTask = {
   sort_order: number;
 };
 
+export type OnboardingDocument = {
+  id: string;
+  process_id: string;
+  organization_id: string;
+  employee_id: string;
+  doc_type: string;
+  doc_label: string;
+  status: "pendente" | "enviado" | "aprovado" | "rejeitado";
+  required: boolean;
+  file_path: string | null;
+  file_name: string | null;
+  uploaded_at: string | null;
+  reviewed_at: string | null;
+  review_notes: string | null;
+};
+
+async function invoke(action: string, payload: any = {}) {
+  const { data, error } = await supabase.functions.invoke("onboarding-manage", { body: { action, payload } });
+  if (error) throw error;
+  if (data?.error) throw new Error(data.error);
+  return data;
+}
+
 export function useOnboardingProcesses() {
   const { organizationId } = useCurrentOrganization();
   const qc = useQueryClient();
@@ -55,26 +82,22 @@ export function useOnboardingProcesses() {
   });
 
   const create = useMutation({
-    mutationFn: async (input: { employee_id: string; template_id?: string | null; expected_completion_at?: string }) => {
-      const { data, error } = await supabase
-        .from("onboarding_processes" as any)
-        .insert({
-          organization_id: orgId!,
-          employee_id: input.employee_id,
-          template_id: input.template_id ?? null,
-          expected_completion_at: input.expected_completion_at ?? null,
-          status: "pendente",
-        })
-        .select()
-        .single();
-      if (error) throw error;
-      return data;
-    },
+    mutationFn: async (input: { employee_id: string; expected_completion_at?: string }) =>
+      invoke("create_process", input),
     onSuccess: () => {
-      toast.success("Processo de onboarding criado");
+      toast.success("Processo de onboarding criado com sucesso");
       qc.invalidateQueries({ queryKey: ["onboarding_processes", orgId] });
     },
     onError: (e: any) => toast.error(e.message ?? "Erro ao criar processo"),
+  });
+
+  const regenerateToken = useMutation({
+    mutationFn: async (process_id: string) => invoke("regenerate_token", { process_id }),
+    onSuccess: () => {
+      toast.success("Novo link gerado");
+      qc.invalidateQueries({ queryKey: ["onboarding_processes", orgId] });
+    },
+    onError: (e: any) => toast.error(e.message),
   });
 
   const updateStatus = useMutation({
@@ -88,38 +111,67 @@ export function useOnboardingProcesses() {
     onSuccess: () => qc.invalidateQueries({ queryKey: ["onboarding_processes", orgId] }),
   });
 
-  return { list, create, updateStatus };
+  return { list, create, updateStatus, regenerateToken };
 }
 
-export function useOnboardingTasks(processId?: string) {
+export function useOnboardingProcess(processId?: string) {
   const qc = useQueryClient();
-  const list = useQuery({
+
+  const process = useQuery({
+    queryKey: ["onboarding_process", processId],
+    enabled: !!processId,
+    queryFn: async () => {
+      const { data, error } = await supabase
+        .from("onboarding_processes" as any)
+        .select("*, employee:employees(full_name, email)")
+        .eq("id", processId!)
+        .single();
+      if (error) throw error;
+      return data as unknown as OnboardingProcess;
+    },
+  });
+
+  const tasks = useQuery({
     queryKey: ["onboarding_tasks", processId],
     enabled: !!processId,
     queryFn: async () => {
       const { data, error } = await supabase
-        .from("onboarding_tasks" as any)
-        .select("*")
-        .eq("process_id", processId!)
-        .order("sort_order", { ascending: true });
+        .from("onboarding_tasks" as any).select("*").eq("process_id", processId!).order("sort_order");
       if (error) throw error;
       return (data ?? []) as unknown as OnboardingTask[];
     },
   });
 
-  const completeTask = useMutation({
-    mutationFn: async (id: string) => {
-      const { error } = await supabase
-        .from("onboarding_tasks" as any)
-        .update({ status: "concluido", completed_at: new Date().toISOString() })
-        .eq("id", id);
+  const documents = useQuery({
+    queryKey: ["onboarding_documents", processId],
+    enabled: !!processId,
+    queryFn: async () => {
+      const { data, error } = await supabase
+        .from("onboarding_documents" as any).select("*").eq("process_id", processId!).order("created_at");
       if (error) throw error;
-    },
-    onSuccess: () => {
-      toast.success("Tarefa concluída");
-      qc.invalidateQueries({ queryKey: ["onboarding_tasks", processId] });
+      return (data ?? []) as unknown as OnboardingDocument[];
     },
   });
 
-  return { list, completeTask };
+  const toggleTask = useMutation({
+    mutationFn: async ({ task_id, status }: { task_id: string; status: OnboardingTask["status"] }) =>
+      invoke("toggle_task", { task_id, status }),
+    onSuccess: () => {
+      qc.invalidateQueries({ queryKey: ["onboarding_tasks", processId] });
+      toast.success("Tarefa atualizada");
+    },
+    onError: (e: any) => toast.error(e.message),
+  });
+
+  const reviewDocument = useMutation({
+    mutationFn: async (input: { document_id: string; status: "aprovado" | "rejeitado"; notes?: string }) =>
+      invoke("review_document", input),
+    onSuccess: () => {
+      qc.invalidateQueries({ queryKey: ["onboarding_documents", processId] });
+      toast.success("Documento revisado");
+    },
+    onError: (e: any) => toast.error(e.message),
+  });
+
+  return { process, tasks, documents, toggleTask, reviewDocument };
 }
