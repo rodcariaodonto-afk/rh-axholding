@@ -4508,6 +4508,48 @@ export type Database = {
           },
         ]
       }
+      organization_modules: {
+        Row: {
+          enabled: boolean
+          enabled_at: string
+          enabled_by: string | null
+          id: string
+          module_key: string
+          organization_id: string
+        }
+        Insert: {
+          enabled?: boolean
+          enabled_at?: string
+          enabled_by?: string | null
+          id?: string
+          module_key: string
+          organization_id: string
+        }
+        Update: {
+          enabled?: boolean
+          enabled_at?: string
+          enabled_by?: string | null
+          id?: string
+          module_key?: string
+          organization_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "organization_modules_organization_id_fkey"
+            columns: ["organization_id"]
+            isOneToOne: false
+            referencedRelation: "organizations"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "organization_modules_organization_id_fkey"
+            columns: ["organization_id"]
+            isOneToOne: false
+            referencedRelation: "organizations_public"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       organizations: {
         Row: {
           allowed_domains: string[] | null
@@ -4522,19 +4564,30 @@ export type Database = {
           id: string
           industry: string | null
           instagram_handle: string | null
+          internal_notes: string | null
           interview_format: string | null
           invite_from_email: string | null
           invite_from_name: string | null
           is_active: boolean | null
+          is_internal: boolean
+          last_access_at: string | null
           linkedin_url: string | null
           logo_url: string | null
           max_employees: number | null
           name: string
+          plan_id: string | null
           plan_type: string | null
+          responsible_email: string | null
+          responsible_name: string | null
+          responsible_phone: string | null
+          scheduled_deletion_at: string | null
           settings: Json | null
           slug: string
+          status: string
+          suspended_at: string | null
           team_structure: string | null
           tech_stack: string | null
+          trial_ends_at: string | null
           twitter_handle: string | null
           updated_at: string
           website: string | null
@@ -4554,19 +4607,30 @@ export type Database = {
           id?: string
           industry?: string | null
           instagram_handle?: string | null
+          internal_notes?: string | null
           interview_format?: string | null
           invite_from_email?: string | null
           invite_from_name?: string | null
           is_active?: boolean | null
+          is_internal?: boolean
+          last_access_at?: string | null
           linkedin_url?: string | null
           logo_url?: string | null
           max_employees?: number | null
           name: string
+          plan_id?: string | null
           plan_type?: string | null
+          responsible_email?: string | null
+          responsible_name?: string | null
+          responsible_phone?: string | null
+          scheduled_deletion_at?: string | null
           settings?: Json | null
           slug: string
+          status?: string
+          suspended_at?: string | null
           team_structure?: string | null
           tech_stack?: string | null
+          trial_ends_at?: string | null
           twitter_handle?: string | null
           updated_at?: string
           website?: string | null
@@ -4586,26 +4650,45 @@ export type Database = {
           id?: string
           industry?: string | null
           instagram_handle?: string | null
+          internal_notes?: string | null
           interview_format?: string | null
           invite_from_email?: string | null
           invite_from_name?: string | null
           is_active?: boolean | null
+          is_internal?: boolean
+          last_access_at?: string | null
           linkedin_url?: string | null
           logo_url?: string | null
           max_employees?: number | null
           name?: string
+          plan_id?: string | null
           plan_type?: string | null
+          responsible_email?: string | null
+          responsible_name?: string | null
+          responsible_phone?: string | null
+          scheduled_deletion_at?: string | null
           settings?: Json | null
           slug?: string
+          status?: string
+          suspended_at?: string | null
           team_structure?: string | null
           tech_stack?: string | null
+          trial_ends_at?: string | null
           twitter_handle?: string | null
           updated_at?: string
           website?: string | null
           work_environment?: string | null
           work_policy?: string | null
         }
-        Relationships: []
+        Relationships: [
+          {
+            foreignKeyName: "organizations_plan_id_fkey"
+            columns: ["plan_id"]
+            isOneToOne: false
+            referencedRelation: "plans"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       payment_schedule: {
         Row: {
@@ -5563,6 +5646,84 @@ export type Database = {
         }
         Relationships: []
       }
+      plans: {
+        Row: {
+          created_at: string
+          default_modules: string[]
+          description: string | null
+          display_order: number
+          features: Json
+          id: string
+          is_active: boolean
+          name: string
+          price_cents: number
+          slug: string
+          updated_at: string
+        }
+        Insert: {
+          created_at?: string
+          default_modules?: string[]
+          description?: string | null
+          display_order?: number
+          features?: Json
+          id?: string
+          is_active?: boolean
+          name: string
+          price_cents?: number
+          slug: string
+          updated_at?: string
+        }
+        Update: {
+          created_at?: string
+          default_modules?: string[]
+          description?: string | null
+          display_order?: number
+          features?: Json
+          id?: string
+          is_active?: boolean
+          name?: string
+          price_cents?: number
+          slug?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
+      platform_audit_log: {
+        Row: {
+          action: string
+          actor_user_id: string
+          created_at: string
+          id: string
+          ip_address: unknown
+          metadata: Json
+          target_organization_id: string | null
+          target_user_id: string | null
+          user_agent: string | null
+        }
+        Insert: {
+          action: string
+          actor_user_id: string
+          created_at?: string
+          id?: string
+          ip_address?: unknown
+          metadata?: Json
+          target_organization_id?: string | null
+          target_user_id?: string | null
+          user_agent?: string | null
+        }
+        Update: {
+          action?: string
+          actor_user_id?: string
+          created_at?: string
+          id?: string
+          ip_address?: unknown
+          metadata?: Json
+          target_organization_id?: string | null
+          target_user_id?: string | null
+          user_agent?: string | null
+        }
+        Relationships: []
+      }
       ponto_registros: {
         Row: {
           created_at: string | null
@@ -6360,6 +6521,57 @@ export type Database = {
           {
             foreignKeyName: "soft_skills_organization_id_fkey"
             columns: ["organization_id"]
+            isOneToOne: false
+            referencedRelation: "organizations_public"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      super_admin_sessions: {
+        Row: {
+          ended_at: string | null
+          expires_at: string
+          id: string
+          ip_address: unknown
+          reason: string | null
+          started_at: string
+          super_admin_user_id: string
+          target_organization_id: string
+          user_agent: string | null
+        }
+        Insert: {
+          ended_at?: string | null
+          expires_at: string
+          id?: string
+          ip_address?: unknown
+          reason?: string | null
+          started_at?: string
+          super_admin_user_id: string
+          target_organization_id: string
+          user_agent?: string | null
+        }
+        Update: {
+          ended_at?: string | null
+          expires_at?: string
+          id?: string
+          ip_address?: unknown
+          reason?: string | null
+          started_at?: string
+          super_admin_user_id?: string
+          target_organization_id?: string
+          user_agent?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "super_admin_sessions_target_organization_id_fkey"
+            columns: ["target_organization_id"]
+            isOneToOne: false
+            referencedRelation: "organizations"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "super_admin_sessions_target_organization_id_fkey"
+            columns: ["target_organization_id"]
             isOneToOne: false
             referencedRelation: "organizations_public"
             referencedColumns: ["id"]
@@ -7999,7 +8211,17 @@ export type Database = {
         }
         Returns: string
       }
+      is_platform_admin: { Args: { _user_id: string }; Returns: boolean }
       is_same_org: { Args: { _org_id: string }; Returns: boolean }
+      log_platform_action: {
+        Args: {
+          _action: string
+          _metadata?: Json
+          _target_organization_id?: string
+          _target_user_id?: string
+        }
+        Returns: string
+      }
       tcraw_mark_processed: {
         Args: {
           _event_id: string
