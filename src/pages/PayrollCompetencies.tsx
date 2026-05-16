@@ -1,11 +1,12 @@
 import { useState } from "react";
+import { useNavigate, Link } from "react-router-dom";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger, DialogFooter } from "@/components/ui/dialog";
-import { Plus, Lock, CheckCircle2, FileDown } from "lucide-react";
+import { Plus, Lock, CheckCircle2, FileDown, ListChecks, Tags } from "lucide-react";
 import {
   usePayrollCompetencies,
   useCreatePayrollCompetency,
@@ -24,6 +25,7 @@ const STATUS_LABEL: Record<string, { label: string; variant: any }> = {
 };
 
 export default function PayrollCompetencies() {
+  const navigate = useNavigate();
   const { data: comps = [], isLoading } = usePayrollCompetencies();
   const create = useCreatePayrollCompetency();
   const updateStatus = useUpdateCompetencyStatus();
@@ -40,10 +42,12 @@ export default function PayrollCompetencies() {
           <h1 className="text-2xl font-bold tracking-tight">Folha de Pagamento — Competências</h1>
           <p className="text-muted-foreground">Gestão de competências mensais e fechamento</p>
         </div>
-        <Dialog open={open} onOpenChange={setOpen}>
-          <DialogTrigger asChild>
-            <Button><Plus className="size-4 mr-1.5" />Nova competência</Button>
-          </DialogTrigger>
+        <div className="flex gap-2">
+          <Button asChild variant="outline"><Link to="/payroll-rubrics"><Tags className="size-4 mr-1.5" />Rubricas</Link></Button>
+          <Dialog open={open} onOpenChange={setOpen}>
+            <DialogTrigger asChild>
+              <Button><Plus className="size-4 mr-1.5" />Nova competência</Button>
+            </DialogTrigger>
           <DialogContent>
             <DialogHeader><DialogTitle>Abrir competência</DialogTitle></DialogHeader>
             <div className="grid grid-cols-2 gap-3 py-2">
@@ -78,7 +82,8 @@ export default function PayrollCompetencies() {
               </Button>
             </DialogFooter>
           </DialogContent>
-        </Dialog>
+          </Dialog>
+        </div>
       </div>
 
       <Card>
@@ -103,12 +108,15 @@ export default function PayrollCompetencies() {
                 {comps.map((c: any) => {
                   const st = STATUS_LABEL[c.status] ?? { label: c.status, variant: "secondary" };
                   return (
-                    <TableRow key={c.id}>
+                    <TableRow key={c.id} className="cursor-pointer" onClick={() => navigate(`/payroll-competencies/${c.id}`)}>
                       <TableCell className="font-medium">{c.reference_label}</TableCell>
                       <TableCell><Badge variant={st.variant}>{st.label}</Badge></TableCell>
                       <TableCell className="text-sm">{c.opened_at ? new Date(c.opened_at).toLocaleDateString("pt-BR") : "—"}</TableCell>
                       <TableCell className="text-sm">{c.closed_at ? new Date(c.closed_at).toLocaleDateString("pt-BR") : "—"}</TableCell>
-                      <TableCell className="text-right space-x-1">
+                      <TableCell className="text-right space-x-1" onClick={(e) => e.stopPropagation()}>
+                        <Button size="sm" variant="ghost" onClick={() => navigate(`/payroll-competencies/${c.id}`)}>
+                          <ListChecks className="size-3.5 mr-1" />Abrir
+                        </Button>
                         <Button
                           size="sm" variant="outline"
                           onClick={() => createExport.mutate({ job_type: "payroll_csv", params: { competency_id: c.id } })}
