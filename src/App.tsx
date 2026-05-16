@@ -183,6 +183,11 @@ const App = () => (
               <CareersPage />
             </Suspense>
           } />
+          <Route path="/admissoes-publica/:token" element={
+            <Suspense fallback={<div className="min-h-screen flex items-center justify-center"><Loader2 className="h-8 w-8 animate-spin text-muted-foreground" /></div>}>
+              <AdmissaoPublica />
+            </Suspense>
+          } />
 
           {/* Registrar Ponto via QR Code (protected, no layout) */}
           <Route path="/registrar-ponto" element={
@@ -310,6 +315,8 @@ const App = () => (
             <Route path="/admin/clientes/:id" element={<AdminClientDetail />} />
             <Route path="/admin/planos" element={<AdminPlans />} />
             <Route path="/admin/auditoria-global" element={<AdminAudit />} />
+            <Route path="/admissoes" element={<PeopleRoute><Admissoes /></PeopleRoute>} />
+            <Route path="/admissoes/:id" element={<PeopleRoute><AdmissaoDetail /></PeopleRoute>} />
           </Route>
 
           {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
