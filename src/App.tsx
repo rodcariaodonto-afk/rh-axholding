@@ -102,6 +102,8 @@ const LegalEntities = lazy(() => import("./pages/LegalEntities"));
 const TimeClockDevices = lazy(() => import("./pages/TimeClockDevices"));
 const TimeInconsistencies = lazy(() => import("./pages/TimeInconsistencies"));
 const MyTasks = lazy(() => import("./pages/MyTasks"));
+const PayrollCompetencies = lazy(() => import("./pages/PayrollCompetencies"));
+const Exports = lazy(() => import("./pages/Exports"));
 
 const queryClient = new QueryClient({
   defaultOptions: {
@@ -283,6 +285,8 @@ const App = () => (
             <Route path="/time-clock-devices" element={<PeopleRoute><TimeClockDevices /></PeopleRoute>} />
             <Route path="/time-inconsistencies" element={<PeopleRoute><TimeInconsistencies /></PeopleRoute>} />
             <Route path="/my-tasks" element={<MyTasks />} />
+            <Route path="/payroll-competencies" element={<PeopleRoute><PayrollCompetencies /></PeopleRoute>} />
+            <Route path="/exports" element={<PeopleRoute><Exports /></PeopleRoute>} />
           </Route>
 
           {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
