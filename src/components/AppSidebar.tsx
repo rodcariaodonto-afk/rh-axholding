@@ -232,6 +232,37 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
   
   // Search state
   const [searchTerm, setSearchTerm] = useState("");
+
+  // Persisted per user+org expansion state
+  const storageKey = useMemo(
+    () => `sidebar:open-groups:${user?.id ?? "anon"}:${selectedOrgId ?? "default"}`,
+    [user?.id, selectedOrgId]
+  );
+  const [openGroups, setOpenGroups] = useState<Record<string, boolean>>({});
+
+  // Hydrate from localStorage when key changes
+  useEffect(() => {
+    try {
+      const raw = localStorage.getItem(storageKey);
+      if (raw) setOpenGroups(JSON.parse(raw));
+      else setOpenGroups({});
+    } catch {
+      setOpenGroups({});
+    }
+  }, [storageKey]);
+
+  const persistOpenGroups = (next: Record<string, boolean>) => {
+    setOpenGroups(next);
+    try {
+      localStorage.setItem(storageKey, JSON.stringify(next));
+    } catch {
+      /* ignore quota errors */
+    }
+  };
+
+  const toggleGroup = (label: string) => {
+    persistOpenGroups({ ...openGroups, [label]: !openGroups[label] });
+  };
   
   // Get current organization
   const currentOrg = selectedOrgId 
