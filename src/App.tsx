@@ -117,6 +117,9 @@ const AdminAudit = lazy(() => import("./pages/AdminAudit"));
 const Admissoes = lazy(() => import("./pages/Admissoes"));
 const AdmissaoDetail = lazy(() => import("./pages/AdmissaoDetail"));
 const AdmissaoPublica = lazy(() => import("./pages/AdmissaoPublica"));
+const Holerites = lazy(() => import("./pages/Holerites"));
+const HoleriteNovo = lazy(() => import("./pages/HoleriteNovo"));
+const HoleriteDetail = lazy(() => import("./pages/HoleriteDetail"));
 
 const queryClient = new QueryClient({
   defaultOptions: {
