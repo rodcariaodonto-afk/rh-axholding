@@ -72,6 +72,7 @@ import {
   CreditCard,
   Compass,
   Inbox,
+  HardDrive,
 } from "lucide-react";
 
 interface MenuItem {
@@ -87,6 +88,18 @@ interface MenuGroup {
   items: MenuItem[];
   showFor?: "all" | "admin" | "people";
 }
+
+// Item exibido no topo, fora de qualquer grupo (primeira coisa que o usuário vê).
+// Tradução pedida pelo cliente: "Dashboard" -> "Painel de Controle".
+const topLevelItems: MenuItem[] = [
+  { icon: LayoutDashboard, label: "Painel de Controle", href: "/dashboard", hideFor: ["admin", "people"] },
+];
+
+// Mesmo item, mas visível para admin/people (que têm o grupo PERFIL com outro recorte).
+// Mantido simples: o Painel aparece no topo para todos os perfis.
+const topLevelItemsForStaff: MenuItem[] = [
+  { icon: LayoutDashboard, label: "Painel de Controle", href: "/dashboard" },
+];
 
 const menuGroups: MenuGroup[] = [
   {
@@ -105,40 +118,71 @@ const menuGroups: MenuGroup[] = [
     ],
   },
   {
-    label: "CADASTRO",
+    label: "CADASTRO DE FUNCIONÁRIOS",
     showFor: "people",
     items: [
       { icon: Users, label: "Colaboradores", href: "/employees" },
+      { icon: Palmtree, label: "Gestão de Férias", href: "/time-off" },
+      { icon: ClipboardCheck, label: "ASO — Exames Ocupacionais", href: "/medical-exams" },
+      { icon: UserPlus, label: "Admissão Digital", href: "/admissoes" },
+      { icon: FileText, label: "Documentos de Colaboradores", href: "/documents" },
+    ],
+  },
+  {
+    label: "CADASTRO INTERNO",
+    showFor: "people",
+    items: [
+      { icon: Briefcase, label: "Centros de Custo", href: "/cost-centers" },
+      { icon: Network, label: "Organograma", href: "/organogram" },
       { icon: Briefcase, label: "Cargos", href: "/positions" },
       { icon: DollarSign, label: "Salários", href: "/salary-ranges" },
       { icon: Building2, label: "Departamentos", href: "/departments" },
+      { icon: Building2, label: "Filiais (CNPJ)", href: "/legal-entities" },
+      { icon: FileStack, label: "Documentos da Empresa", href: "/company-documents" },
+    ],
+  },
+  {
+    label: "PONTO ELETRÔNICO",
+    showFor: "people",
+    items: [
+      { icon: CalendarClock, label: "Escalas", href: "/work-schedules" },
+      { icon: ClipboardCheck, label: "Parametrização de Jornada", href: "/journey-config" },
+      { icon: Clock, label: "Gestão de Ponto", href: "/time-tracking" },
+      { icon: AlertTriangle, label: "Inconsistências de Ponto", href: "/time-inconsistencies" },
+      { icon: AlertTriangle, label: "Absenteísmo", href: "/absenteeism" },
+    ],
+  },
+  {
+    label: "RELATÓRIOS / DOCUMENTOS",
+    showFor: "people",
+    items: [
+      { icon: ClipboardCheck, label: "Relatórios de Ponto", href: "/time-reports" },
+      { icon: TrendingUp, label: "People Analytics", href: "/people-analytics" },
+      { icon: FileText, label: "Folha de Pagamento", href: "/payroll" },
+      { icon: FileText, label: "Competências (Folha)", href: "/payroll-competencies" },
+      { icon: FileText, label: "Rubricas (Folha)", href: "/payroll-rubrics" },
+      { icon: FileText, label: "Holerites (lote)", href: "/holerites" },
+      { icon: FileText, label: "Holerites (individual)", href: "/payslips" },
+      { icon: CreditCard, label: "Programação de Pagamento", href: "/payment-schedule" },
+      { icon: FileText, label: "Recibos (EPI, Vale, Uniforme)", href: "/receipts" },
+      { icon: DollarSign, label: "Custos", href: "/company-costs" },
+      { icon: FileStack, label: "Central de Exportações", href: "/exports" },
+    ],
+  },
+  {
+    label: "AFD / EQUIPAMENTOS",
+    showFor: "people",
+    items: [
+      { icon: HardDrive, label: "Dispositivos de Ponto", href: "/time-clock-devices" },
     ],
   },
   {
     label: "ESTRUTURA ORGANIZACIONAL",
     showFor: "people",
     items: [
-      { icon: Network, label: "Organograma", href: "/organogram" },
       { icon: Calendar, label: "Políticas de Trabalho", href: "/work-policies" },
       { icon: Compass, label: "Identidade Organizacional", href: "/culture" },
-    ],
-  },
-  {
-    label: "DEPARTAMENTO PESSOAL",
-    showFor: "people",
-    items: [
       { icon: Landmark, label: "Dados Trabalhistas", href: "/labor-data" },
-      { icon: Building2, label: "Filiais (CNPJ)", href: "/legal-entities" },
-      { icon: Briefcase, label: "Centros de Custo", href: "/cost-centers" },
-      { icon: Clock, label: "Gestão de Ponto", href: "/time-tracking" },
-      { icon: Clock, label: "Dispositivos de Ponto", href: "/time-clock-devices" },
-      { icon: Palmtree, label: "Gestão de Férias", href: "/time-off" },
-      { icon: CalendarClock, label: "Escalas", href: "/work-schedules" },
-      { icon: ClipboardCheck, label: "Parametrização de Jornada", href: "/journey-config" },
-      { icon: AlertTriangle, label: "Inconsistências de Ponto", href: "/time-inconsistencies" },
-      { icon: AlertTriangle, label: "Absenteísmo", href: "/absenteeism" },
-      { icon: UserMinus, label: "Rescisão Contratual", href: "/terminations" },
-      { icon: UserMinus, label: "Processos de Rescisão", href: "/terminations/processes" },
     ],
   },
   {
@@ -146,7 +190,7 @@ const menuGroups: MenuGroup[] = [
     showFor: "people",
     items: [
       { icon: Target, label: "Avaliação de Desempenho", href: "/performance-evaluation" },
-      { icon: MessageSquare, label: "Feedbacks", href: "/feedbacks" },
+      { icon: MessageSquare, label: "Avaliações", href: "/feedbacks" },
       { icon: Award, label: "Competências", href: "/skills-management" },
       { icon: TrendingUp, label: "Metas & OKRs", href: "/goals" },
       { icon: BookOpen, label: "Catálogo de Treinamentos", href: "/training-catalog" },
@@ -161,7 +205,6 @@ const menuGroups: MenuGroup[] = [
       { icon: UserPlus, label: "Candidatos", href: "/candidates" },
       { icon: Filter, label: "Funil de Seleção", href: "/selection-funnel" },
       { icon: Archive, label: "Banco de Talentos", href: "/talent-bank" },
-      { icon: UserPlus, label: "Admissão Digital", href: "/admissoes" },
     ],
   },
   {
@@ -169,34 +212,17 @@ const menuGroups: MenuGroup[] = [
     showFor: "people",
     items: [
       { icon: UserPlus, label: "Onboarding Digital", href: "/onboarding-processes" },
-      { icon: ClipboardCheck, label: "ASO — Exames Ocupacionais", href: "/medical-exams" },
-      { icon: FileText, label: "Recibos (EPI, Vale, Uniforme)", href: "/receipts" },
       { icon: Package, label: "EPIs — Catálogo & Estoque", href: "/epis" },
       { icon: ClipboardList, label: "EPIs — Entregas", href: "/epis/entregas" },
       { icon: Archive, label: "Patrimônio", href: "/patrimonio" },
     ],
   },
   {
-    label: "RELATÓRIOS & DASHBOARDS",
+    label: "RESCISÃO",
     showFor: "people",
     items: [
-      { icon: LayoutDashboard, label: "Dashboard", href: "/dashboard" },
-      { icon: ClipboardCheck, label: "Relatórios de Ponto", href: "/time-reports" },
-      { icon: TrendingUp, label: "People Analytics", href: "/people-analytics" },
-    ],
-  },
-  {
-    label: "FINANCEIRO",
-    showFor: "people",
-    items: [
-      { icon: FileText, label: "Folha de Pagamento", href: "/payroll" },
-      { icon: FileText, label: "Competências (Folha)", href: "/payroll-competencies" },
-      { icon: FileText, label: "Rubricas (Folha)", href: "/payroll-rubrics" },
-      { icon: FileText, label: "Holerites (individual)", href: "/payslips" },
-      { icon: FileText, label: "Holerites (lote)", href: "/holerites" },
-      { icon: CreditCard, label: "Programação de Pagamento", href: "/payment-schedule" },
-      { icon: DollarSign, label: "Custos", href: "/company-costs" },
-      { icon: FileStack, label: "Central de Exportações", href: "/exports" },
+      { icon: UserMinus, label: "Rescisão Contratual", href: "/terminations" },
+      { icon: UserMinus, label: "Processos de Rescisão", href: "/terminations/processes" },
     ],
   },
   {
@@ -208,9 +234,6 @@ const menuGroups: MenuGroup[] = [
       { icon: Shield, label: "Gestão de Acessos", href: "/access-management" },
       { icon: FileText, label: "Auditoria", href: "/audit" },
       { icon: Shield, label: "Governança de Dados", href: "/data-governance" },
-      { icon: FileStack, label: "Documentos da Empresa", href: "/company-documents" },
-      { icon: Package, label: "Inventário", href: "/" },
-      { icon: FileText, label: "Documentos de Colaboradores", href: "/documents" },
     ],
   },
 ];
@@ -232,10 +255,10 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
   const { isViewingAsCollaborator, toggleViewAsCollaborator } = useViewAs();
   const { data: userOrganizations = [] } = useUserOrganizations(user?.id);
   const location = useLocation();
-  
+
   // Track selected organization (default to first one)
   const [selectedOrgId, setSelectedOrgId] = useState<string | null>(null);
-  
+
   // Search state
   const [searchTerm, setSearchTerm] = useState("");
 
@@ -269,12 +292,12 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
   const toggleGroup = (label: string) => {
     persistOpenGroups({ ...openGroups, [label]: !openGroups[label] });
   };
-  
+
   // Get current organization
-  const currentOrg = selectedOrgId 
-    ? userOrganizations.find(org => org.id === selectedOrgId) 
+  const currentOrg = selectedOrgId
+    ? userOrganizations.find(org => org.id === selectedOrgId)
     : userOrganizations[0];
-  
+
   const hasMultipleOrgs = userOrganizations.length > 1;
 
   const isActive = (path: string) => {
@@ -307,7 +330,7 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
   };
 
   const userInitials = user?.email?.slice(0, 2).toUpperCase() || "US";
-  
+
   // Fallback org name if no organization found
   const displayOrgName = currentOrg?.name || "Orb RH";
   const displayOrgLogo = currentOrg?.logo_url;
@@ -322,6 +345,10 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
       .toUpperCase()
       .slice(0, 2);
   };
+
+  // Painel de Controle no topo: para staff (admin/people) usa a versão sempre visível;
+  // para colaborador comum, usa a versão com hideFor (mantém regra de permissão original).
+  const topItems = (isAdmin || isPeople) ? topLevelItemsForStaff : topLevelItems;
 
   const OrgHeader = () => (
     <div className="flex items-center gap-2">
@@ -343,7 +370,7 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
   );
 
   return (
-    <Sidebar collapsible="offcanvas" className="!border-r-0" {...props}>
+    <Sidebar collapsible="offcanvas" className="!border-r-0 bg-sidebar" {...props}>
       <SidebarHeader className="p-5 pb-0">
         <div className="flex items-center justify-between">
           {hasMultipleOrgs ? (
@@ -357,7 +384,7 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
                     Organizações
                   </p>
                   {userOrganizations.map((org) => (
-                    <DropdownMenuItem 
+                    <DropdownMenuItem
                       key={org.id}
                       onClick={() => setSelectedOrgId(org.id)}
                     >
@@ -432,6 +459,34 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
           )}
         </div>
 
+        {/* Painel de Controle — item fixo no topo, fora de grupo (pedido do cliente) */}
+        {(() => {
+          const isSearching = searchTerm.trim().length > 0;
+          const visibleTopItems = filterItems(topItems.filter(canShowItem));
+          if (visibleTopItems.length === 0) return null;
+          return (
+            <SidebarMenu className="mb-3">
+              {visibleTopItems.map((item) => (
+                <SidebarMenuItem key={item.label}>
+                  <SidebarMenuButton
+                    asChild
+                    isActive={isActive(item.href)}
+                    className="h-[38px] transition-colors hover:bg-sidebar-accent hover:text-sidebar-accent-foreground data-[active=true]:bg-sidebar-accent data-[active=true]:text-sidebar-accent-foreground data-[active=true]:font-medium"
+                  >
+                    <Link to={item.href}>
+                      <item.icon className="size-5" />
+                      <span className="flex-1">{item.label}</span>
+                      {isActive(item.href) && (
+                        <ChevronRight className="size-4 text-muted-foreground opacity-60" />
+                      )}
+                    </Link>
+                  </SidebarMenuButton>
+                </SidebarMenuItem>
+              ))}
+            </SidebarMenu>
+          );
+        })()}
+
         {(() => {
           const allGroups = [...menuGroups, ...(isPlatformAdmin ? [platformAdminGroup] : [])];
           const isSearching = searchTerm.trim().length > 0;
@@ -486,7 +541,7 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
                           <SidebarMenuButton
                             asChild
                             isActive={isActive(item.href)}
-                            className="h-[38px]"
+                            className="h-[38px] transition-colors hover:bg-sidebar-accent hover:text-sidebar-accent-foreground data-[active=true]:bg-sidebar-accent data-[active=true]:text-sidebar-accent-foreground data-[active=true]:font-medium"
                           >
                             <Link to={item.href}>
                               <item.icon className="size-5" />
