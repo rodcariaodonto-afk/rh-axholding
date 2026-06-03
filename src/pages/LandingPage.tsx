@@ -123,7 +123,7 @@ const plans = [
 ];
 
 export default function LandingPage() {
-  const WHATSAPP_URL = "https://wa.me/5511960011555?text=Olá! Gostaria de falar com um consultor sobre o RH Smart IA.";
+  const WHATSAPP_URL = "https://wa.me/5511939171383?text=Ol%C3%A1%2C%20gostaria%20de%20saber%20mais%20sobre%20o%20RH%20Smart%20IA%20.%20Poderia%20me%20falar%20sobre%20a%20plataforma%3F";
 
   const { toast } = useToast();
   const [mobileMenu, setMobileMenu] = useState(false);
