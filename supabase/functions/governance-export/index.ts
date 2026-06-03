@@ -95,6 +95,12 @@ Deno.serve(async (req) => {
     for (const s of body.scope) {
       const cfg = SCOPE_TABLES[s];
       if (!cfg) continue;
+      // Scopes without an org column require an explicit subject to avoid
+      // cross-organization leaks (e.g. pdi_goals, contracts).
+      if (cfg.requireSubject && !body.subject_id) {
+        payload[s] = { error: 'subject_id required for this scope' };
+        continue;
+      }
       try {
         let q = supabase.from(cfg.table).select('*');
         if (cfg.orgCol) q = q.eq(cfg.orgCol, body.organization_id);
