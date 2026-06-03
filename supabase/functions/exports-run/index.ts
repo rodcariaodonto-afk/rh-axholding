@@ -27,16 +27,42 @@ Deno.serve(async (req) => {
   if (req.method === "OPTIONS") return new Response("ok", { headers: corsHeaders });
 
   try {
+    // === Authentication ===
+    const authHeader = req.headers.get("Authorization");
+    if (!authHeader?.startsWith("Bearer ")) {
+      return new Response(JSON.stringify({ error: "Unauthorized" }), { status: 401, headers: corsHeaders });
+    }
+    const supabaseUrl = Deno.env.get("SUPABASE_URL")!;
+    const serviceKey = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!;
+    const anonKey = Deno.env.get("SUPABASE_ANON_KEY")!;
+
+    const userClient = createClient(supabaseUrl, anonKey, {
+      global: { headers: { Authorization: authHeader } },
+    });
+    const token = authHeader.replace("Bearer ", "");
+    const { data: claimsData, error: claimsErr } = await userClient.auth.getClaims(token);
+    if (claimsErr || !claimsData?.claims) {
+      return new Response(JSON.stringify({ error: "Unauthorized" }), { status: 401, headers: corsHeaders });
+    }
+    const userId = claimsData.claims.sub as string;
+
     const { job_id } = await req.json();
     if (!job_id) return new Response(JSON.stringify({ error: "job_id required" }), { status: 400, headers: corsHeaders });
 
-    const supabaseUrl = Deno.env.get("SUPABASE_URL")!;
-    const serviceKey = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!;
     const admin = createClient(supabaseUrl, serviceKey);
 
     const { data: job, error: jobErr } = await admin
       .from("export_jobs").select("*").eq("id", job_id).single();
     if (jobErr || !job) throw new Error(jobErr?.message ?? "job not found");
+
+    // === Authorization: must belong to job's org ===
+    const { data: isMember } = await admin.rpc("user_belongs_to_org", {
+      _user_id: userId,
+      _org_id: job.organization_id,
+    });
+    if (!isMember) {
+      return new Response(JSON.stringify({ error: "Forbidden" }), { status: 403, headers: corsHeaders });
+    }
 
     await admin.from("export_jobs").update({
       status: "processing", started_at: new Date().toISOString(),
@@ -96,6 +122,7 @@ Deno.serve(async (req) => {
       case "audit_csv": {
         const { data, error } = await admin.from("audit_log")
           .select("created_at, user_id, resource_type, resource_id, action")
+          .eq("organization_id", orgId)
           .order("created_at", { ascending: false }).limit(5000);
         if (error) throw error;
         rows = data ?? [];
