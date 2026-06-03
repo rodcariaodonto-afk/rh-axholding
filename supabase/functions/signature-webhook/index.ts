@@ -7,10 +7,53 @@ const corsHeaders = {
   "Access-Control-Allow-Methods": "POST, OPTIONS",
 };
 
+async function hmacSha256Hex(secret: string, message: string): Promise<string> {
+  const enc = new TextEncoder();
+  const key = await crypto.subtle.importKey(
+    "raw",
+    enc.encode(secret),
+    { name: "HMAC", hash: "SHA-256" },
+    false,
+    ["sign"],
+  );
+  const sig = await crypto.subtle.sign("HMAC", key, enc.encode(message));
+  return Array.from(new Uint8Array(sig))
+    .map((b) => b.toString(16).padStart(2, "0"))
+    .join("");
+}
+
 Deno.serve(async (req) => {
   if (req.method === "OPTIONS") return new Response("ok", { headers: corsHeaders });
   try {
-    const body = await req.json();
+    // Read raw body once so we can verify HMAC then parse JSON
+    const rawBody = await req.text();
+
+    // === HMAC verification (Clicksign) ===
+    const hmacSecret = Deno.env.get("CLICKSIGN_HMAC_SECRET");
+    const providedSig = req.headers.get("x-clicksign-hmac-sha256")?.replace(/^sha256=/i, "").trim();
+
+    if (hmacSecret) {
+      if (!providedSig) {
+        console.warn("signature-webhook: missing HMAC header");
+        return new Response(JSON.stringify({ error: "Missing signature" }), {
+          status: 401,
+          headers: { ...corsHeaders, "Content-Type": "application/json" },
+        });
+      }
+      const expected = await hmacSha256Hex(hmacSecret, rawBody);
+      if (expected.toLowerCase() !== providedSig.toLowerCase()) {
+        console.warn("signature-webhook: invalid HMAC");
+        return new Response(JSON.stringify({ error: "Invalid signature" }), {
+          status: 403,
+          headers: { ...corsHeaders, "Content-Type": "application/json" },
+        });
+      }
+    } else {
+      console.warn("signature-webhook: CLICKSIGN_HMAC_SECRET not configured — webhook accepted without verification. Configure the secret to enable signature verification.");
+    }
+
+    const body = JSON.parse(rawBody);
+
     // Parse genérico (sem token) só para identificar o envelope
     const probe = getSignatureProvider("clicksign", "probe");
     const parsed = probe.parseWebhook(body);

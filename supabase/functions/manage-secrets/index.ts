@@ -128,7 +128,7 @@ serve(async (req) => {
     // Route by method
     switch (req.method) {
       case 'GET':
-        return await handleGet(req, supabaseAdmin, requestId);
+        return await handleGet(req, supabaseAdmin, userId, requestId);
       case 'POST':
         return await handlePost(req, supabaseAdmin, userId, requestId);
       case 'DELETE':
@@ -167,6 +167,7 @@ serve(async (req) => {
 async function handleGet(
   req: Request,
   supabase: any,
+  userId: string,
   requestId: string
 ): Promise<Response> {
   const url = new URL(req.url);
@@ -180,6 +181,24 @@ async function handleGet(
   
   const { organization_id } = validation.data;
   console.log(`[${FUNCTION_NAME}][${requestId}] GET integrations`);
+
+  // === Authorization: caller must be allowed to manage this org's integrations ===
+  const { data: canAccess } = await supabase.rpc('can_manage_org_integrations', {
+    p_user_id: userId,
+    p_org_id: organization_id,
+  });
+  if (!canAccess) {
+    return new Response(
+      JSON.stringify({
+        type: "about:blank",
+        title: "Forbidden",
+        status: 403,
+        detail: "Você não tem permissão para visualizar as integrações desta organização",
+        requestId,
+      }),
+      { status: 403, headers: { ...corsHeaders, 'Content-Type': 'application/problem+json' } }
+    );
+  }
 
   const { data, error } = await supabase
     .from('organization_integrations')

@@ -10,10 +10,10 @@ interface Body {
   include_files?: boolean;
 }
 
-const SCOPE_TABLES: Record<string, { table: string; orgCol?: string; userCol?: string }> = {
+const SCOPE_TABLES: Record<string, { table: string; orgCol?: string; userCol?: string; requireSubject?: boolean }> = {
   organization: { table: 'organizations' },
   employees: { table: 'employees', orgCol: 'organization_id', userCol: 'id' },
-  contracts: { table: 'employees_contracts', userCol: 'user_id' },
+  contracts: { table: 'employees_contracts', userCol: 'user_id', requireSubject: true },
   contact: { table: 'employees_contact', userCol: 'user_id' },
   demographics: { table: 'employees_demographics', userCol: 'user_id' },
   legal_docs: { table: 'employees_legal_docs', userCol: 'user_id' },
@@ -22,7 +22,7 @@ const SCOPE_TABLES: Record<string, { table: string; orgCol?: string; userCol?: s
   positions: { table: 'positions', orgCol: 'organization_id' },
   departments: { table: 'departments', orgCol: 'organization_id' },
   pdis: { table: 'pdis', orgCol: 'organization_id' },
-  pdi_goals: { table: 'pdi_goals' },
+  pdi_goals: { table: 'pdi_goals', requireSubject: true },
   feedbacks: { table: 'feedbacks', orgCol: 'organization_id' },
   evaluations: { table: 'evaluation_cycles', orgCol: 'organization_id' },
   time_off: { table: 'time_off_requests', orgCol: 'organization_id' },
@@ -95,6 +95,12 @@ Deno.serve(async (req) => {
     for (const s of body.scope) {
       const cfg = SCOPE_TABLES[s];
       if (!cfg) continue;
+      // Scopes without an org column require an explicit subject to avoid
+      // cross-organization leaks (e.g. pdi_goals, contracts).
+      if (cfg.requireSubject && !body.subject_id) {
+        payload[s] = { error: 'subject_id required for this scope' };
+        continue;
+      }
       try {
         let q = supabase.from(cfg.table).select('*');
         if (cfg.orgCol) q = q.eq(cfg.orgCol, body.organization_id);
