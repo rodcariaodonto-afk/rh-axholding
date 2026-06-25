@@ -58,6 +58,7 @@ import {
   Eye,
   EyeOff,
   Calendar,
+  CalendarX,
   FileText,
   Filter,
   UserPlus,
@@ -150,6 +151,8 @@ const menuGroups: MenuGroup[] = [
       { icon: Clock, label: "Gestão de Ponto", href: "/time-tracking" },
       { icon: AlertTriangle, label: "Inconsistências de Ponto", href: "/time-inconsistencies" },
       { icon: AlertTriangle, label: "Absenteísmo", href: "/absenteeism" },
+      { icon: CalendarX, label: "Justificativas", href: "/justificativas" },
+      { icon: Calendar, label: "Feriados", href: "/feriados" },
     ],
   },
   {

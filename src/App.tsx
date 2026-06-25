@@ -129,6 +129,8 @@ const AdmissaoPublica = lazy(() => import("./pages/AdmissaoPublica"));
 const Holerites = lazy(() => import("./pages/Holerites"));
 const HoleriteNovo = lazy(() => import("./pages/HoleriteNovo"));
 const HoleriteDetail = lazy(() => import("./pages/HoleriteDetail"));
+const Justificativas = lazy(() => import("./pages/Justificativas"));
+const Feriados = lazy(() => import("./pages/Feriados"));
 
 const queryClient = new QueryClient({
   defaultOptions: {
@@ -347,6 +349,8 @@ const App = () => (
             <Route path="/holerites" element={<PeopleRoute><Holerites /></PeopleRoute>} />
             <Route path="/holerites/novo" element={<PeopleRoute><HoleriteNovo /></PeopleRoute>} />
             <Route path="/holerites/:id" element={<PeopleRoute><HoleriteDetail /></PeopleRoute>} />
+            <Route path="/justificativas" element={<PeopleRoute><Justificativas /></PeopleRoute>} />
+            <Route path="/feriados" element={<PeopleRoute><Feriados /></PeopleRoute>} />
           </Route>
 
           {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
