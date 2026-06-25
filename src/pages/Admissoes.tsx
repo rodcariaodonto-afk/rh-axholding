@@ -45,6 +45,9 @@ const EMPTY_FORM = {
   unit_id: "",
   base_position_id: "",
   manager_id: "",
+  matricula: "",
+  codigo_interno: "",
+  matricula_esocial: "",
   notes: "",
 };
 
@@ -89,6 +92,9 @@ export default function Admissoes() {
         unit_id: form.unit_id || undefined,
         base_position_id: form.base_position_id || undefined,
         manager_id: form.manager_id || undefined,
+        matricula: form.matricula || undefined,
+        codigo_interno: form.codigo_interno || undefined,
+        matricula_esocial: form.matricula_esocial || undefined,
         notes: form.notes || undefined,
       };
       const process = await create.mutateAsync(payload);
@@ -239,6 +245,33 @@ export default function Admissoes() {
                         ))}
                       </SelectContent>
                     </Select>
+                  </div>
+                  <div>
+                    <Label>Matrícula</Label>
+                    <Input
+                      className="mt-1"
+                      value={form.matricula}
+                      onChange={(e) => set("matricula")(e.target.value)}
+                      placeholder="Número da matrícula"
+                    />
+                  </div>
+                  <div>
+                    <Label>Código Interno</Label>
+                    <Input
+                      className="mt-1"
+                      value={form.codigo_interno}
+                      onChange={(e) => set("codigo_interno")(e.target.value)}
+                      placeholder="Código interno"
+                    />
+                  </div>
+                  <div>
+                    <Label>Matrícula eSocial</Label>
+                    <Input
+                      className="mt-1"
+                      value={form.matricula_esocial}
+                      onChange={(e) => set("matricula_esocial")(e.target.value)}
+                      placeholder="Matrícula eSocial"
+                    />
                   </div>
                 </div>
               </div>

@@ -45,6 +45,9 @@ const personalSchema = z.object({
   rg_issuer: z.string().optional().or(z.literal("")),
   pis_pasep: z.string().optional().or(z.literal("")),
   sus_card: z.string().optional().or(z.literal("")),
+  ctps_number: z.string().optional().or(z.literal("")),
+  ctps_series: z.string().optional().or(z.literal("")),
+  ctps_state: z.string().optional().or(z.literal("")),
   // Dados Bancários (from employees_legal_docs)
   bank_name: z.string().optional().or(z.literal("")),
   bank_agency: z.string().optional().or(z.literal("")),
@@ -96,6 +99,9 @@ export function PersonalInfoForm({
       rg_issuer: "",
       pis_pasep: "",
       sus_card: "",
+      ctps_number: "",
+      ctps_series: "",
+      ctps_state: "",
       bank_name: "",
       bank_agency: "",
       bank_account: "",
@@ -137,6 +143,9 @@ export function PersonalInfoForm({
         rg_issuer: legalDocs?.rg_issuer || "",
         pis_pasep: legalDocs?.pis_pasep || "",
         sus_card: legalDocs?.sus_card || "",
+        ctps_number: legalDocs?.ctps_number || "",
+        ctps_series: legalDocs?.ctps_series || "",
+        ctps_state: legalDocs?.ctps_state || "",
         bank_name: legalDocs?.bank_name || "",
         bank_agency: legalDocs?.bank_agency || "",
         bank_account: legalDocs?.bank_account || "",
@@ -727,6 +736,50 @@ export function PersonalInfoForm({
                         field.onChange(digits);
                       }}
                     />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+          </div>
+
+          <div className="grid grid-cols-3 gap-4 mt-4">
+            <FormField
+              control={form.control}
+              name="ctps_number"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Número CTPS</FormLabel>
+                  <FormControl>
+                    <Input {...field} value={field.value || ""} placeholder="Número da CTPS" disabled={legalDocsDisabled} />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+
+            <FormField
+              control={form.control}
+              name="ctps_series"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Série CTPS</FormLabel>
+                  <FormControl>
+                    <Input {...field} value={field.value || ""} placeholder="Série" disabled={legalDocsDisabled} />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+
+            <FormField
+              control={form.control}
+              name="ctps_state"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>UF CTPS</FormLabel>
+                  <FormControl>
+                    <Input {...field} value={field.value || ""} placeholder="SP" maxLength={2} disabled={legalDocsDisabled} />
                   </FormControl>
                   <FormMessage />
                 </FormItem>

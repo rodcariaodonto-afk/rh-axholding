@@ -8,6 +8,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { DatePickerWithYearMonth } from "@/components/ui/date-picker-with-year-month";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { CalendarIcon } from "lucide-react";
+import { Switch } from "@/components/ui/switch";
 import { format } from "date-fns";
 import { ptBR } from "date-fns/locale";
 import { cn } from "@/lib/utils";
@@ -29,6 +30,16 @@ const contractSchema = z.object({
   other_benefits: z.number().min(0).optional(),
   weekly_hours: z.number().min(1).max(168).optional(),
   is_active: z.boolean(),
+  cost_per_hour: z.number().min(0).optional(),
+  hazard_pay_percentage: z.number().min(0).max(100).optional(),
+  monthly_hours: z.number().min(0).optional(),
+  immediate_supervisor_name: z.string().optional().or(z.literal("")),
+  immediate_supervisor_email: z.string().optional().or(z.literal("")),
+  immediate_supervisor_registration: z.string().optional().or(z.literal("")),
+  badge_barcode: z.string().optional().or(z.literal("")),
+  mifare_card: z.string().optional().or(z.literal("")),
+  block_time_view: z.boolean().optional(),
+  receive_alerts: z.boolean().optional(),
 });
 
 export type ContractFormData = z.infer<typeof contractSchema>;
@@ -58,6 +69,16 @@ export function ContractInfoForm({ contracts, isCreating, isUpdating, onSubmit }
       other_benefits: 0,
       weekly_hours: 44,
       is_active: true,
+      cost_per_hour: 0,
+      hazard_pay_percentage: 0,
+      monthly_hours: undefined,
+      immediate_supervisor_name: "",
+      immediate_supervisor_email: "",
+      immediate_supervisor_registration: "",
+      badge_barcode: "",
+      mifare_card: "",
+      block_time_view: false,
+      receive_alerts: false,
     },
   });
 
@@ -80,6 +101,16 @@ export function ContractInfoForm({ contracts, isCreating, isUpdating, onSubmit }
         other_benefits: Number(activeContract.other_benefits) || 0,
         weekly_hours: Number(activeContract.weekly_hours) || 44,
         is_active: activeContract.is_active,
+        cost_per_hour: Number(activeContract.cost_per_hour) || 0,
+        hazard_pay_percentage: Number(activeContract.hazard_pay_percentage) || 0,
+        monthly_hours: activeContract.monthly_hours ? Number(activeContract.monthly_hours) : undefined,
+        immediate_supervisor_name: activeContract.immediate_supervisor_name || "",
+        immediate_supervisor_email: activeContract.immediate_supervisor_email || "",
+        immediate_supervisor_registration: activeContract.immediate_supervisor_registration || "",
+        badge_barcode: activeContract.badge_barcode || "",
+        mifare_card: activeContract.mifare_card || "",
+        block_time_view: activeContract.block_time_view ?? false,
+        receive_alerts: activeContract.receive_alerts ?? false,
       });
     }
   }, [contracts, form]);
@@ -334,6 +365,186 @@ export function ContractInfoForm({ contracts, isCreating, isUpdating, onSubmit }
             </FormItem>
           )}
         />
+
+        <div className="grid grid-cols-3 gap-4">
+          <FormField
+            control={form.control}
+            name="cost_per_hour"
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel>Custo por hora (R$)</FormLabel>
+                <FormControl>
+                  <Input
+                    type="text"
+                    placeholder="0,00"
+                    value={field.value ? new Intl.NumberFormat('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 }).format(field.value) : ''}
+                    onChange={(e) => {
+                      const numericValue = e.target.value.replace(/\D/g, '');
+                      const floatValue = parseFloat(numericValue) / 100;
+                      field.onChange(isNaN(floatValue) ? 0 : floatValue);
+                    }}
+                  />
+                </FormControl>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
+
+          <FormField
+            control={form.control}
+            name="hazard_pay_percentage"
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel>Periculosidade (%)</FormLabel>
+                <FormControl>
+                  <Input
+                    type="number"
+                    min={0}
+                    max={100}
+                    placeholder="0"
+                    {...field}
+                    value={field.value ?? ""}
+                    onChange={(e) => field.onChange(e.target.value === "" ? undefined : Number(e.target.value))}
+                  />
+                </FormControl>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
+
+          <FormField
+            control={form.control}
+            name="monthly_hours"
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel>Carga horária mensal</FormLabel>
+                <FormControl>
+                  <Input
+                    type="number"
+                    min={0}
+                    placeholder="220"
+                    {...field}
+                    value={field.value ?? ""}
+                    onChange={(e) => field.onChange(e.target.value === "" ? undefined : Number(e.target.value))}
+                  />
+                </FormControl>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
+        </div>
+
+        <div>
+          <h3 className="text-sm font-medium text-muted-foreground mb-3">Chefia Imediata</h3>
+          <div className="grid grid-cols-3 gap-4">
+            <FormField
+              control={form.control}
+              name="immediate_supervisor_name"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Nome</FormLabel>
+                  <FormControl>
+                    <Input {...field} value={field.value || ""} placeholder="Nome da chefia imediata" />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+
+            <FormField
+              control={form.control}
+              name="immediate_supervisor_email"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>E-mail</FormLabel>
+                  <FormControl>
+                    <Input type="email" {...field} value={field.value || ""} placeholder="email@empresa.com" />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+
+            <FormField
+              control={form.control}
+              name="immediate_supervisor_registration"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Matrícula</FormLabel>
+                  <FormControl>
+                    <Input {...field} value={field.value || ""} placeholder="Matrícula da chefia" />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+          </div>
+        </div>
+
+        <div>
+          <h3 className="text-sm font-medium text-muted-foreground mb-3">Controle de Acesso</h3>
+          <div className="grid grid-cols-2 gap-4 mb-4">
+            <FormField
+              control={form.control}
+              name="badge_barcode"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Código de barras do crachá</FormLabel>
+                  <FormControl>
+                    <Input {...field} value={field.value || ""} placeholder="Código de barras" />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+
+            <FormField
+              control={form.control}
+              name="mifare_card"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Cartão de proximidade Mifare</FormLabel>
+                  <FormControl>
+                    <Input {...field} value={field.value || ""} placeholder="Número do cartão Mifare" />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+          </div>
+
+          <div className="space-y-3">
+            <FormField
+              control={form.control}
+              name="block_time_view"
+              render={({ field }) => (
+                <FormItem className="flex items-center justify-between rounded-lg border p-3">
+                  <FormLabel className="font-normal cursor-pointer">
+                    Bloquear visualização das batidas pelo funcionário
+                  </FormLabel>
+                  <FormControl>
+                    <Switch checked={field.value ?? false} onCheckedChange={field.onChange} />
+                  </FormControl>
+                </FormItem>
+              )}
+            />
+
+            <FormField
+              control={form.control}
+              name="receive_alerts"
+              render={({ field }) => (
+                <FormItem className="flex items-center justify-between rounded-lg border p-3">
+                  <FormLabel className="font-normal cursor-pointer">
+                    Receber alertas desse funcionário
+                  </FormLabel>
+                  <FormControl>
+                    <Switch checked={field.value ?? false} onCheckedChange={field.onChange} />
+                  </FormControl>
+                </FormItem>
+              )}
+            />
+          </div>
+        </div>
 
         <Button type="submit" className="w-full" disabled={isCreating || isUpdating}>
           {(isCreating || isUpdating) ? "Salvando..." : "Salvar Dados Contratuais"}
