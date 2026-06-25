@@ -4,7 +4,7 @@ import Layout from "@/components/Layout";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { ArrowLeft, Fingerprint, UserMinus } from "lucide-react";
+import { ArrowLeft, Fingerprint, Megaphone, UserMinus } from "lucide-react";
 import { usePermissions } from "@/hooks/usePermissions";
 import ProfilerDetailModal from "@/components/ProfilerDetailModal";
 import { AvatarUpload } from "@/components/AvatarUpload";
@@ -26,6 +26,7 @@ import { MyJustificativasSection } from "@/components/MyJustificativasSection";
 import { EmployeeDocumentsTab } from "@/components/EmployeeDocumentsTab";
 import { EmployeeTrainingsTab } from "@/components/EmployeeTrainingsTab";
 import { EmployeeChangesHistory } from "@/components/EmployeeChangesHistory";
+import { ComunicadosEmployeeTab } from "@/components/ComunicadosEmployeeTab";
 import { PersonalInfoForm, type PersonalFormData } from "@/components/PersonalInfoForm";
 import { ContactInfoForm, type ContactFormData } from "@/components/ContactInfoForm";
 import { ContractInfoForm, type ContractFormData } from "@/components/ContractInfoForm";
@@ -218,7 +219,7 @@ export default function EmployeeProfile() {
         <Card>
           <CardContent className="pt-6">
             <Tabs defaultValue="personal" className="w-full">
-              <TabsList className="grid w-full grid-cols-3 sm:grid-cols-7 h-auto">
+              <TabsList className="grid w-full grid-cols-4 sm:grid-cols-8 h-auto">
                 <TabsTrigger value="personal">Pessoal</TabsTrigger>
                 <TabsTrigger value="contact">Contato</TabsTrigger>
                 <TabsTrigger value="contract">Contrato</TabsTrigger>
@@ -226,6 +227,9 @@ export default function EmployeeProfile() {
                 <TabsTrigger value="pdi">PDI</TabsTrigger>
                 <TabsTrigger value="trainings">Treinamentos</TabsTrigger>
                 <TabsTrigger value="documents">Arquivos</TabsTrigger>
+                <TabsTrigger value="comunicados">
+                  <Megaphone className="mr-1.5 h-3.5 w-3.5" />Comunicados
+                </TabsTrigger>
               </TabsList>
 
               <TabsContent value="personal" className="space-y-4 pt-6">
@@ -276,6 +280,10 @@ export default function EmployeeProfile() {
 
               <TabsContent value="documents" className="space-y-4 pt-6">
                 {id && <EmployeeDocumentsTab employeeId={id} />}
+              </TabsContent>
+
+              <TabsContent value="comunicados" className="space-y-4 pt-6">
+                {id && <ComunicadosEmployeeTab employeeId={id} />}
               </TabsContent>
             </Tabs>
           </CardContent>

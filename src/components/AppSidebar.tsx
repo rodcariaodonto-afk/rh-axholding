@@ -74,6 +74,7 @@ import {
   Compass,
   Inbox,
   HardDrive,
+  Megaphone,
 } from "lucide-react";
 
 interface MenuItem {
@@ -140,6 +141,7 @@ const menuGroups: MenuGroup[] = [
       { icon: Building2, label: "Departamentos", href: "/departments" },
       { icon: Building2, label: "Filiais (CNPJ)", href: "/legal-entities" },
       { icon: FileStack, label: "Documentos da Empresa", href: "/company-documents" },
+      { icon: Megaphone, label: "Comunicados", href: "/comunicados" },
     ],
   },
   {
