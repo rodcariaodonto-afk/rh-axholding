@@ -152,6 +152,28 @@ export function ContractInfoForm({ contracts, isCreating, isUpdating, onSubmit }
 
         <FormField
           control={form.control}
+          name="probation_days"
+          render={({ field }) => (
+            <FormItem>
+              <FormLabel>Período de Experiência (dias)</FormLabel>
+              <FormControl>
+                <Input
+                  type="number"
+                  min={0}
+                  placeholder="0"
+                  {...field}
+                  value={field.value ?? ""}
+                  onChange={(e) => field.onChange(e.target.value === "" ? undefined : Number(e.target.value))}
+                />
+              </FormControl>
+              <p className="text-xs text-muted-foreground mt-1">Valores sugeridos: 45 ou 90 dias</p>
+              <FormMessage />
+            </FormItem>
+          )}
+        />
+
+        <FormField
+          control={form.control}
           name="base_salary"
           render={({ field }) => (
             <FormItem>

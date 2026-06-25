@@ -183,7 +183,7 @@ export function ContactInfoForm({ contact, isUpdating, onSubmit }: ContactInfoFo
         {/* Endereço */}
         <div>
           <h3 className="text-sm font-medium text-muted-foreground mb-3">Endereço</h3>
-          <div className="grid grid-cols-3 gap-4 mb-4">
+          <div className="grid grid-cols-4 gap-4 mb-4">
             <FormField
               control={form.control}
               name="zip_code"
@@ -250,9 +250,23 @@ export function ContactInfoForm({ contact, isUpdating, onSubmit }: ContactInfoFo
                 </FormItem>
               )}
             />
+
+            <FormField
+              control={form.control}
+              name="country"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>País</FormLabel>
+                  <FormControl>
+                    <Input {...field} value={field.value || ""} placeholder="Brasil" />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
           </div>
 
-          <div className="grid grid-cols-4 gap-4">
+          <div className="grid grid-cols-5 gap-4">
             <FormField
               control={form.control}
               name="street"
@@ -261,6 +275,20 @@ export function ContactInfoForm({ contact, isUpdating, onSubmit }: ContactInfoFo
                   <FormLabel>Logradouro</FormLabel>
                   <FormControl>
                     <Input {...field} placeholder="Rua, Av., Travessa..." />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+
+            <FormField
+              control={form.control}
+              name="neighborhood"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Bairro</FormLabel>
+                  <FormControl>
+                    <Input {...field} value={field.value || ""} placeholder="Bairro" />
                   </FormControl>
                   <FormMessage />
                 </FormItem>
