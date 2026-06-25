@@ -10,7 +10,7 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from "
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Badge } from "@/components/ui/badge";
 import { Skeleton } from "@/components/ui/skeleton";
-import { Plus, Pencil, Copy, Trash2 } from "lucide-react";
+import { Plus, Pencil, Copy, Trash2, CalendarClock } from "lucide-react";
 import { useEmployees } from "@/hooks/useEmployees";
 import { useCurrentOrganization } from "@/hooks/useCurrentOrganization";
 import {
@@ -21,6 +21,8 @@ import {
   type JourneyConfig,
   type JourneyConfigInsert,
 } from "@/hooks/useJourneyConfig";
+import { useEscalaOverrides, useDeleteEscalaOverride } from "@/hooks/useEscalaOverrides";
+import { EscalaOverrideDialog } from "@/components/time-tracking/EscalaOverrideDialog";
 
 const JOURNEY_TYPES = [
   { value: "44h", label: "CLT 44h semanais" },
@@ -72,7 +74,11 @@ export default function JourneyConfig() {
   const updateMutation = useUpdateJourneyConfig();
   const deleteMutation = useDeleteJourneyConfig();
 
+  const { data: overrides = [] } = useEscalaOverrides();
+  const deleteOverrideMutation = useDeleteEscalaOverride();
+
   const [dialogOpen, setDialogOpen] = useState(false);
+  const [overrideDialogOpen, setOverrideDialogOpen] = useState(false);
   const [editingId, setEditingId] = useState<string | null>(null);
   const [form, setForm] = useState(defaultForm);
   const [step, setStep] = useState(0);
@@ -173,7 +179,12 @@ export default function JourneyConfig() {
           <h1 className="text-2xl font-bold tracking-tight">Parametrização de Jornada</h1>
           <p className="text-muted-foreground">Configure a jornada de trabalho por colaborador</p>
         </div>
-        <Button onClick={openCreate}><Plus className="mr-2 h-4 w-4" />Nova Configuração</Button>
+        <div className="flex gap-2">
+          <Button variant="outline" onClick={() => setOverrideDialogOpen(true)}>
+            <CalendarClock className="mr-2 h-4 w-4" />Override por Dia
+          </Button>
+          <Button onClick={openCreate}><Plus className="mr-2 h-4 w-4" />Nova Configuração</Button>
+        </div>
       </div>
 
       <Card>
@@ -218,6 +229,66 @@ export default function JourneyConfig() {
           )}
         </CardContent>
       </Card>
+
+      {/* Lista de overrides */}
+      <div>
+        <h2 className="text-base font-semibold mb-3">Overrides por Dia</h2>
+        <Card>
+          <CardContent className="p-0">
+            {overrides.length === 0 ? (
+              <div className="p-6 text-center text-sm text-muted-foreground">
+                Nenhum override cadastrado.
+              </div>
+            ) : (
+              <Table>
+                <TableHeader>
+                  <TableRow>
+                    <TableHead>Colaborador</TableHead>
+                    <TableHead>Data</TableHead>
+                    <TableHead>Tipo de Turno</TableHead>
+                    <TableHead>Entrada</TableHead>
+                    <TableHead>Saída</TableHead>
+                    <TableHead>Motivo</TableHead>
+                    <TableHead className="w-12" />
+                  </TableRow>
+                </TableHeader>
+                <TableBody>
+                  {overrides.map((o) => (
+                    <TableRow key={o.id}>
+                      <TableCell className="font-medium">
+                        {o.employees?.full_name || o.employees?.email || "—"}
+                      </TableCell>
+                      <TableCell>
+                        {new Date(o.data + "T12:00:00Z").toLocaleDateString("pt-BR")}
+                      </TableCell>
+                      <TableCell>
+                        {{ normal: "Trabalho Normal", hora_extra: "Hora Extra", folga: "Folga", feriado_trabalhado: "Feriado Trabalhado" }[o.tipo_turno]}
+                      </TableCell>
+                      <TableCell className="font-mono text-sm">{o.entrada || "—"}</TableCell>
+                      <TableCell className="font-mono text-sm">{o.saida || "—"}</TableCell>
+                      <TableCell className="max-w-[200px] truncate text-sm text-muted-foreground">{o.motivo}</TableCell>
+                      <TableCell>
+                        <Button
+                          variant="ghost"
+                          size="icon"
+                          onClick={() => deleteOverrideMutation.mutate(o.id)}
+                        >
+                          <Trash2 className="h-4 w-4 text-destructive" />
+                        </Button>
+                      </TableCell>
+                    </TableRow>
+                  ))}
+                </TableBody>
+              </Table>
+            )}
+          </CardContent>
+        </Card>
+      </div>
+
+      <EscalaOverrideDialog
+        open={overrideDialogOpen}
+        onClose={() => setOverrideDialogOpen(false)}
+      />
 
       <Dialog open={dialogOpen} onOpenChange={setDialogOpen}>
         <DialogContent className="max-w-2xl max-h-[85vh] overflow-y-auto">
