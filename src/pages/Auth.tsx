@@ -226,7 +226,7 @@ const Auth = () => {
 
   return (
     <>
-    <div className="min-h-screen flex flex-col items-center justify-center bg-gradient-to-br from-background via-background to-accent/5 p-4">
+    <div className="min-h-screen flex flex-col items-center justify-start sm:justify-center bg-gradient-to-br from-background via-background to-accent/5 p-4 py-8 overflow-y-auto">
       <Card className="w-full max-w-md border-border/50 shadow-lg">
         <CardHeader className="text-center space-y-4">
           <CardTitle className="text-2xl">
@@ -303,7 +303,7 @@ const Auth = () => {
                 )}
               </div>
 
-              <Button type="submit" className="w-full" disabled={isLoading}>
+              <Button type="submit" className="w-full min-h-[48px]" disabled={isLoading}>
                 {isLoading ? (
                   <>
                     <Loader2 className="mr-2 h-4 w-4 animate-spin" />
@@ -354,7 +354,7 @@ const Auth = () => {
                     )}
                   </div>
 
-                  <Button type="submit" className="w-full" disabled={isLoading}>
+                  <Button type="submit" className="w-full min-h-[48px]" disabled={isLoading}>
                     {isLoading ? (
                       <>
                         <Loader2 className="mr-2 h-4 w-4 animate-spin" />
@@ -441,7 +441,7 @@ const Auth = () => {
                     )}
                   </div>
 
-                  <Button type="submit" className="w-full" disabled={isLoading}>
+                  <Button type="submit" className="w-full min-h-[48px]" disabled={isLoading}>
                     {isLoading ? (
                       <>
                         <Loader2 className="mr-2 h-4 w-4 animate-spin" />
