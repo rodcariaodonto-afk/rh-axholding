@@ -17,6 +17,8 @@ import { Alert, AlertDescription } from "@/components/ui/alert";
 
 const personalSchema = z.object({
   full_name: z.string().min(1, "Nome obrigatório"),
+  social_name: z.string().optional().or(z.literal("")),
+  mothers_name: z.string().optional().or(z.literal("")),
   birth_date: z.date().optional().nullable(),
   gender: z.enum(["male", "female", "non_binary", "prefer_not_to_say"]).optional().nullable(),
   nationality: z.string().optional().nullable(),
@@ -41,6 +43,8 @@ const personalSchema = z.object({
     .or(z.literal("")),
   rg: z.string().optional().or(z.literal("")),
   rg_issuer: z.string().optional().or(z.literal("")),
+  pis_pasep: z.string().optional().or(z.literal("")),
+  sus_card: z.string().optional().or(z.literal("")),
   // Dados Bancários (from employees_legal_docs)
   bank_name: z.string().optional().or(z.literal("")),
   bank_agency: z.string().optional().or(z.literal("")),
@@ -85,9 +89,13 @@ export function PersonalInfoForm({
     defaultValues: {
       employment_type: "full_time",
       status: "active",
+      social_name: "",
+      mothers_name: "",
       cpf: "",
       rg: "",
       rg_issuer: "",
+      pis_pasep: "",
+      sus_card: "",
       bank_name: "",
       bank_agency: "",
       bank_account: "",
@@ -102,6 +110,8 @@ export function PersonalInfoForm({
     if (employee) {
       form.reset({
         full_name: employee.full_name || "",
+        social_name: demographics?.social_name || employee?.social_name || "",
+        mothers_name: demographics?.mothers_name || "",
         // Demographics data (from employees_demographics table or fallback to employees)
         birth_date: parseDateFromDB(demographics?.birth_date || employee.birth_date),
         gender: demographics?.gender || employee.gender || undefined,
@@ -125,6 +135,8 @@ export function PersonalInfoForm({
         cpf: legalDocs?.cpf || "",
         rg: legalDocs?.rg || "",
         rg_issuer: legalDocs?.rg_issuer || "",
+        pis_pasep: legalDocs?.pis_pasep || "",
+        sus_card: legalDocs?.sus_card || "",
         bank_name: legalDocs?.bank_name || "",
         bank_agency: legalDocs?.bank_agency || "",
         bank_account: legalDocs?.bank_account || "",
@@ -219,6 +231,36 @@ export function PersonalInfoForm({
                     <SelectItem value="prefer_not_to_say">Prefiro não dizer</SelectItem>
                   </SelectContent>
                 </Select>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
+        </div>
+
+        <div className="grid grid-cols-2 gap-4">
+          <FormField
+            control={form.control}
+            name="social_name"
+            render={({ field }) => (
+              <FormItem className="flex flex-col">
+                <FormLabel>Nome Social</FormLabel>
+                <FormControl>
+                  <Input {...field} value={field.value || ""} placeholder="Nome social (se houver)" />
+                </FormControl>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
+
+          <FormField
+            control={form.control}
+            name="mothers_name"
+            render={({ field }) => (
+              <FormItem className="flex flex-col">
+                <FormLabel>Nome da Mãe *</FormLabel>
+                <FormControl>
+                  <Input {...field} value={field.value || ""} placeholder="Nome completo da mãe" />
+                </FormControl>
                 <FormMessage />
               </FormItem>
             )}
@@ -633,6 +675,58 @@ export function PersonalInfoForm({
                   <FormLabel>Órgão Emissor</FormLabel>
                   <FormControl>
                     <Input {...field} value={field.value || ""} placeholder="SSP-SP" disabled={legalDocsDisabled} />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+          </div>
+
+          <div className="grid grid-cols-2 gap-4 mt-4">
+            <FormField
+              control={form.control}
+              name="pis_pasep"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>PIS/PASEP</FormLabel>
+                  <FormControl>
+                    <Input
+                      {...field}
+                      value={field.value || ""}
+                      placeholder="000.00000.00-0"
+                      disabled={legalDocsDisabled}
+                      onChange={(e) => {
+                        const digits = e.target.value.replace(/\D/g, "").slice(0, 11);
+                        let formatted = digits;
+                        if (digits.length > 3) formatted = `${digits.slice(0, 3)}.${digits.slice(3)}`;
+                        if (digits.length > 8) formatted = `${digits.slice(0, 3)}.${digits.slice(3, 8)}.${digits.slice(8)}`;
+                        if (digits.length > 10) formatted = `${digits.slice(0, 3)}.${digits.slice(3, 8)}.${digits.slice(8, 10)}-${digits.slice(10)}`;
+                        field.onChange(formatted);
+                      }}
+                    />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+
+            <FormField
+              control={form.control}
+              name="sus_card"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Cartão SUS</FormLabel>
+                  <FormControl>
+                    <Input
+                      {...field}
+                      value={field.value || ""}
+                      placeholder="000 0000 0000 0000"
+                      disabled={legalDocsDisabled}
+                      onChange={(e) => {
+                        const digits = e.target.value.replace(/\D/g, "").slice(0, 15);
+                        field.onChange(digits);
+                      }}
+                    />
                   </FormControl>
                   <FormMessage />
                 </FormItem>
