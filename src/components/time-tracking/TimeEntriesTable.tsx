@@ -3,12 +3,14 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import { Pencil } from "lucide-react";
+import { Pencil, FileText } from "lucide-react";
 import { formatTimeBrasilia, formatDateBrasilia } from "@/lib/timezone";
 import { EditTimeEntryDialog } from "./EditTimeEntryDialog";
+import { EspelhoPontoDialog } from "./EspelhoPontoDialog";
 
 interface TimeEntry {
   id: string;
+  employee_id?: string;
   clock_in: string;
   clock_out: string | null;
   lunch_out?: string | null;
@@ -43,6 +45,7 @@ function getStatus(entry: TimeEntry) {
 
 export function TimeEntriesTable({ entries, showEmployee = true }: TimeEntriesTableProps) {
   const [editingEntry, setEditingEntry] = useState<TimeEntry | null>(null);
+  const [espelhoEmployee, setEspelhoEmployee] = useState<{ id: string; name: string } | null>(null);
 
   return (
     <>
@@ -58,7 +61,7 @@ export function TimeEntriesTable({ entries, showEmployee = true }: TimeEntriesTa
               <TableHead>Saída</TableHead>
               <TableHead>Total</TableHead>
               <TableHead>Status</TableHead>
-              <TableHead className="w-16">Ações</TableHead>
+              <TableHead className="w-24">Ações</TableHead>
             </TableRow>
           </TableHeader>
           <TableBody>
@@ -116,14 +119,32 @@ export function TimeEntriesTable({ entries, showEmployee = true }: TimeEntriesTa
                       )}
                     </TableCell>
                     <TableCell>
-                      <Button
-                        variant="ghost"
-                        size="icon"
-                        className="size-7"
-                        onClick={() => setEditingEntry(entry)}
-                      >
-                        <Pencil className="size-3.5" />
-                      </Button>
+                      <div className="flex items-center gap-1">
+                        {showEmployee && entry.employee_id && (
+                          <Button
+                            variant="ghost"
+                            size="icon"
+                            className="size-7"
+                            title="Ver Espelho de Ponto"
+                            onClick={() =>
+                              setEspelhoEmployee({
+                                id: entry.employee_id!,
+                                name: entry.employees?.full_name || entry.employees?.email || "Funcionário",
+                              })
+                            }
+                          >
+                            <FileText className="size-3.5" />
+                          </Button>
+                        )}
+                        <Button
+                          variant="ghost"
+                          size="icon"
+                          className="size-7"
+                          onClick={() => setEditingEntry(entry)}
+                        >
+                          <Pencil className="size-3.5" />
+                        </Button>
+                      </div>
                     </TableCell>
                   </TableRow>
                 );
@@ -137,6 +158,15 @@ export function TimeEntriesTable({ entries, showEmployee = true }: TimeEntriesTa
         entry={editingEntry}
         onClose={() => setEditingEntry(null)}
       />
+
+      {espelhoEmployee && (
+        <EspelhoPontoDialog
+          open={!!espelhoEmployee}
+          onClose={() => setEspelhoEmployee(null)}
+          employeeId={espelhoEmployee.id}
+          employeeName={espelhoEmployee.name}
+        />
+      )}
     </>
   );
 }
