@@ -132,6 +132,7 @@ const HoleriteDetail = lazy(() => import("./pages/HoleriteDetail"));
 const Justificativas = lazy(() => import("./pages/Justificativas"));
 const Feriados = lazy(() => import("./pages/Feriados"));
 const Comunicados = lazy(() => import("./pages/Comunicados"));
+const DocumentosCentral = lazy(() => import("./pages/DocumentosCentral"));
 
 const queryClient = new QueryClient({
   defaultOptions: {
@@ -353,6 +354,7 @@ const App = () => (
             <Route path="/justificativas" element={<PeopleRoute><Justificativas /></PeopleRoute>} />
             <Route path="/feriados" element={<PeopleRoute><Feriados /></PeopleRoute>} />
             <Route path="/comunicados" element={<PeopleRoute><Comunicados /></PeopleRoute>} />
+            <Route path="/documentos-central" element={<PeopleRoute><DocumentosCentral /></PeopleRoute>} />
           </Route>
 
           {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}

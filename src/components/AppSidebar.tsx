@@ -75,6 +75,7 @@ import {
   Inbox,
   HardDrive,
   Megaphone,
+  FolderOpen,
 } from "lucide-react";
 
 interface MenuItem {
@@ -172,6 +173,7 @@ const menuGroups: MenuGroup[] = [
       { icon: FileText, label: "Recibos (EPI, Vale, Uniforme)", href: "/receipts" },
       { icon: DollarSign, label: "Custos", href: "/company-costs" },
       { icon: FileStack, label: "Central de Exportações", href: "/exports" },
+      { icon: FolderOpen, label: "Central de Documentos", href: "/documentos-central" },
     ],
   },
   {
