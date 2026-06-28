@@ -1,16 +1,17 @@
 import { useMemo, useState } from "react";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Card, CardContent } from "@/components/ui/card";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Download } from "lucide-react";
-import { format, eachDayOfInterval, startOfMonth, endOfMonth, getDay, isWeekend } from "date-fns";
-import { ptBR } from "date-fns/locale";
+import { format, eachDayOfInterval, startOfMonth, endOfMonth, getDay } from "date-fns";
 import { useEmployees } from "@/hooks/useEmployees";
 import { useTimeEntries } from "@/hooks/useTimeEntries";
 import { useJourneyConfigByEmployee } from "@/hooks/useJourneyConfig";
+import { useFeriados, type Feriado } from "@/hooks/useFeriados";
+import { formatTimeBrasilia } from "@/lib/timezone";
 
 const MONTHS = ["Janeiro","Fevereiro","Março","Abril","Maio","Junho","Julho","Agosto","Setembro","Outubro","Novembro","Dezembro"];
 const WEEKDAY_MAP: Record<number, string> = { 0: "dom", 1: "seg", 2: "ter", 3: "qua", 4: "qui", 5: "sex", 6: "sab" };
@@ -24,7 +25,13 @@ function minutesToHm(mins: number) {
 
 function tsToTime(ts: string | null) {
   if (!ts) return "—";
-  return format(new Date(ts), "HH:mm");
+  return formatTimeBrasilia(ts);
+}
+
+function isFeriadoDate(dateStr: string, feriados: Feriado[]): boolean {
+  return feriados.some((f) =>
+    f.recorrente ? f.data.slice(5) === dateStr.slice(5) : f.data === dateStr
+  );
 }
 
 export function BancoHorasEspelho() {
@@ -37,6 +44,7 @@ export function BancoHorasEspelho() {
 
   const startDate = format(startOfMonth(new Date(year, month)), "yyyy-MM-dd");
   const endDate = format(endOfMonth(new Date(year, month)), "yyyy-MM-dd");
+  const today = format(new Date(), "yyyy-MM-dd");
 
   const { data: entries = [], isLoading: loadingEntries } = useTimeEntries({
     employeeId: employeeId || undefined,
@@ -45,31 +53,54 @@ export function BancoHorasEspelho() {
   });
 
   const { data: journeyConfig } = useJourneyConfigByEmployee(employeeId || undefined);
+  const { data: feriados = [] } = useFeriados();
 
   const days = useMemo(() => {
     if (!employeeId) return [];
     const interval = eachDayOfInterval({ start: startOfMonth(new Date(year, month)), end: endOfMonth(new Date(year, month)) });
     const workDays = journeyConfig?.dias_trabalho || ["seg", "ter", "qua", "qui", "sex"];
-    const expectedMinutes = (journeyConfig?.horas_dia || 8) * 60;
-    const tolerance = journeyConfig?.tolerancia_atraso || 10;
+    const expectedMinutesPerDay = (journeyConfig?.horas_dia || 8) * 60;
+    const toleranciaAtraso = journeyConfig?.tolerancia_atraso ?? 10;
+    const toleranciaSaida = journeyConfig?.tolerancia_saida_antecipada ?? 10;
 
     return interval.map((date) => {
       const dateStr = format(date, "yyyy-MM-dd");
       const dayOfWeek = WEEKDAY_MAP[getDay(date)];
       const isWorkDay = workDays.includes(dayOfWeek);
+      const isFeriado = isFeriadoDate(dateStr, feriados);
+      const isPast = dateStr <= today;
       const dayEntries = entries.filter((e: any) => e.date === dateStr);
       const entry = dayEntries[0] as any;
 
       const workedMinutes = entry?.total_minutes || 0;
-      const expected = isWorkDay ? expectedMinutes : 0;
+
+      // Expected only for past work days that are not feriados
+      const expected = isWorkDay && !isFeriado && isPast ? expectedMinutesPerDay : 0;
       const diff = workedMinutes - expected;
-      const extras = diff > tolerance ? diff : diff > 0 ? 0 : diff;
+
+      // Extras: only positive minutes above tolerance count; never negative
+      const extras = diff > toleranciaAtraso ? diff : 0;
+
+      // Effective diff for saldo: apply both tolerances symmetrically
+      const effectiveDiff =
+        diff > toleranciaAtraso ? diff
+        : diff < -toleranciaSaida ? diff
+        : 0;
+
+      const tipo =
+        isFeriado && workedMinutes > 0 ? "presenca"
+        : isFeriado ? "feriado"
+        : !isWorkDay && workedMinutes === 0 ? "folga"
+        : isWorkDay && workedMinutes === 0 && isPast ? "falta"
+        : isWorkDay && workedMinutes === 0 ? "folga" // future unrecorded work day
+        : "presenca";
 
       return {
         date: dateStr,
         dayOfWeek,
         dayLabel: WEEKDAY_LABELS[dayOfWeek],
         isWorkDay,
+        isFeriado,
         entrada: entry?.clock_in,
         lunchOut: entry?.lunch_out,
         lunchReturn: entry?.lunch_return,
@@ -77,11 +108,12 @@ export function BancoHorasEspelho() {
         expected,
         worked: workedMinutes,
         diff,
+        effectiveDiff,
         extras,
-        tipo: !isWorkDay && workedMinutes === 0 ? "folga" : workedMinutes === 0 && isWorkDay ? "falta" : "presenca",
+        tipo,
       };
     });
-  }, [employeeId, entries, journeyConfig, month, year]);
+  }, [employeeId, entries, journeyConfig, feriados, today, month, year]);
 
   const totals = useMemo(() => {
     const presentes = days.filter((d) => d.tipo === "presenca").length;
@@ -89,14 +121,27 @@ export function BancoHorasEspelho() {
     const totalWorked = days.reduce((s, d) => s + d.worked, 0);
     const totalExpected = days.reduce((s, d) => s + d.expected, 0);
     const totalExtras = days.reduce((s, d) => s + (d.extras > 0 ? d.extras : 0), 0);
-    const saldo = totalWorked - totalExpected;
+    const saldo = days.reduce((s, d) => s + d.effectiveDiff, 0);
     return { presentes, faltas, totalWorked, totalExpected, totalExtras, saldo };
   }, [days]);
 
   const exportCSV = () => {
     const header = "Data;Dia;Escala;Entrada;Saída Almoço;Retorno Almoço;Saída;Esperado;Trabalhado;Diferença;Extras;Tipo\n";
     const rows = days.map((d) =>
-      `${d.date};${d.dayLabel};${d.isWorkDay ? "Sim" : "Não"};${tsToTime(d.entrada)};${tsToTime(d.lunchOut)};${tsToTime(d.lunchReturn)};${tsToTime(d.saida)};${minutesToHm(d.expected)};${minutesToHm(d.worked)};${minutesToHm(d.diff)};${minutesToHm(d.extras)};${d.tipo}`
+      [
+        d.date,
+        d.dayLabel,
+        d.isFeriado ? "Feriado" : d.isWorkDay ? "Sim" : "Não",
+        tsToTime(d.entrada),
+        tsToTime(d.lunchOut),
+        tsToTime(d.lunchReturn),
+        tsToTime(d.saida),
+        minutesToHm(d.expected),
+        minutesToHm(d.worked),
+        minutesToHm(d.diff),
+        minutesToHm(d.extras), // always ≥ 0
+        d.tipo,
+      ].join(";")
     ).join("\n");
     const blob = new Blob([header + rows], { type: "text/csv;charset=utf-8" });
     const url = URL.createObjectURL(blob);
@@ -140,7 +185,9 @@ export function BancoHorasEspelho() {
           </Select>
         </div>
         {employeeId && (
-          <Button variant="outline" size="sm" onClick={exportCSV}><Download className="mr-2 h-4 w-4" />Exportar CSV</Button>
+          <Button variant="outline" size="sm" onClick={exportCSV}>
+            <Download className="mr-2 h-4 w-4" />Exportar CSV
+          </Button>
         )}
       </div>
 
@@ -154,7 +201,8 @@ export function BancoHorasEspelho() {
             <div className="flex gap-4 text-xs text-muted-foreground">
               <span>Jornada: <strong>{journeyConfig.tipo_jornada}</strong></span>
               <span>Horas/dia: <strong>{Number(journeyConfig.horas_dia)}h</strong></span>
-              <span>Tolerância: <strong>{journeyConfig.tolerancia_atraso}min</strong></span>
+              <span>Tolerância entrada: <strong>{journeyConfig.tolerancia_atraso}min</strong></span>
+              <span>Tolerância saída: <strong>{journeyConfig.tolerancia_saida_antecipada}min</strong></span>
             </div>
           )}
           <Card>
@@ -178,10 +226,20 @@ export function BancoHorasEspelho() {
                   </TableHeader>
                   <TableBody>
                     {days.map((d) => (
-                      <TableRow key={d.date} className={d.tipo === "falta" ? "bg-destructive/5" : d.tipo === "folga" ? "bg-muted/30" : ""}>
+                      <TableRow
+                        key={d.date}
+                        className={
+                          d.tipo === "falta" ? "bg-destructive/5"
+                          : d.tipo === "feriado" ? "bg-blue-50/40 dark:bg-blue-950/20"
+                          : d.tipo === "folga" ? "bg-muted/30"
+                          : ""
+                        }
+                      >
                         <TableCell className="font-mono text-xs">{d.date}</TableCell>
                         <TableCell>{d.dayLabel}</TableCell>
-                        <TableCell>{d.isWorkDay ? "Sim" : "—"}</TableCell>
+                        <TableCell>
+                          {d.isFeriado ? "Feriado" : d.isWorkDay ? "Sim" : "—"}
+                        </TableCell>
                         <TableCell>{tsToTime(d.entrada)}</TableCell>
                         <TableCell>{tsToTime(d.lunchOut)}</TableCell>
                         <TableCell>{tsToTime(d.lunchReturn)}</TableCell>
@@ -192,9 +250,15 @@ export function BancoHorasEspelho() {
                           {minutesToHm(d.diff)}
                         </TableCell>
                         <TableCell>
-                          <Badge variant={d.tipo === "falta" ? "destructive" : d.tipo === "folga" ? "secondary" : "default"} className="text-xs">
-                            {d.tipo === "presenca" ? "Presença" : d.tipo === "falta" ? "Falta" : "Folga"}
-                          </Badge>
+                          {d.tipo === "feriado" ? (
+                            <Badge variant="outline" className="text-xs bg-blue-500/10 text-blue-600 border-blue-200">Feriado</Badge>
+                          ) : d.tipo === "falta" ? (
+                            <Badge variant="destructive" className="text-xs">Falta</Badge>
+                          ) : d.tipo === "folga" ? (
+                            <Badge variant="secondary" className="text-xs">Folga</Badge>
+                          ) : (
+                            <Badge variant="default" className="text-xs">Presença</Badge>
+                          )}
                         </TableCell>
                       </TableRow>
                     ))}

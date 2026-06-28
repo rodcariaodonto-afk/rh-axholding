@@ -8,6 +8,7 @@ import { format, startOfMonth, endOfMonth, eachDayOfInterval, getDay } from "dat
 import { useEmployees } from "@/hooks/useEmployees";
 import { useTimeEntries } from "@/hooks/useTimeEntries";
 import { useJourneyConfigByEmployee } from "@/hooks/useJourneyConfig";
+import { useFeriados, type Feriado } from "@/hooks/useFeriados";
 
 const MONTHS = ["Janeiro","Fevereiro","Março","Abril","Maio","Junho","Julho","Agosto","Setembro","Outubro","Novembro","Dezembro"];
 const WEEKDAY_MAP: Record<number, string> = { 0: "dom", 1: "seg", 2: "ter", 3: "qua", 4: "qui", 5: "sex", 6: "sab" };
@@ -16,6 +17,12 @@ function minutesToHm(mins: number) {
   const sign = mins < 0 ? "-" : "";
   const abs = Math.abs(mins);
   return `${sign}${Math.floor(abs / 60)}h${String(abs % 60).padStart(2, "0")}`;
+}
+
+function isFeriadoDate(dateStr: string, feriados: Feriado[]): boolean {
+  return feriados.some((f) =>
+    f.recorrente ? f.data.slice(5) === dateStr.slice(5) : f.data === dateStr
+  );
 }
 
 export function BancoHorasResumoMensal() {
@@ -36,14 +43,23 @@ export function BancoHorasResumoMensal() {
   });
 
   const { data: journeyConfig } = useJourneyConfigByEmployee(employeeId || undefined);
+  const { data: feriados = [] } = useFeriados();
 
   const summary = useMemo(() => {
     if (!employeeId || !journeyConfig) return null;
+
+    const today = format(new Date(), "yyyy-MM-dd");
     const interval = eachDayOfInterval({ start: startOfMonth(new Date(year, month)), end: endOfMonth(new Date(year, month)) });
     const workDays = journeyConfig.dias_trabalho || ["seg", "ter", "qua", "qui", "sex"];
     const expectedMinutesPerDay = (journeyConfig.horas_dia || 8) * 60;
+    const toleranciaAtraso = journeyConfig.tolerancia_atraso ?? 10;
 
-    const businessDays = interval.filter((d) => workDays.includes(WEEKDAY_MAP[getDay(d)])).length;
+    // Total business days in the month (excluding feriados) — for planning reference
+    const businessDays = interval.filter((d) => {
+      const dateStr = format(d, "yyyy-MM-dd");
+      return workDays.includes(WEEKDAY_MAP[getDay(d)]) && !isFeriadoDate(dateStr, feriados);
+    }).length;
+
     let workedDays = 0;
     let absences = 0;
     let totalWorked = 0;
@@ -52,22 +68,27 @@ export function BancoHorasResumoMensal() {
 
     interval.forEach((date) => {
       const dateStr = format(date, "yyyy-MM-dd");
+      // Skip future days — they have no entries and shouldn't count as absences or inflate expected
+      if (dateStr > today) return;
+
       const dayOfWeek = WEEKDAY_MAP[getDay(date)];
       const isWorkDay = workDays.includes(dayOfWeek);
+      const isFeriado = isFeriadoDate(dateStr, feriados);
       const dayEntries = entries.filter((e: any) => e.date === dateStr);
       const worked = dayEntries.reduce((s: number, e: any) => s + (e.total_minutes || 0), 0);
 
-      if (isWorkDay) {
+      if (isWorkDay && !isFeriado) {
         totalExpected += expectedMinutesPerDay;
         if (worked > 0) {
           workedDays++;
           totalWorked += worked;
           const diff = worked - expectedMinutesPerDay;
-          if (diff > (journeyConfig.tolerancia_atraso || 10)) totalExtras += diff;
+          if (diff > toleranciaAtraso) totalExtras += diff;
         } else {
           absences++;
         }
       } else if (worked > 0) {
+        // Worked on weekend or feriado — counts as worked time and extras
         totalWorked += worked;
         totalExtras += worked;
       }
@@ -76,7 +97,7 @@ export function BancoHorasResumoMensal() {
     const saldo = totalWorked - totalExpected;
 
     return { businessDays, workedDays, absences, totalWorked, totalExpected, totalExtras, saldo };
-  }, [employeeId, entries, journeyConfig, month, year]);
+  }, [employeeId, entries, journeyConfig, feriados, month, year]);
 
   return (
     <div className="space-y-4">
@@ -118,7 +139,7 @@ export function BancoHorasResumoMensal() {
             <CardContent className="p-4 flex items-center gap-3">
               <CalendarDays className="h-8 w-8 text-primary" />
               <div>
-                <p className="text-xs text-muted-foreground">Dias úteis</p>
+                <p className="text-xs text-muted-foreground">Dias úteis (mês)</p>
                 <p className="text-xl font-bold">{summary.businessDays}</p>
               </div>
             </CardContent>
