@@ -274,9 +274,23 @@ function ImportAfdDialog({ device, onClose }: { device: TimeClockDevice; onClose
       if (!res.ok) throw new Error(json.error ?? "Falha na importação");
       toast({
         title: "Importação concluída",
-        description: `Recebidos: ${json.events_received} · Aceitos: ${json.events_accepted} · Duplicados: ${json.events_duplicated} · Rejeitados: ${json.events_rejected}`,
+        description: `Recebidos: ${json.received} · Aceitos: ${json.accepted} · Duplicados: ${json.duplicated} · Rejeitados: ${json.rejected}`,
       });
       refetch();
+
+      // Processar eventos pendentes → time_entries
+      const { error: procError } = await supabase.functions.invoke("time-clock-process", {
+        body: { organization_id: organization.id },
+      });
+      if (procError) {
+        console.warn("[time-clock-process]", procError.message);
+        toast({
+          title: "Aviso de processamento",
+          description: "Arquivo importado, mas a conversão para registros de ponto falhou. Os eventos permanecerão pendentes.",
+          variant: "destructive",
+        });
+      }
+
       if (fileRef.current) fileRef.current.value = "";
     } catch (e) {
       toast({ title: "Erro", description: (e as Error).message, variant: "destructive" });
