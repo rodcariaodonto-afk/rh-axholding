@@ -36,6 +36,13 @@ export function useUpdateTimeEntry() {
 
   return useMutation({
     mutationFn: async (params: UpdateTimeEntryParams) => {
+      // Capturar valores atuais antes do UPDATE para o log de auditoria
+      const { data: previous } = await supabase
+        .from("time_entries")
+        .select("clock_in, lunch_out, lunch_return, clock_out, total_minutes")
+        .eq("id", params.id)
+        .single();
+
       const clock_in = timeToISO(params.date, params.clock_in)!;
       const lunch_out = timeToISO(params.date, params.lunch_out);
       const lunch_return = timeToISO(params.date, params.lunch_return);
@@ -51,8 +58,28 @@ export function useUpdateTimeEntry() {
 
       if (error) throw error;
 
-      // TODO: salvar log de auditoria na tabela time_entry_edits quando ela for criada.
-      // Campos esperados: entry_id, edited_by (user id), motivo, previous_values (JSON), new_values (JSON), edited_at.
+      // Log de auditoria — falha não reverte a edição principal
+      try {
+        const { data: { user } } = await supabase.auth.getUser();
+        const { error: auditError } = await (supabase as any)
+          .from("time_entry_edits")
+          .insert({
+            entry_id: params.id,
+            edited_by: user?.id ?? null,
+            motivo: params.motivo,
+            valores_anteriores: previous ?? {},
+            valores_novos: { clock_in, lunch_out, lunch_return, clock_out, total_minutes },
+          });
+
+        if (auditError) {
+          console.warn("[time_entry_edits] Falha ao salvar log de auditoria:", auditError.message);
+          toast.warning("Edição salva, mas o log de auditoria não pôde ser registrado.", {
+            description: auditError.message,
+          });
+        }
+      } catch (auditEx) {
+        console.warn("[time_entry_edits] Exceção ao salvar log de auditoria:", auditEx);
+      }
 
       return data;
     },
