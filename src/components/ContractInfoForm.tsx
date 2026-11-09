@@ -14,9 +14,10 @@ import { ptBR } from "date-fns/locale";
 import { cn } from "@/lib/utils";
 import { useEffect } from "react";
 import { parseDateFromDB } from "@/lib/dateUtils";
+import { Constants } from "@/integrations/supabase/types";
 
 const contractSchema = z.object({
-  contract_type: z.enum(["clt", "pj", "internship", "temporary", "autonomous", "other"]),
+  contract_type: z.enum(Constants.public.Enums.contract_type),
   hire_date: z.date(),
   probation_days: z.number().optional(),
   contract_start_date: z.date().nullish(),
@@ -136,7 +137,6 @@ export function ContractInfoForm({ contracts, isCreating, isUpdating, onSubmit }
                     <SelectItem value="pj">PJ</SelectItem>
                     <SelectItem value="internship">Estágio</SelectItem>
                     <SelectItem value="temporary">Temporário</SelectItem>
-                    <SelectItem value="autonomous">Autônomo</SelectItem>
                     <SelectItem value="other">Outro</SelectItem>
                   </SelectContent>
                 </Select>
